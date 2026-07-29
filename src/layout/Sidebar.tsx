@@ -1,4 +1,6 @@
 'use client'
+import { GoPerson } from 'react-icons/go'
+import { SlBasket } from 'react-icons/sl'
 import styled from 'styled-components'
 
 import { useAppSelector } from '@/redux/hooks'
@@ -13,7 +15,13 @@ const Sidebar = () => {
       <aside className={`sidebar ${isOpen ? 'sidebar--show' : ''}`}>
         <div className="sidebar__overlay" />
         <div className="sidebar__content">
-          <NavbarLinks parentClass="sidebar__links" />
+          <div className="sidebar__nav">
+            <div className="sidebar__icons">
+              <GoPerson className="sidebar__basket" />
+              <SlBasket className="sidebar__basket" />
+            </div>
+            <NavbarLinks parentClass="sidebar__links" />
+          </div>
           <SocialLinks />
         </div>
       </aside>
@@ -53,11 +61,9 @@ const Container = styled.div`
     0% {
       background-position: 0% 50%;
     }
-
     50% {
       background-position: 100% 50%;
     }
-
     100% {
       background-position: 0% 50%;
     }
@@ -85,6 +91,19 @@ const Container = styled.div`
     place-items: center;
   }
 
+  .sidebar__nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .sidebar__icons {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
   .sidebar__links {
     text-align: center;
     opacity: 0;
@@ -97,6 +116,16 @@ const Container = styled.div`
   .sidebar--show .sidebar__links {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  .sidebar__basket {
+    font-size: 2.5rem;
+    color: var(--clr-primary-4);
+    cursor: pointer;
+    transition:
+      color 0.3s ease,
+      transform 0.25s ease,
+      filter 0.25s ease;
   }
 
   @media ${device.mobile} {

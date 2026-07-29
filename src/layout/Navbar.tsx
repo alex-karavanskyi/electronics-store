@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { GoPerson } from 'react-icons/go'
+import { SlBasket } from 'react-icons/sl'
 import styled from 'styled-components'
 
 import pngwing_grey from '@/images/pngwing_grey.png'
@@ -60,7 +62,25 @@ const Navbar = () => {
           >
             <HamburgerIcon />
           </button>
-          <NavbarLinks parentClass={linksClassName} />
+          <div className="navbar__right">
+            <NavbarLinks parentClass={linksClassName} />
+            <GoPerson
+              size={35}
+              className={
+                navbar
+                  ? 'navbar__basket navbar__basket--dark'
+                  : 'navbar__basket'
+              }
+            />
+            <SlBasket
+              size={35}
+              className={
+                navbar
+                  ? 'navbar__basket navbar__basket--dark'
+                  : 'navbar__basket'
+              }
+            />
+          </div>
         </div>
       </Container>
       {navbar && <div style={{ height: '5rem' }} />}
@@ -158,9 +178,63 @@ const Container = styled.nav`
       transform 0.3s ease;
   }
 
+  .navbar__basket {
+    font-size: 1.7rem;
+    color: var(--clr-primary-4);
+    cursor: pointer;
+    transition:
+      color 0.3s ease,
+      transform 0.25s ease,
+      filter 0.25s ease;
+  }
+
+  .navbar__basket--dark {
+    color: black;
+  }
+
+  .navbar__basket:hover {
+    animation: basketShake 0.35s ease;
+  }
+
+  .navbar__basket {
+    display: none;
+  }
+
+  @keyframes basketShake {
+    0% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(-10deg);
+    }
+    50% {
+      transform: rotate(8deg);
+    }
+    75% {
+      transform: rotate(-4deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+
+  .navbar__basket:active {
+    transform: scale(0.95);
+  }
+
+  .navbar__right {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
   @media ${device.mobile} {
     .navbar__btn {
       display: none;
+    }
+
+    .navbar__basket {
+      display: block;
     }
 
     .navbar__links {

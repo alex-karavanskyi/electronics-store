@@ -10,8 +10,13 @@ import { device } from '@/shared/constants/device'
 import { useDragAndDropFavorites } from '@/shared/hooks/useFavorites'
 import { Product } from '@/shared/types/productsType'
 import Breadcrumbs from '@/shared/ui/Breadcrumbs'
+import CartButton from '@/shared/ui/CartButton'
 import ProductInfo from '@/shared/ui/ProductInfo'
-import { containerStyles } from '@/shared/ui/styles/containerStyles'
+import {
+  containerCart,
+  containerStyles,
+} from '@/shared/ui/styles/containerStyles'
+import { formatPrice } from '@/shared/utils/formatPrice'
 
 const Favorites = () => {
   const { favorites_products } = useAppSelector(store => store.favorite)
@@ -64,9 +69,17 @@ const Favorites = () => {
                       product={product}
                       variant="compact"
                       showHeader={true}
-                      showPrice={true}
+                      showPrice={false}
                       showFavorite={false}
                     />
+
+                    <div className="favorites__price-cart">
+                      <p className="product__info-price">
+                        {formatPrice(product.price)}
+                      </p>
+                      <CartButton />
+                    </div>
+
                     <button
                       onClick={() => handleRemoveFromWishlist(product.id)}
                       className="favorites__btn-delete"
@@ -144,6 +157,15 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .favorites__price-cart {
+    ${containerCart}
+  }
+
+  .product__info-price {
+    color: var(--clr-primary-4);
+    margin: 0;
   }
 
   .favorites__btn-delete {

@@ -27,6 +27,12 @@ export const containerStyles = css`
   max-width: 1280px;
 `
 
+export const containerCart = css`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`
+
 export const skeletonBaseStyles = css`
   border-radius: 4px;
   background: var(--clr-grey-4);

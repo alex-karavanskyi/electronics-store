@@ -4,14 +4,17 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { HiOutlineShoppingCart } from 'react-icons/hi2'
 import styled from 'styled-components'
 
 import { device } from '@/shared/constants/device'
 import { Product } from '@/shared/types/productsType'
+import CartButton from '@/shared/ui/CartButton'
 import ProductInfo from '@/shared/ui/ProductInfo'
 import ListViewSkeleton from '@/shared/ui/skeletons/ListViewSkeleton'
-import { containerStyles } from '@/shared/ui/styles/containerStyles'
+import {
+  containerCart,
+  containerStyles,
+} from '@/shared/ui/styles/containerStyles'
 
 interface ListProductsProps {
   products: Product[]
@@ -51,7 +54,7 @@ const ListView = ({ products, isLoading }: ListProductsProps) => {
                     showHeader={true}
                     showPrice={false}
                   />
-                  <div className="list__view-price">
+                  <div className="list__view-price-cart">
                     <ProductInfo
                       product={product}
                       variant="compact"
@@ -59,13 +62,7 @@ const ListView = ({ products, isLoading }: ListProductsProps) => {
                       showPrice
                     />
 
-                    <button
-                      type="button"
-                      className="list__view-cart-button"
-                      aria-label={`Add ${product.name} to cart`}
-                    >
-                      <HiOutlineShoppingCart />
-                    </button>
+                    <CartButton />
                   </div>
 
                   <p className="list__view-products-description">
@@ -213,46 +210,14 @@ const Container = styled.section`
     transform: translateY(0);
   }
 
+  .list__view-price-cart {
+    ${containerCart}
+  }
+
   .product__info-favorite-icon {
-    width: 18px;
-    height: 18px;
-    color: var(--clr-primary-4);
+    width: 1.2rem;
+    height: 1.2rem;
     cursor: pointer;
-  }
-
-  .product__info-price {
-    font-weight: 500;
-  }
-
-  .list__view-price {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .list__view-cart-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-  }
-
-  .list__view-cart-button svg {
-    width: 1.3rem;
-    height: 1.3rem;
-    color: var(--clr-primary-5);
-    transition:
-      color 0.2s ease,
-      transform 0.2s ease;
-  }
-
-  .list__view-cart-button:hover svg {
-    color: var(--clr-primary-4);
-    transform: scale(1.15);
   }
 
   @media ${device.mobile} {
