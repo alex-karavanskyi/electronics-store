@@ -35,7 +35,7 @@ export const containerCart = css`
 
 export const skeletonBaseStyles = css`
   border-radius: 4px;
-  background: var(--clr-grey-4);
+  background: var(--clr-grey-3);
   animation: ${pulseAnimation} 1.5s infinite ease-in-out;
 `
 

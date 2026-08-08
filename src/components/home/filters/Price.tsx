@@ -28,8 +28,8 @@ const Price: React.FC<PriceProps> = ({
     to right,
     var(--clr-primary-5) 0%,
     var(--clr-primary-5) ${progress}%,
-    var(--clr-grey-11) ${progress}%,
-    var(--clr-grey-11) 100%
+    var(--clr-grey-7) ${progress}%,
+    var(--clr-grey-7) 100%
   )`,
   }
 
@@ -57,7 +57,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  color: var(--clr-primary-4);
+  color: var(--ink-soft);
 
   .price__header {
     display: flex;
@@ -67,13 +67,13 @@ const Container = styled.div`
 
   h5 {
     font-size: 0.95rem;
-    color: var(--clr-primary-3);
+    color: var(--navy);
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
 
   p {
-    color: var(--clr-primary-3);
+    color: var(--navy);
     font-weight: 600;
   }
 

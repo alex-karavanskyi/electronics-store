@@ -24,28 +24,29 @@ const Breadcrumbs = ({ name }: BreadcrumbsProps) => {
 const Container = styled.div`
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
-  color: #ccc;
+  color: var(--ink-soft);
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  gap: 0.5rem;
 
   .breadcrumbs__link {
-    color: #acb4be;
+    color: var(--ink-soft);
     cursor: pointer;
     transition: color 0.3s ease;
   }
 
   .breadcrumbs__link:hover {
-    color: white;
+    color: var(--copper-dark);
   }
 
   .breadcrumbs__separator {
-    margin: 0 0.5rem;
-    color: #aaa;
+    color: var(--copper);
   }
 
   .breadcrumbs__current {
-    color: #fff;
+    color: var(--ink);
+    font-weight: 500;
     text-transform: capitalize;
   }
 

@@ -58,61 +58,111 @@ const ProductList = () => {
   }
 
   return (
-    <CatalogShell>
-      <FilterPanel>
-        <PanelHeading>Refine your search</PanelHeading>
-        <Category
-          selectedCategories={category}
-          handleFilters={handleFilters}
-          loading={loading}
-        />
-        <Filters
-          category={category}
-          price={price}
-          min_price={min_price}
-          max_price={max_price}
-          handleFilters={handleFilters}
-          handleClearButton={handleClearButton}
-        />
-      </FilterPanel>
+    <CatalogSection id="collection">
+      <CollectionHeader>
+        <div>
+          <span>THE VOLT EDIT</span>
+          <h2>Find the tech that fits.</h2>
+        </div>
+        <p>
+          From everyday essentials to powerful devices for work and play —
+          compare the details and choose technology that works for you.
+        </p>
+      </CollectionHeader>
+      <CatalogShell>
+        <FilterPanel>
+          <PanelHeading>Refine your search</PanelHeading>
+          <Category
+            selectedCategories={category}
+            handleFilters={handleFilters}
+            loading={loading}
+          />
+          <Filters
+            category={category}
+            price={price}
+            min_price={min_price}
+            max_price={max_price}
+            handleFilters={handleFilters}
+            handleClearButton={handleClearButton}
+          />
+        </FilterPanel>
 
-      <ProductsPanel>
-        <Sort handleFilters={handleFilters} />
-        {!loading && !error && products.length < 1 ? (
-          <Message data-cy="no-results">
-            Sorry, no products matched your search...
-          </Message>
-        ) : !grid_view ? (
-          <ListView products={products} isLoading={loading} />
-        ) : (
-          <>
-            <GridView products={currentPosts} isLoading={loading} />
-            <Pagination
-              postsPerPage={postsPerPage}
-              totalPosts={products.length}
-            />
-          </>
-        )}
-      </ProductsPanel>
-    </CatalogShell>
+        <ProductsPanel>
+          <Sort handleFilters={handleFilters} />
+          {!loading && !error && products.length < 1 ? (
+            <Message data-cy="no-results">
+              Sorry, no products matched your search...
+            </Message>
+          ) : !grid_view ? (
+            <ListView products={products} isLoading={loading} />
+          ) : (
+            <>
+              <GridView products={currentPosts} isLoading={loading} />
+              <Pagination
+                postsPerPage={postsPerPage}
+                totalPosts={products.length}
+              />
+            </>
+          )}
+        </ProductsPanel>
+      </CatalogShell>
+    </CatalogSection>
   )
 }
+
+const CatalogSection = styled.section`
+  padding: 1rem 0 4rem;
+  scroll-margin-top: var(--navbar-height);
+`
+
+const CollectionHeader = styled.header`
+  ${containerStyles}
+  display: grid;
+  gap: 1.5rem;
+  padding: 4rem 1rem 2rem;
+  border-bottom: 1px solid var(--line);
+
+  span {
+    display: block;
+    margin-bottom: 0.75rem;
+    color: var(--copper-dark);
+    font-family: var(--font-utility);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+  }
+
+  h2 {
+    max-width: 11ch;
+    font-size: clamp(2.7rem, 6vw, 5rem);
+  }
+  p {
+    max-width: 37rem;
+    line-height: 1.8;
+  }
+
+  @media ${device.tablet} {
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items: end;
+    padding: 5.5rem 1.5rem 3rem;
+  }
+`
 
 const CatalogShell = styled.section`
   ${containerStyles}
   display: grid;
   gap: 1.5rem;
-  padding: 1rem 1rem 2rem;
+  padding: 2rem 1rem;
 
   @media ${device.tablet} {
     grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
     align-items: start;
     gap: 2rem;
-    padding: 1.5rem 1rem 2.5rem;
+    padding: 3rem 1.5rem;
   }
 
   @media ${device.desktop} {
-    padding: 2rem 0 3rem;
+    padding: 3.5rem 0 1rem;
   }
 `
 
@@ -121,21 +171,19 @@ const FilterPanel = styled.aside`
   flex-direction: column;
   gap: 1rem;
   padding: 1.25rem;
-  border: 1px solid var();
-  border-radius: 1.5rem;
-  background: rgba(15, 23, 42, 0.7);
-  box-shadow:
-    0 20px 45px rgba(2, 6, 23, 0.28),
-    inset 0 1px 0 var(--clr-secondary-1);
-  backdrop-filter: blur(18px);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 16px 40px rgba(16, 42, 53, 0.06);
+  backdrop-filter: blur(12px);
   position: sticky;
   top: calc(var(--navbar-height) + 1rem);
 `
 
 const PanelHeading = styled.h4`
-  color: var(--clr-primary-3);
-  font-size: 1.05rem;
-  text-align: center;
+  color: var(--navy);
+  font-size: 1.4rem;
+  text-align: left;
 `
 
 const ProductsPanel = styled.div`
@@ -148,7 +196,7 @@ const Message = styled.h5`
   text-align: center;
   padding: 1rem 0 1.5rem;
   text-transform: none;
-  color: var(--clr-grey-10);
+  color: var(--clr-grey-6);
   font-size: 1rem;
 `
 

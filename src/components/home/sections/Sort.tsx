@@ -101,19 +101,18 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+    padding: 0 0 1rem;
   }
 
   .sort__title {
     text-transform: capitalize;
-    color: white;
+    color: var(--ink);
     font-weight: 500;
   }
 
   .sort__label {
     text-transform: capitalize;
-    color: white;
+    color: var(--ink-soft);
     font-weight: 500;
     font-size: 0.95rem;
     margin-right: 0.5rem;
@@ -126,12 +125,12 @@ const Container = styled.div`
 
   .sort__select {
     appearance: none;
-    background: var(--clr-secondary-2);
-    border: 1px solid var(--clr-secondary-9);
+    background: white;
+    border: 1px solid var(--line);
     border-radius: 77px;
     padding: 0.65rem 1rem;
     font-size: 0.95rem;
-    color: var(--clr-grey-10);
+    color: var(--ink);
     cursor: pointer;
     box-shadow:
       inset 0 1px 0 var(--clr-secondary-6),
@@ -142,7 +141,7 @@ const Container = styled.div`
     &:hover,
     &:focus {
       border-color: var(--clr-secondary-10);
-      background: var(--clr-secondary-8);
+      background: white;
       box-shadow:
         0 0 0 3px var(--clr-secondary-2),
         0 10px 30px rgba(0, 0, 0, 0.3);
@@ -150,8 +149,8 @@ const Container = styled.div`
     }
 
     option {
-      background-color: #111827;
-      color: #f8fafc;
+      background-color: white;
+      color: var(--ink);
     }
   }
 
@@ -161,8 +160,8 @@ const Container = styled.div`
       align-items: center;
       gap: 0.35rem;
       padding: 0.3rem;
-      background: var(--clr-secondary-2);
-      border: 1px solid var(--clr-secondary-3);
+      background: white;
+      border: 1px solid var(--line);
       border-radius: 999px;
       box-shadow: inset 0 1px 0 var(--clr-secondary-2);
       backdrop-filter: blur(10px);
@@ -170,7 +169,7 @@ const Container = styled.div`
       button {
         background: transparent;
         border: 1px solid transparent;
-        color: rgba(248, 250, 252, 0.78);
+        color: var(--ink-soft);
         width: 2.1rem;
         height: 2.1rem;
         display: flex;
@@ -186,19 +185,19 @@ const Container = styled.div`
 
         &:hover:not(.sort__btn-active) {
           background: var(--clr-secondary-3);
-          color: var(--clr-primary-3);
+          color: var(--ink);
           transform: translateY(-1px);
         }
 
         &.sort__btn-active {
-          background: linear-gradient(135deg, #38bdf8, #6366f1);
+          background: var(--navy);
           color: #f8fafc;
-          box-shadow: 0 8px 18px rgba(99, 102, 241, 0.28);
+          box-shadow: 0 8px 18px rgba(16, 42, 53, 0.18);
           border-color: var(--clr-secondary-7);
         }
 
         &.sort__btn-active:hover {
-          background: linear-gradient(135deg, #60a5fa, #818cf8);
+          background: var(--copper);
           transform: translateY(-1px);
         }
       }

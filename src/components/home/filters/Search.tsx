@@ -45,8 +45,8 @@ const Container = styled.div`
     padding: 0.8rem 3.25rem 0.8rem 1rem;
     border: 1px solid var(--clr-secondary-3);
     border-radius: 77px;
-    background: var(--clr-secondary-2);
-    color: var(--clr-grey-10);
+    background: white;
+    color: var(--ink);
     letter-spacing: var(--spacing);
     outline: none;
     box-shadow: inset 0 1px 0 var(--clr-secondary-2);
@@ -59,14 +59,14 @@ const Container = styled.div`
   }
 
   .search__input::placeholder {
-    color: rgba(241, 245, 249, 0.7);
+    color: #8a9499;
     text-transform: capitalize;
   }
 
   .search__input:hover,
   .search__input:focus {
     border-color: var(--clr-secondary-7);
-    background: var(--clr-secondary-8);
+    background: white;
     box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
   }
 
@@ -86,7 +86,7 @@ const Container = styled.div`
     border: none;
     border-radius: 50%;
     background: var(--clr-secondary-2);
-    color: var(--clr-secondary-4);
+    color: var(--ink-soft);
     cursor: pointer;
 
     transition:

@@ -31,6 +31,18 @@ const Footer = () => {
   return (
     <Container>
       <div className="footer__container" ref={ref}>
+        <div className="footer__intro">
+          <div className="footer__wordmark">VOLT</div>
+          <h2>
+            Upgrade your
+            <br />
+            <em>everyday.</em>
+          </h2>
+          <p>
+            Useful technology, selected for people who care about quality,
+            performance and thoughtful design.
+          </p>
+        </div>
         <motion.nav
           className="footer__grid"
           initial="hidden"
@@ -101,20 +113,49 @@ const Footer = () => {
 }
 
 const Container = styled.footer`
-  padding-top: 2rem;
-  padding-bottom: 1rem;
-  padding-left: 1rem;
-  background: var(--gradient-navbar-footer-bg);
+  margin-top: 2rem;
+  padding: 4.5rem 1rem 1.5rem;
+  background: var(--navy);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 
   .footer__container {
     ${containerStyles}
   }
 
+  .footer__intro {
+    display: grid;
+    gap: 1.25rem;
+    padding-bottom: 4rem;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .footer__wordmark {
+    color: var(--copper);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    letter-spacing: 0.14em;
+  }
+
+  .footer__intro h2 {
+    color: white;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+  }
+
+  .footer__intro em {
+    color: var(--copper);
+    font-weight: 400;
+  }
+  .footer__intro p {
+    max-width: 30rem;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
   .footer__grid {
     display: grid;
-    gap: 2rem;
+    gap: 2.5rem;
     grid-template-columns: repeat(auto-fit, minmax(120px, 250px));
-    justify-content: start;
+    justify-content: space-between;
   }
 
   .footer__column {
@@ -122,9 +163,12 @@ const Container = styled.footer`
   }
 
   .footer__title {
-    color: var(--clr-secondary-4);
+    color: white;
     font-weight: 600;
+    font-family: var(--font-main);
     font-size: 1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     text-transform: capitalize;
     margin-bottom: 1.5rem;
   }
@@ -133,20 +177,26 @@ const Container = styled.footer`
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.7rem;
   }
 
   .footer__link {
-    color: var(--clr-secondary-11);
+    color: rgba(255, 255, 255, 0.5);
     text-decoration: none;
     transition: color 0.3s ease;
   }
 
   .footer__link:hover {
-    color: var(--clr-primary-2);
+    color: var(--copper);
   }
 
   @media ${device.mobile} {
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+    .footer__intro {
+      grid-template-columns: 0.35fr 1fr 0.7fr;
+      align-items: end;
+    }
     .footer__grid {
       justify-content: center;
     }

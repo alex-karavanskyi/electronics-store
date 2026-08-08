@@ -114,7 +114,7 @@ const Container = styled.main`
 
   .single__product-description {
     line-height: 1.8;
-    color: #acb4be;
+    color: var(--ink-soft);
   }
 
   .product__info-favorite-icon {
@@ -279,7 +279,7 @@ const CloseButton = styled.button`
   }
 
   &:active {
-    background: var(--clr-grey-11);
+    background: var(--clr-grey-7);
   }
 `
 

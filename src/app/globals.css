@@ -1,160 +1,148 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans|Roboto:400,700&display=swap');
-
 :root {
-  /* Primary */
-  --clr-primary-1: #3b82f6;
-  --clr-primary-2: hsl(22, 31%, 52%);
-  --clr-primary-3: #fff;
-  --clr-primary-4: rgb(220, 220, 220);
-  --clr-primary-5: #ff680a;
-  /* Secondary */
-  --clr-secondary-1: rgba(255, 255, 255, 0.06);
-  --clr-secondary-2: rgba(255, 255, 255, 0.08);
-  --clr-secondary-3: rgba(255, 255, 255, 0.12);
-  --clr-secondary-4: rgba(255, 255, 255, 0.7);
-  --clr-secondary-5: rgba(255, 255, 255, 0.04);
+  --ink: #17212b;
+  --ink-soft: #38414a;
+  --navy: #102a35;
+  --navy-light: #193b47;
+  --porcelain: #f4f6f3;
+  --paper: #ffffff;
+  --sand: #e8e2d8;
+  --copper: #c87845;
+  --copper-dark: #a85d31;
+  --line: #dce1dc;
+  --clr-primary-1: #c87845;
+  --clr-primary-2: #c87845;
+  --clr-primary-3: #ffffff;
+  --clr-primary-4: #52606d;
+  --clr-primary-5: #c87845;
+  --clr-secondary-1: rgba(16, 42, 53, 0.05);
+  --clr-secondary-2: rgba(16, 42, 53, 0.08);
+  --clr-secondary-3: rgba(16, 42, 53, 0.14);
+  --clr-secondary-4: rgba(255, 255, 255, 0.75);
+  --clr-secondary-5: rgba(16, 42, 53, 0.035);
   --clr-secondary-6: rgba(255, 255, 255, 0.1);
-  --clr-secondary-7: rgba(255, 255, 255, 0.24);
-  --clr-secondary-8: rgba(255, 255, 255, 0.14);
-  --clr-secondary-9: rgba(255, 255, 255, 0.16);
-  --clr-secondary-10: rgba(255, 255, 255, 0.28);
-  --clr-secondary-11: rgba(255, 255, 255, 0.35);
-  /* Grey */
-  --clr-grey-1: hsl(209, 61%, 16%);
-  --clr-grey-2: hsl(211, 39%, 23%);
-  --clr-grey-3: hsl(209, 34%, 30%);
-  --clr-grey-4: hsl(209, 28%, 39%);
-  --clr-grey-5: hsl(210, 22%, 49%);
-  --clr-grey-6: hsl(209, 23%, 60%);
-  --clr-grey-7: hsl(211, 27%, 70%);
-  --clr-grey-8: hsl(210, 31%, 80%);
-  --clr-grey-9: hsl(93, 32%, 89%);
-  --clr-grey-10: hsl(210, 36%, 96%);
-  --clr-grey-11: hsl(220, 13%, 85%);
-  /* Hover */
-  --clr-list-hover-shadow: rgba(234, 140, 46, 0.45);
-  --clr-list-hover-background: rgba(234, 140, 46, 0.15);
-  --clr-pagination-hover-border: rgba(59, 130, 246, 0.35);
-  --clr-pagination-hover-background: rgba(59, 130, 246, 0.12);
-  /* Layout */
-  --spacing: 0.1rem;
-  --radius: 0.3rem;
-  --navbar-height: 5rem;
-  --font-main: 'Intel', sans-serif;
-  --transition: all 0.3s linear;
-  /* Dark gradient background for navbar and footer */
-  --gradient-navbar-footer-bg: linear-gradient(
-    135deg,
-    #0d0d0d 0%,
-    #2d3748 50%,
-    #1f2632 50% 100%
-  );
-  /* Skeleton loading gradient */
+  --clr-secondary-7: rgba(200, 120, 69, 0.4);
+  --clr-secondary-8: rgba(16, 42, 53, 0.1);
+  --clr-secondary-9: rgba(16, 42, 53, 0.18);
+  --clr-secondary-10: rgba(16, 42, 53, 0.28);
+  --clr-secondary-11: rgba(255, 255, 255, 0.55);
+  --clr-grey-1: #17212b;
+  --clr-grey-2: #334e68;
+  --clr-grey-3: #9aa5ad;
+  --clr-grey-4: #8d989f;
+  --clr-grey-5: #dce1dc;
+  --clr-grey-6: #f4f6f3;
+  --clr-grey-7: #dce1dc;
+  --clr-list-hover-shadow: rgba(200, 120, 69, 0.22);
+  --clr-list-hover-background: rgba(200, 120, 69, 0.1);
+  --clr-pagination-hover-border: rgba(200, 120, 69, 0.5);
+  --clr-pagination-hover-background: rgba(200, 120, 69, 0.09);
+  --spacing: 0.02em;
+  --radius: 1.1rem;
+  --navbar-height: 5.25rem;
+  --font-main: Arial, sans-serif;
+  --font-display: Georgia, serif;
+  --font-utility: monospace;
+  --transition: all 0.25s ease;
+  --gradient-navbar-footer-bg: #102a35;
   --skeleton-gradient: linear-gradient(
     90deg,
-    #2a2a2a 25%,
-    #3a3a3a 50%,
-    #2a2a2a 75%
+    #e5e8e4 25%,
+    #f2f4f1 50%,
+    #e5e8e4 75%
   );
 }
-
-/*
-=============== 
-Global Styles
-===============
-*/
 
 *,
 ::after,
 ::before {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+}
+
+html {
   scroll-behavior: smooth;
 }
 html,
 body {
-  height: 100%;
+  min-height: 100%;
 }
+
 body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: 'Open Sans', sans-serif;
-  color: var(--clr-grey-1);
-  line-height: 1.2;
-  font-size: 0.875rem;
-}
-body {
-  min-height: 100vh;
-
-  background: linear-gradient(#0f1724, #1a2742, #1a3a3a, #402235, #111827);
-
-  background-size: 400% 400%;
-  animation: gradient 25s ease infinite;
-}
-
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  25% {
-    background-position: 100% 50%;
-  }
-
-  50% {
-    background-position: 100% 100%;
-  }
-
-  75% {
-    background-position: 0% 100%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
+  overflow-x: hidden;
+  background-color: var(--porcelain);
+  background-image: radial-gradient(
+    rgba(16, 42, 53, 0.06) 0.6px,
+    transparent 0.6px
+  );
+  background-size: 8px 8px;
+  color: var(--ink);
+  font-family: Arial, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
-body.sidebar-scroll-hidden {
-  overflow: hidden;
-}
+body.sidebar-scroll-hidden,
 html.sidebar-scroll-hidden {
   overflow: hidden;
 }
 main {
+  flex: 1;
   padding-top: var(--navbar-height);
 }
 ul {
-  list-style-type: none;
+  list-style: none;
 }
 a {
+  color: inherit;
   text-decoration: none;
-  text-transform: capitalize;
 }
-hr {
-  border: none;
-  border-top: 1px solid var(--clr-grey-8);
+button,
+input,
+select {
+  font: inherit;
 }
+img {
+  max-width: 100%;
+}
+
 h1,
 h2,
 h3,
 h4,
 h5 {
-  letter-spacing: var(--spacing);
-  text-transform: capitalize;
-  line-height: 1.25;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
 }
+
 p {
-  color: var(--clr-primary-4);
+  color: var(--ink-soft);
+}
+:focus-visible {
+  outline: 3px solid rgba(200, 120, 69, 0.55);
+  outline-offset: 3px;
+}
+::selection {
+  background: var(--copper);
+  color: white;
 }
 
 @media (min-width: 768px) {
+  body {
+    font-size: 1rem;
+  }
   h1 {
-    font-size: 3rem;
+    font-size: clamp(3.5rem, 7vw, 6.5rem);
   }
   h2 {
-    font-size: 2.5rem;
+    font-size: clamp(2.25rem, 4vw, 4rem);
   }
   h3 {
     font-size: 2rem;
@@ -162,16 +150,15 @@ p {
   h4 {
     font-size: 1.5rem;
   }
-  h5 {
-    font-size: 1rem;
-  }
-  body {
-    font-size: 1rem;
-  }
-  h1,
-  h2,
-  h3,
-  h4 {
-    line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

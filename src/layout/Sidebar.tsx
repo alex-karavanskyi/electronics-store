@@ -41,8 +41,7 @@ const Container = styled.div`
     align-items: center;
     transform: translateX(-100%);
     opacity: 0;
-    background: linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #4a5568 100%);
-    background-size: 200% 200%;
+    background: var(--navy);
     transition:
       transform 0.3s ease-in-out,
       opacity 0.3s ease-in-out;
@@ -54,7 +53,6 @@ const Container = styled.div`
     transform: translateX(0);
     opacity: 1;
     pointer-events: auto;
-    animation: gradientShift 15s ease infinite;
   }
 
   @keyframes gradientShift {

@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import { Category, ClearButton, Price, Search, Sort } from '@/components/home'
 import {
@@ -83,7 +83,7 @@ const Conteiner = styled.aside`
 const HorizontalLine = styled.hr`
   width: 50%;
   height: 1px;
-  background-color: white;
+  background-color: black;
   border: none;
   margin: 0.75rem 0;
 `
@@ -116,6 +116,25 @@ const SidebarContent = styled.div<{ side: 'left' | 'right' }>`
   flex-direction: column;
   gap: 1rem;
   box-sizing: border-box;
+
+  ${({ side }) =>
+    side === 'right' &&
+    css`
+      && label,
+      && .price__header h5,
+      && .price__header p {
+        color: rgba(255, 255, 255, 0.88);
+      }
+    `}
+
+  ${({ side }) =>
+    side === 'left' &&
+    css`
+      && .sort__title,
+      && .sort__label {
+        color: rgba(255, 255, 255, 0.88);
+      }
+    `}
 `
 
 export default Sidebar

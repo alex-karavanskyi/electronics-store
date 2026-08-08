@@ -48,15 +48,11 @@ const Container = styled.div`
     width: 100%;
     padding: 0.75rem 0.9rem;
     text-transform: capitalize;
-    background: linear-gradient(
-      135deg,
-      rgba(56, 189, 248, 0.16),
-      rgba(99, 102, 241, 0.16)
-    );
-    border: 1px solid var(--clr-secondary-3);
+    background: var(--navy);
+    border: 1px solid var(--navy);
     border-radius: 77px;
     letter-spacing: var(--spacing);
-    color: var(--clr-primary-3);
+    color: white;
     font-family: var(--font-main);
     font-weight: 700;
     font-size: 0.95rem;

@@ -69,19 +69,26 @@ const ProductImages: React.FC<ProductImagesProps> = ({
           variants={galleryVariants}
         >
           {images.map((image, index) => (
-            <motion.div
+            <motion.button
+              type={'button'}
               key={index}
               variants={itemVariants}
               onClick={() => setMainImage(image)}
+              className={
+                image === mainImage
+                  ? 'product__images-thumbnail product__images-thumbnail--active'
+                  : 'product__images-thumbnail'
+              }
+              aria-label={`Show product image ${index + 1}`}
+              aria-pressed={image === mainImage}
             >
               <Image
                 alt={`thumbnail ${index}`}
                 width={100}
                 height={75}
                 src={image}
-                className={image === mainImage ? 'product__images--active' : ''}
               />
-            </motion.div>
+            </motion.button>
           ))}
         </motion.div>
       )}
@@ -99,16 +106,24 @@ const Container = styled.div`
   .product__images-gallery {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap: 0.5rem;
+    gap: 0.75rem;
     align-items: start;
+    padding: 0.3rem;
 
-    div {
+    .product__images-thumbnail {
+      padding: 0;
       cursor: pointer;
-      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) - 0.2rem);
+      background: var(--paper);
       overflow: hidden;
       aspect-ratio: 4 / 3;
       min-height: 0;
       position: relative;
+      box-shadow: 0 3px 10px rgb(16 42 53 / 8%);
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 
       img {
         width: 100%;
@@ -122,10 +137,14 @@ const Container = styled.div`
         transform: scale(1.05);
       }
     }
-  }
 
-  .product__images--active {
-    border: 2px solid var(--clr-primary-2);
+    .product__images-thumbnail--active {
+      border-color: var(--copper);
+      box-shadow:
+        0 0 0 2px var(--porcelain),
+        0 0 0 4px var(--copper),
+        0 8px 18px rgb(200 120 69 / 24%);
+    }
   }
 `
 

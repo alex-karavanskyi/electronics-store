@@ -67,8 +67,8 @@ const CategoryLabel = styled(motion.label)<{ $isActive: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--clr-primary-4);
-  font: 700 1rem var(--font-main);
+  color: var(--ink-soft);
+  font: 600 0.9rem var(--font-main);
   border-radius: 1rem;
   cursor: pointer;
   transition: color 0.25s ease;
@@ -96,7 +96,7 @@ const CheckboxIndicator = styled.span<{ $isActive: boolean }>`
 
   border: 2px solid
     ${({ $isActive }) =>
-      $isActive ? 'var(--clr-primary-5)' : 'var(--clr-grey-5)'};
+      $isActive ? 'var(--clr-primary-5)' : 'var(--clr-grey-4)'};
 
   border-radius: 0.4rem;
 

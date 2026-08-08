@@ -40,17 +40,17 @@ const Container = styled.aside`
   flex-direction: column;
   gap: 1.2rem;
   padding: 1rem;
-  border: 1px solid var(--clr-secondary-2);
+  border: 1px solid var(--line);
   border-radius: 1.1rem;
-  background: var(--clr-secondary-5);
+  background: #f7f8f5;
 `
 
 const SectionTitle = styled.h5`
-  color: var(--clr-primary-3);
+  color: var(--navy);
   font-size: 0.95rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  text-align: center;
+  text-align: left;
 `
 
 export default Filters

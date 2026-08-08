@@ -71,12 +71,12 @@ const Container = styled.nav`
     position: relative;
     display: inline-block;
     text-decoration: none;
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
+    font-family: var(--font-main);
+    font-weight: 600;
     text-transform: uppercase;
-    font-size: 1.0625rem;
-    letter-spacing: var(--spacing);
-    color: var(--clr-primary-4);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.72);
     transition: color 0.3s ease;
   }
 
@@ -87,7 +87,7 @@ const Container = styled.nav`
     left: 0;
     width: 0;
     height: 2px;
-    background-color: #84436c;
+    background-color: var(--copper);
     transition: width 0.3s ease;
   }
 
@@ -96,7 +96,7 @@ const Container = styled.nav`
   }
 
   .navbar__links--color a {
-    color: black;
+    color: var(--ink);
   }
 
   .sidebar__links {

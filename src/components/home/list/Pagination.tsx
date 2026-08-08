@@ -31,7 +31,7 @@ const Pagination: React.FC<PaginationProducts> = ({
       dispatch(numberPagination(pageNumber))
 
       if (typeof window !== 'undefined') {
-        window.scrollTo({ top: 500, behavior: 'smooth' })
+        window.scrollTo({ top: 1100, behavior: 'smooth' })
       }
       event.currentTarget.blur()
     }
@@ -118,7 +118,7 @@ const Container = styled.nav`
   }
 
   .pagination {
-    border: 1px solid var(--clr-grey-5);
+    border: 1px solid var(--clr-grey-4);
     border-radius: 50%;
     overflow: hidden;
     transition: all 0.25s ease;
@@ -130,15 +130,15 @@ const Container = styled.nav`
     }
 
     &.pagination--active {
-      background-color: var(--clr-primary-1);
-      border-color: var(--clr-primary-1);
+      background-color: var(--navy);
+      border-color: var(--navy);
 
       .pagination__link {
         color: #fff;
       }
 
       &:hover {
-        background-color: #2563eb;
+        background-color: var(--copper);
       }
     }
 
@@ -171,7 +171,7 @@ const Container = styled.nav`
     width: 100%;
     height: 100%;
     text-decoration: none;
-    color: var(--clr-primary-4);
+    color: var(--ink);
     transition: color 0.25s ease;
   }
 

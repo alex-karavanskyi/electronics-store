@@ -53,7 +53,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
 }
 
 const baseStyles = css`
-  color: var(--clr-primary-4);
+  color: var(--ink);
 `
 
 const Container = styled.div<{ $isDetailed: boolean }>`
@@ -61,6 +61,17 @@ const Container = styled.div<{ $isDetailed: boolean }>`
   flex-direction: column;
   gap: ${({ $isDetailed }) => ($isDetailed ? '0.75rem' : '0.5rem')};
   ${baseStyles}
+
+  .product__info-price {
+    margin: 0;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: ${({ $isDetailed }) =>
+      $isDetailed ? 'clamp(1.125rem, 1.4vw, 1.375rem)' : '1rem'};
+    font-weight: 650;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+  }
 `
 
 const Header = styled.div<{ $isDetailed: boolean }>`
@@ -71,8 +82,13 @@ const Header = styled.div<{ $isDetailed: boolean }>`
 
 const Name = styled.h5<{ $isDetailed: boolean }>`
   font-weight: 500;
-  color: var(--clr-primary-4);
-  font-size: ${({ $isDetailed }) => ($isDetailed ? '1.5rem' : 'inherit')};
+  color: var(--ink);
+  font-size: ${({ $isDetailed }) => ($isDetailed ? '1.5rem' : '1.15rem')};
+  line-height: 1.25;
+
+  & + svg {
+    flex: 0 0 auto;
+  }
 
   @media ${device.laptop} {
     font-size: ${({ $isDetailed }) => ($isDetailed ? '2rem' : 'inherit')};

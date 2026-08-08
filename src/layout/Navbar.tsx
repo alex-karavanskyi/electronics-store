@@ -1,246 +1,202 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-import Image from 'next/image'
 import Link from 'next/link'
 
 import { GoPerson } from 'react-icons/go'
 import { SlBasket } from 'react-icons/sl'
 import styled from 'styled-components'
 
-import pngwing_grey from '@/images/pngwing_grey.png'
-import pngwing_red from '@/images/pngwing_red.png'
 import { closeModal, toggleModal } from '@/redux/features/modalSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { device } from '@/shared/constants/device'
 import NavbarLinks from '@/shared/ui/NavbarLinks'
 
 const Navbar = () => {
-  const [navbar, setNavbar] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const dispatch = useAppDispatch()
-
   const isModalOpen = useAppSelector(state => state.modal.isOpen)
 
   useEffect(() => {
-    const handleScroll = () => setNavbar(window.scrollY > 80)
-    window.addEventListener('scroll', handleScroll)
+    const handleScroll = () => setScrolled(window.scrollY > 36)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   useEffect(() => {
-    const onResize = () => {
-      if (window.innerWidth >= 768) {
-        dispatch(closeModal())
-      }
-    }
+    const onResize = () => window.innerWidth >= 768 && dispatch(closeModal())
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [dispatch])
 
-  const navClassName = navbar ? 'navbar navbar--scrolled' : 'navbar'
-  const linksClassName = navbar
-    ? 'navbar__links navbar__links--color'
-    : 'navbar__links'
-
   return (
-    <>
-      <Container>
-        <div className={navClassName}>
-          <Link href="/">
-            <Image
-              alt="Logo"
-              width={60}
-              height={60}
-              priority
-              src={navbar ? pngwing_red : pngwing_grey}
-            />
-          </Link>
-          <button
-            className="navbar__btn"
-            onClick={() => dispatch(toggleModal())}
-            aria-label={isModalOpen ? 'Close menu' : 'Open menu'}
-          >
-            <HamburgerIcon />
-          </button>
-          <div className="navbar__right">
-            <NavbarLinks parentClass={linksClassName} />
-            <GoPerson
-              size={35}
-              className={
-                navbar
-                  ? 'navbar__basket navbar__basket--dark'
-                  : 'navbar__basket'
-              }
-            />
-            <SlBasket
-              size={35}
-              className={
-                navbar
-                  ? 'navbar__basket navbar__basket--dark'
-                  : 'navbar__basket'
-              }
-            />
+    <Container $scrolled={scrolled}>
+      <div className="navbar">
+        <Link href="/" className="navbar__brand" aria-label="VOLT home">
+          <span>VOLT</span>
+          <small>Technology store</small>
+        </Link>
+
+        <button
+          className="navbar__menu"
+          onClick={() => dispatch(toggleModal())}
+          aria-label={isModalOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isModalOpen}
+        >
+          <span />
+          <span />
+        </button>
+
+        <div className="navbar__right">
+          <NavbarLinks parentClass="navbar__links" />
+          <div className="navbar__icons">
+            <button aria-label="Your account">
+              <GoPerson />
+            </button>
+            <button aria-label="Your cart">
+              <SlBasket />
+            </button>
           </div>
         </div>
-      </Container>
-      {navbar && <div style={{ height: '5rem' }} />}
-    </>
+      </div>
+    </Container>
   )
 }
 
-const HamburgerIcon = () => (
-  <svg
-    width="28"
-    height="28"
-    viewBox="0 0 28 28"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path d="M4 8H24" className="line line-1" />
-    <path d="M4 14H24" className="line line-2" />
-    <path d="M4 20H24" className="line line-3" />
-  </svg>
-)
+const Container = styled.nav<{ $scrolled: boolean }>`
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 3000;
+  height: var(--navbar-height);
+  padding: 0 1rem;
+  background: ${({ $scrolled }) =>
+    $scrolled ? 'rgba(244, 246, 243, 0.94)' : 'var(--navy)'};
+  border-bottom: 1px solid
+    ${({ $scrolled }) => ($scrolled ? 'var(--line)' : 'rgba(255,255,255,.1)')};
+  box-shadow: ${({ $scrolled }) =>
+    $scrolled ? '0 12px 35px rgba(16,42,53,.08)' : 'none'};
+  backdrop-filter: blur(16px);
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease;
 
-const Container = styled.nav`
   .navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: var(--navbar-height);
-    z-index: 3000;
+    max-width: 1280px;
+    height: 100%;
+    margin: 0 auto;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background: var(--gradient-navbar-footer-bg);
-    padding: 0 1rem;
-    transition:
-      background 0.3s ease,
-      box-shadow 0.3s ease;
+    justify-content: space-between;
   }
 
-  .navbar--scrolled {
-    background: var(--clr-primary-3);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  .navbar__brand {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    color: ${({ $scrolled }) => ($scrolled ? 'var(--navy)' : 'white')};
   }
 
-  .navbar__btn {
-    position: absolute;
-    right: 1rem;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: #84436c;
+  .navbar__brand span {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    letter-spacing: 0.13em;
   }
 
-  .navbar__btn:hover .line {
-    stroke-width: 4;
-  }
-
-  .navbar__btn:hover .line-1 {
-    transform: translateY(-2px) scaleX(1.1);
-  }
-
-  .navbar__btn:hover .line-2 {
-    transform: scaleX(1.2);
-  }
-
-  .navbar__btn:hover .line-3 {
-    transform: translateY(2px) scaleX(1.1);
-  }
-
-  .navbar__links {
+  .navbar__brand small {
     display: none;
-  }
-
-  .navbar__btn[aria-label='Close menu'] .line-1 {
-    transform: translateY(6px) rotate(45deg);
-  }
-
-  .navbar__btn[aria-label='Close menu'] .line-2 {
-    opacity: 0;
-    transform: scaleX(0);
-  }
-
-  .navbar__btn[aria-label='Close menu'] .line-3 {
-    transform: translateY(-6px) rotate(-45deg);
-  }
-
-  .line {
-    stroke: currentColor;
-    stroke-width: 3;
-    stroke-linecap: round;
-    transform-origin: center;
-    transition:
-      opacity 0.3s ease,
-      stroke-width 0.3s ease,
-      transform 0.3s ease;
-  }
-
-  .navbar__basket {
-    font-size: 1.7rem;
-    color: var(--clr-primary-4);
-    cursor: pointer;
-    transition:
-      color 0.3s ease,
-      transform 0.25s ease,
-      filter 0.25s ease;
-  }
-
-  .navbar__basket--dark {
-    color: black;
-  }
-
-  .navbar__basket:hover {
-    animation: basketShake 0.35s ease;
-  }
-
-  .navbar__basket {
-    display: none;
-  }
-
-  @keyframes basketShake {
-    0% {
-      transform: rotate(0deg);
-    }
-    25% {
-      transform: rotate(-10deg);
-    }
-    50% {
-      transform: rotate(8deg);
-    }
-    75% {
-      transform: rotate(-4deg);
-    }
-    100% {
-      transform: rotate(0deg);
-    }
-  }
-
-  .navbar__basket:active {
-    transform: scale(0.95);
+    padding-left: 0.75rem;
+    border-left: 1px solid
+      ${({ $scrolled }) =>
+        $scrolled ? 'var(--line)' : 'rgba(255,255,255,.25)'};
+    color: ${({ $scrolled }) =>
+      $scrolled ? 'var(--ink-soft)' : 'rgba(255,255,255,.55)'};
+    font-family: var(--font-utility);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .navbar__right {
-    display: flex;
+    display: none;
     align-items: center;
-    gap: 2rem;
+    gap: 2.25rem;
+  }
+  .navbar__links {
+    display: flex;
+    gap: 1.75rem;
+  }
+  .navbar__links a {
+    color: ${({ $scrolled }) =>
+      $scrolled ? 'var(--navy)' : 'rgba(255,255,255,.72)'};
+  }
+  .navbar__icons {
+    display: flex;
+    gap: 0.45rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid
+      ${({ $scrolled }) =>
+        $scrolled ? 'var(--line)' : 'rgba(255,255,255,.18)'};
+  }
+  .navbar__icons button {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: ${({ $scrolled }) => ($scrolled ? 'var(--navy)' : 'white')};
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .navbar__icons button:hover {
+    background: ${({ $scrolled }) =>
+      $scrolled ? 'white' : 'rgba(255,255,255,.1)'};
+  }
+  .navbar__icons svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .navbar__menu {
+    width: 2.75rem;
+    height: 2.75rem;
+    display: grid;
+    align-content: center;
+    gap: 6px;
+    padding: 0 0.65rem;
+    border: 1px solid
+      ${({ $scrolled }) => ($scrolled ? 'var(--line)' : 'rgba(255,255,255,.3)')};
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+  }
+  .navbar__menu span {
+    height: 1px;
+    background: ${({ $scrolled }) => ($scrolled ? 'var(--navy)' : 'white')};
+    transition: transform 0.25s ease;
+  }
+  .navbar__menu[aria-expanded='true'] span:first-child {
+    transform: translateY(3.5px) rotate(45deg);
+  }
+  .navbar__menu[aria-expanded='true'] span:last-child {
+    transform: translateY(-3.5px) rotate(-45deg);
   }
 
   @media ${device.mobile} {
-    .navbar__btn {
+    padding: 0 1.5rem;
+    .navbar__brand small {
+      display: inline;
+    }
+  }
+
+  @media ${device.tablet} {
+    .navbar__menu {
       display: none;
     }
-
-    .navbar__basket {
-      display: block;
-    }
-
-    .navbar__links {
+    .navbar__right {
       display: flex;
-      justify-content: end;
-      gap: 2rem;
     }
   }
 `

@@ -33,7 +33,7 @@ const Container = styled.ul`
 
   .social__links-icon {
     font-size: 1.5rem;
-    color: var(--clr-grey-3);
+    color: var(--clr-grey-2);
     transition: var(--transition);
   }
 

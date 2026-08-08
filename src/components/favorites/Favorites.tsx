@@ -109,7 +109,7 @@ const Container = styled.div`
     display: flex;
     justify-content: center;
     padding-bottom: 1rem;
-    color: white;
+    color: black;
     font-size: 2rem;
   }
 

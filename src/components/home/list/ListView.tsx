@@ -128,28 +128,29 @@ const Container = styled.section`
 
   .list__view-products-btn-details {
     padding: 0.7rem 1.6rem;
-    color: #f8fafc;
+    color: var(--copper-dark);
     text-transform: uppercase;
     font-size: 0.95rem;
     font-weight: 600;
     letter-spacing: 1px;
-    background: var(--clr-secondary-1);
-    border: 1px solid rgba(234, 140, 46, 0.5);
+    background: transparent;
+    border: 1px solid var(--copper);
     border-radius: 8px;
     width: max-content;
-    backdrop-filter: blur(8px);
     cursor: pointer;
-    transition: all 0.3s ease;
-
-    box-shadow:
-      0 0 0 rgba(234, 140, 46, 0),
-      inset 0 0 0 var(--clr-secondary-6);
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease,
+      box-shadow 0.25s ease,
+      transform 0.25s ease;
   }
 
   .list__view-products-btn-details:hover {
-    background: var(--clr-list-hover-background);
-    border-color: rgb(234, 140, 46);
-    box-shadow: 0 0 7px var(--clr-list-hover-shadow);
+    color: var(--paper);
+    background: var(--copper);
+    border-color: var(--copper-dark);
+    box-shadow: 0 8px 18px var(--clr-list-hover-shadow);
     transform: translateY(-2px);
   }
 
@@ -162,40 +163,33 @@ const Container = styled.section`
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 0.75rem;
 
     min-width: 180px;
     padding: 0.9rem 2.2rem;
-    border: 1px solid rgba(234, 140, 46, 0.5);
+    border: 1px solid var(--navy);
     border-radius: 999px;
-    background: var(--clr-secondary-1);
-    backdrop-filter: blur(10px);
-    color: #f8fafc;
+    background: var(--navy);
+    color: var(--paper);
     font-size: 1rem;
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
     cursor: pointer;
-
-    box-shadow:
-      inset 0 1px 0 var(--clr-secondary-2),
-      0 0 0 rgba(234, 140, 46, 0);
+    box-shadow: 0 10px 24px rgb(16 42 53 / 16%);
 
     transition:
-      background 0.3s ease,
+      background-color 0.25s ease,
       border-color 0.3s ease,
       box-shadow 0.3s ease,
       transform 0.3s ease;
   }
 
   .list__view-load-more-btn:hover {
-    background: var(--clr-list-hover-background);
-    border-color: #ea8c2e;
-    box-shadow: 0 0 18px var(--clr-list-hover-shadow);
+    background: var(--navy-light);
+    border-color: var(--navy-light);
+    box-shadow: 0 12px 28px rgb(16 42 53 / 24%);
     transform: translateY(-3px);
-  }
-
-  .list__view-load-more-btn {
-    gap: 0.75rem;
   }
 
   .list__view-load-more-btn span {
