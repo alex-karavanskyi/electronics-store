@@ -1,4 +1,6 @@
 'use client'
+import { useLayoutEffect, useRef, useState } from 'react'
+
 import styled from 'styled-components'
 
 import {
@@ -19,6 +21,9 @@ const postsPerPage = 6
 
 const ProductList = () => {
   const isMobile = useIsMobile()
+  const productsContentRef = useRef<HTMLDivElement>(null)
+  const maxProductsHeightRef = useRef(0)
+  const [reservedProductsHeight, setReservedProductsHeight] = useState(0)
   const { handleFilters, handleClearButton } = useFilters()
   const { pagination } = useAppSelector(store => store.pagination)
 
@@ -35,6 +40,32 @@ const ProductList = () => {
     (pagination - 1) * postsPerPage,
     pagination * postsPerPage
   )
+
+  useLayoutEffect(() => {
+    const content = productsContentRef.current
+
+    if (!content || isMobile) return
+
+    maxProductsHeightRef.current = 0
+
+    const preserveLargestHeight = () => {
+      const nextHeight = Math.ceil(content.getBoundingClientRect().height)
+
+      if (nextHeight <= maxProductsHeightRef.current) return
+
+      maxProductsHeightRef.current = nextHeight
+      setReservedProductsHeight(nextHeight)
+    }
+
+    preserveLargestHeight()
+
+    if (typeof ResizeObserver === 'undefined') return
+
+    const observer = new ResizeObserver(preserveLargestHeight)
+    observer.observe(content)
+
+    return () => observer.disconnect()
+  }, [grid_view, isMobile])
 
   if (isMobile) {
     if (!loading && !error && products.length < 1) {
@@ -87,23 +118,25 @@ const ProductList = () => {
           />
         </FilterPanel>
 
-        <ProductsPanel>
-          <Sort handleFilters={handleFilters} />
-          {!loading && !error && products.length < 1 ? (
-            <Message data-cy="no-results">
-              Sorry, no products matched your search...
-            </Message>
-          ) : !grid_view ? (
-            <ListView products={products} isLoading={loading} />
-          ) : (
-            <>
-              <GridView products={currentPosts} isLoading={loading} />
-              <Pagination
-                postsPerPage={postsPerPage}
-                totalPosts={products.length}
-              />
-            </>
-          )}
+        <ProductsPanel $reservedHeight={reservedProductsHeight}>
+          <ProductsContent ref={productsContentRef}>
+            <Sort handleFilters={handleFilters} />
+            {!loading && !error && products.length < 1 ? (
+              <Message data-cy="no-results">
+                Sorry, no products matched your search...
+              </Message>
+            ) : !grid_view ? (
+              <ListView products={products} isLoading={loading} />
+            ) : (
+              <>
+                <GridView products={currentPosts} isLoading={loading} />
+                <Pagination
+                  postsPerPage={postsPerPage}
+                  totalPosts={products.length}
+                />
+              </>
+            )}
+          </ProductsContent>
         </ProductsPanel>
       </CatalogShell>
     </CatalogSection>
@@ -158,6 +191,7 @@ const CatalogShell = styled.section`
     grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
     align-items: start;
     gap: 2rem;
+    min-height: calc(100svh - var(--navbar-height));
     padding: 3rem 1.5rem;
   }
 
@@ -186,7 +220,11 @@ const PanelHeading = styled.h4`
   text-align: left;
 `
 
-const ProductsPanel = styled.div`
+const ProductsPanel = styled.div<{ $reservedHeight: number }>`
+  min-height: ${({ $reservedHeight }) => `${$reservedHeight}px`};
+`
+
+const ProductsContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;

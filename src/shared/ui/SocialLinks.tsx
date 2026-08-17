@@ -32,13 +32,17 @@ const Container = styled.ul`
   margin-top: 5rem;
 
   .social__links-icon {
+    display: inline-flex;
     font-size: 1.5rem;
-    color: var(--clr-grey-2);
-    transition: var(--transition);
+    color: var(--social-icon);
+    transition:
+      color 0.25s ease,
+      transform 0.25s ease;
   }
 
   .social__links-icon:hover {
-    color: var(--clr-primary-2);
+    color: var(--social-icon-hover);
+    transform: translateY(-2px);
   }
 `
 

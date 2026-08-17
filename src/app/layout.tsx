@@ -1,5 +1,5 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
+import { Inter, Sora } from 'next/font/google'
 
 import { Metadata } from 'next'
 
@@ -9,6 +9,10 @@ import ClientOnly from '@/shared/lib/ClientOnly'
 import FiltersCleaner from '@/shared/lib/FiltersCleaner'
 
 const inter = Inter({ subsets: ['latin'] })
+const sora = Sora({
+  subsets: ['latin'],
+  variable: '--font-sora',
+})
 
 export const metadata: Metadata = {
   title: 'VOLT — Technology for everyday life',
@@ -23,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${sora.variable}`}>
         <ClientOnly>
           <ReduxProvider>
             <FiltersCleaner />

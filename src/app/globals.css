@@ -8,6 +8,8 @@
   --sand: #e8e2d8;
   --copper: #c87845;
   --copper-dark: #a85d31;
+  --social-icon: #93acb4;
+  --social-icon-hover: #e28a52;
   --line: #dce1dc;
   --clr-primary-1: #c87845;
   --clr-primary-2: #c87845;
@@ -40,7 +42,6 @@
   --radius: 1.1rem;
   --navbar-height: 5.25rem;
   --font-main: Arial, sans-serif;
-  --font-display: Georgia, serif;
   --font-utility: monospace;
   --transition: all 0.25s ease;
   --gradient-navbar-footer-bg: #102a35;
@@ -69,6 +70,7 @@ body {
 }
 
 body {
+  --font-display: var(--font-sora), Arial, sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;

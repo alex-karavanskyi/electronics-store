@@ -2,7 +2,7 @@
 import 'swiper/css'
 import 'swiper/css/effect-fade'
 import 'swiper/css/pagination'
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
@@ -21,107 +21,147 @@ import { useAppSelector } from '@/redux/hooks'
 import { Product } from '@/shared/types/productsType'
 import { containerStyles } from '@/shared/ui/styles/containerStyles'
 
+import type { Swiper as SwiperInstance } from 'swiper'
+
+const MAX_SLIDES = 5
+
+const highlights = [
+  { label: 'Catalogue', value: 'Curated technology' },
+  { label: 'Selection', value: '12 product categories' },
+  { label: 'Support', value: 'Official warranty' },
+] as const
+
+const HeroCopy = () => (
+  <div className="hero__copy">
+    <p className="hero__eyebrow">Technology · thoughtfully selected</p>
+    <h1>
+      Better technology
+      <em> for everyday life.</em>
+    </h1>
+    <p className="hero__intro">
+      Reliable devices for work, home and entertainment — selected for
+      performance, quality and long-term value.
+    </p>
+    <Link href="#collection" className="hero__cta">
+      Browse the catalogue <FiArrowDownRight />
+    </Link>
+  </div>
+)
+
+type ProductCarouselProps = {
+  slides: Product[]
+  loading: boolean
+}
+
+const ProductCarousel = ({ slides, loading }: ProductCarouselProps) => {
+  const swiperRef = useRef<SwiperInstance | null>(null)
+
+  if (loading) {
+    return (
+      <div className="hero__visual">
+        <SkeletonSlide />
+      </div>
+    )
+  }
+
+  if (slides.length === 0) {
+    return (
+      <div className="hero__visual">
+        <EmptySlide role="status">
+          Featured products will appear here soon.
+        </EmptySlide>
+      </div>
+    )
+  }
+
+  const hasMultipleSlides = slides.length > 1
+
+  return (
+    <div className="hero__visual">
+      <Swiper
+        onSwiper={swiper => {
+          swiperRef.current = swiper
+        }}
+        effect="fade"
+        loop={hasMultipleSlides}
+        speed={900}
+        autoplay={
+          hasMultipleSlides
+            ? { delay: 4500, disableOnInteraction: false }
+            : false
+        }
+        pagination={hasMultipleSlides ? { clickable: true } : false}
+        modules={[Autoplay, EffectFade, Pagination]}
+      >
+        {slides.map((product, index) => (
+          <SwiperSlide key={product.id}>
+            <Image
+              alt={product.name}
+              src={product.image}
+              fill
+              priority={index === 0}
+              sizes="(max-width: 768px) 100vw, 58vw"
+            />
+            <div className="hero__image-shade" />
+            <div className="hero__caption">
+              <span>Featured product</span>
+              <strong>{product.name}</strong>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+      {hasMultipleSlides && (
+        <div className="hero__controls">
+          <div className="hero__arrows">
+            <button
+              type="button"
+              aria-label="Previous product"
+              onClick={() => swiperRef.current?.slidePrev()}
+            >
+              <FiChevronLeft />
+            </button>
+            <button
+              type="button"
+              aria-label="Next product"
+              onClick={() => swiperRef.current?.slideNext()}
+            >
+              <FiChevronRight />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const HighlightsBar = () => (
+  <div className="hero__stay-bar" aria-label="Store highlights">
+    {highlights.map(({ label, value }) => (
+      <div key={label}>
+        <span>{label}</span>
+        <strong>{value}</strong>
+      </div>
+    ))}
+    <Link href="#collection" aria-label="Browse all products">
+      <FiArrowUpRight />
+    </Link>
+  </div>
+)
+
 const Slider = () => {
-  const [slides, setSlides] = useState<Product[]>([])
-  const swiperRef = useRef<any>(null)
   const { products, products_loading: loading } = useAppSelector(
     state => state.products
   )
-
-  useEffect(() => {
-    if (!loading && products.length > 0) setSlides(products.slice(0, 5))
-  }, [loading, products])
+  const slides = products.slice(0, MAX_SLIDES)
 
   return (
     <Hero>
       <div className="hero__shell">
-        <div className="hero__copy">
-          <p className="hero__eyebrow">Technology · thoughtfully selected</p>
-          <h1>
-            Better technology
-            <em> for everyday life.</em>
-          </h1>
-          <p className="hero__intro">
-            Reliable devices for work, home and entertainment — selected for
-            performance, quality and long-term value.
-          </p>
-          <Link href="#collection" className="hero__cta">
-            Browse the catalogue <FiArrowDownRight />
-          </Link>
-        </div>
+        <HeroCopy />
 
-        <div className="hero__visual">
-          <Swiper
-            ref={swiperRef}
-            effect="fade"
-            loop={slides.length > 1}
-            speed={900}
-            autoplay={{ delay: 4500, disableOnInteraction: false }}
-            pagination={{ el: '.hero__pagination', clickable: true }}
-            modules={[Autoplay, EffectFade, Pagination]}
-          >
-            {loading || slides.length === 0 ? (
-              <SwiperSlide>
-                <SkeletonSlide />
-              </SwiperSlide>
-            ) : (
-              slides.map(product => (
-                <SwiperSlide key={product.id}>
-                  <Image
-                    alt={product.name}
-                    src={product.image}
-                    fill
-                    priority
-                    sizes="(max-width: 768px) 100vw, 58vw"
-                  />
-                  <div className="hero__image-shade" />
-                  <div className="hero__caption">
-                    <span>Featured product</span>
-                    <strong>{product.name}</strong>
-                  </div>
-                </SwiperSlide>
-              ))
-            )}
-          </Swiper>
+        <ProductCarousel slides={slides} loading={loading} />
 
-          <div className="hero__controls">
-            <div className="hero__pagination" />
-            <div className="hero__arrows">
-              <button
-                type="button"
-                aria-label="Previous product"
-                onClick={() => swiperRef.current?.swiper?.slidePrev()}
-              >
-                <FiChevronLeft />
-              </button>
-              <button
-                type="button"
-                aria-label="Next product"
-                onClick={() => swiperRef.current?.swiper?.slideNext()}
-              >
-                <FiChevronRight />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="hero__stay-bar" aria-label="Store highlights">
-          <div>
-            <span>Catalogue</span>
-            <strong>Curated technology</strong>
-          </div>
-          <div>
-            <span>Selection</span>
-            <strong>12 product categories</strong>
-          </div>
-          <div>
-            <span>Support</span>
-            <strong>Official warranty</strong>
-          </div>
-          <Link href="#collection" aria-label="Browse all products">
-            <FiArrowUpRight />
-          </Link>
-        </div>
+        <HighlightsBar />
       </div>
     </Hero>
   )
@@ -151,6 +191,7 @@ const Hero = styled.section`
   .hero__copy {
     z-index: 2;
     display: flex;
+    min-width: 0;
     flex-direction: column;
     justify-content: center;
     padding: 3.5rem 1.5rem 2rem;
@@ -167,7 +208,7 @@ const Hero = styled.section`
   }
 
   h1 {
-    max-width: 9ch;
+    max-width: 100%;
     margin: 1rem 0 1.5rem;
     color: white;
   }
@@ -251,7 +292,7 @@ const Hero = styled.section`
     z-index: 3;
     pointer-events: none;
   }
-  .hero__pagination {
+  .swiper-pagination {
     position: absolute;
     bottom: 1rem;
     left: 50%;
@@ -260,13 +301,13 @@ const Hero = styled.section`
     transform: translateX(-50%);
     pointer-events: auto;
   }
-  .hero__controls > .hero__pagination.swiper-pagination-horizontal {
+  .swiper-pagination.swiper-pagination-horizontal {
     right: auto;
     left: 50%;
     width: max-content;
     transform: translateX(-50%);
   }
-  .hero__pagination .swiper-pagination-bullet {
+  .swiper-pagination .swiper-pagination-bullet {
     width: 1.6rem;
     height: 2px;
     margin: 0;
@@ -274,7 +315,7 @@ const Hero = styled.section`
     background: white;
     opacity: 0.35;
   }
-  .hero__pagination .swiper-pagination-bullet-active {
+  .swiper-pagination .swiper-pagination-bullet-active {
     opacity: 1;
     background: var(--copper);
   }
@@ -356,6 +397,10 @@ const Hero = styled.section`
     .hero__copy {
       padding: 4.5rem 3rem;
     }
+    h1 {
+      font-size: clamp(3.25rem, 4.2vw, 5rem);
+      line-height: 0.98;
+    }
     .hero__visual {
       min-height: auto;
       margin: 0.75rem 0.75rem 0.75rem 0;
@@ -377,6 +422,16 @@ const SkeletonSlide = styled.div`
   background: var(--skeleton-gradient);
   background-size: 200% 100%;
   animation: ${shimmer} 1.2s infinite;
+`
+
+const EmptySlide = styled.div`
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  color: rgb(255 255 255 / 70%);
+  text-align: center;
 `
 
 export default Slider
