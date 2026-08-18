@@ -7,6 +7,7 @@ import { GoPerson } from 'react-icons/go'
 import { SlBasket } from 'react-icons/sl'
 import styled from 'styled-components'
 
+import { openCart } from '@/redux/features/cartSlice'
 import { closeModal, toggleModal } from '@/redux/features/modalSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { device } from '@/shared/constants/device'
@@ -16,6 +17,9 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false)
   const dispatch = useAppDispatch()
   const isModalOpen = useAppSelector(state => state.modal.isOpen)
+  const cartCount = useAppSelector(state =>
+    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+  )
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 36)
@@ -53,8 +57,17 @@ const Navbar = () => {
             <button aria-label="Your account">
               <GoPerson />
             </button>
-            <button aria-label="Your cart">
+            <button
+              className="navbar__cart"
+              onClick={() => dispatch(openCart())}
+              aria-label={'Open cart, ' + cartCount + ' items'}
+            >
               <SlBasket />
+              {cartCount > 0 && (
+                <span className="navbar__cart-count" aria-hidden="true">
+                  {cartCount > 99 ? '99+' : cartCount}
+                </span>
+              )}
             </button>
           </div>
         </div>
@@ -139,6 +152,7 @@ const Container = styled.nav<{ $scrolled: boolean }>`
         $scrolled ? 'var(--line)' : 'rgba(255,255,255,.18)'};
   }
   .navbar__icons button {
+    position: relative;
     display: grid;
     place-items: center;
     width: 2.5rem;
@@ -157,6 +171,24 @@ const Container = styled.nav<{ $scrolled: boolean }>`
   .navbar__icons svg {
     width: 1.25rem;
     height: 1.25rem;
+  }
+  .navbar__cart-count {
+    position: absolute;
+    top: -0.1rem;
+    right: -0.15rem;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    display: grid;
+    place-items: center;
+    padding: 0 0.22rem;
+    border: 2px solid ({$scrolled}) =>
+      ($scrolled ? 'var(--porcelain)': 'var(--navy)');
+    border-radius: 999px;
+    color: white;
+    background: var(--copper);
+    font-size: 0.58rem;
+    font-weight: 700;
+    line-height: 1;
   }
 
   .navbar__menu {

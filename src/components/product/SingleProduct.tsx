@@ -8,6 +8,7 @@ import styled from 'styled-components'
 
 import Chat from '@/components/chat/Chat'
 import { Error, Loading } from '@/layout'
+import { addToCart } from '@/redux/features/cartSlice'
 import { getSingleProduct } from '@/redux/features/productSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { url } from '@/shared/constants/db'
@@ -66,6 +67,9 @@ const SingleProduct = () => {
             type="button"
             className="single__product-buy-button"
             aria-label={`Buy ${product.name}`}
+            onClick={() => {
+              dispatch(addToCart(product))
+            }}
           >
             <HiOutlineShoppingCart />
             <span>Buy now</span>

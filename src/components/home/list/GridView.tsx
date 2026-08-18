@@ -66,7 +66,7 @@ const GridView: React.FC<GridProducts> = ({ products, isLoading }) => {
                       showHeader={false}
                       showPrice
                     />
-                    <CartButton />
+                    <CartButton product={product} />
                   </div>
                 </footer>
               </article>

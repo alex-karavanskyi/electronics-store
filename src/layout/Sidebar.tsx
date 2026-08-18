@@ -3,12 +3,18 @@ import { GoPerson } from 'react-icons/go'
 import { SlBasket } from 'react-icons/sl'
 import styled from 'styled-components'
 
-import { useAppSelector } from '@/redux/hooks'
+import { openCart } from '@/redux/features/cartSlice'
+import { closeModal } from '@/redux/features/modalSlice'
+import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { device } from '@/shared/constants/device'
 import { NavbarLinks, SocialLinks } from '@/shared/ui'
 
 const Sidebar = () => {
   const { isOpen } = useAppSelector(store => store.modal)
+  const cartCount = useAppSelector(state =>
+    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+  )
+  const dispatch = useAppDispatch()
 
   return (
     <Container>
@@ -18,7 +24,22 @@ const Sidebar = () => {
           <div className="sidebar__nav">
             <div className="sidebar__icons">
               <GoPerson className="sidebar__basket" />
-              <SlBasket className="sidebar__basket" />
+              <button
+                type="button"
+                className="sidebar__cart"
+                aria-label={'Open cart, ' + cartCount + ' items'}
+                onClick={() => {
+                  dispatch(closeModal())
+                  dispatch(openCart())
+                }}
+              >
+                <SlBasket />
+                {cartCount > 0 && (
+                  <span aria-hidden="true">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
+              </button>
             </div>
             <NavbarLinks parentClass="sidebar__links" />
           </div>
@@ -124,6 +145,37 @@ const Container = styled.div`
       color 0.3s ease,
       transform 0.25s ease,
       filter 0.25s ease;
+  }
+
+  .sidebar__cart {
+    position: relative;
+    display: grid;
+    place-items: center;
+    border: 0;
+    color: var(--clr-primary-4);
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .sidebar__cart svg {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .sidebar__cart span {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.65rem;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    display: grid;
+    place-items: center;
+    padding: 0 0.25rem;
+    border-radius: 999px;
+    color: white;
+    background: var(--copper);
+    font-size: 0.65rem;
+    font-weight: 700;
   }
 
   @media ${device.mobile} {

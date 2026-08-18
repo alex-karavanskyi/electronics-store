@@ -77,7 +77,7 @@ const Favorites = () => {
                       <p className="product__info-price">
                         {formatPrice(product.price)}
                       </p>
-                      <CartButton />
+                      <CartButton product={product} />
                     </div>
 
                     <button

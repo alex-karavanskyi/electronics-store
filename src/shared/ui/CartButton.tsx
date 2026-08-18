@@ -1,9 +1,28 @@
+'use client'
 import { HiOutlineShoppingCart } from 'react-icons/hi2'
 import styled from 'styled-components'
 
-const CartButton = () => {
+import { addToCart } from '@/redux/features/cartSlice'
+import { useAppDispatch } from '@/redux/hooks'
+import { Product } from '@/shared/types/productsType'
+
+interface CartButtonProps {
+  product: Product
+}
+
+const CartButton = ({ product }: CartButtonProps) => {
+  const dispatch = useAppDispatch()
+
+  const handleAddToCart = () => {
+    dispatch(addToCart(product))
+  }
+
   return (
-    <StyledButton>
+    <StyledButton
+      type="button"
+      onClick={handleAddToCart}
+      aria-label={`Add ${product.name} to cart`}
+    >
       <HiOutlineShoppingCart />
     </StyledButton>
   )
@@ -19,6 +38,10 @@ const StyledButton = styled.button`
   border-radius: 50%;
   background: var(--porcelain);
   cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 
   svg {
     width: 1.3rem;
@@ -37,6 +60,10 @@ const StyledButton = styled.button`
   &:hover {
     background: var(--copper);
     border-color: var(--copper);
+  }
+
+  &:active {
+    transform: scale(0.94);
   }
 `
 export default CartButton

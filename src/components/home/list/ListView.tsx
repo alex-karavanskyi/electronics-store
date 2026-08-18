@@ -62,7 +62,7 @@ const ListView = ({ products, isLoading }: ListProductsProps) => {
                       showPrice
                     />
 
-                    <CartButton />
+                    <CartButton product={product} />
                   </div>
 
                   <p className="list__view-products-description">
