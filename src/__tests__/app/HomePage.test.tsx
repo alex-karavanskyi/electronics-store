@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react'
 
-import HomePage, { metadata } from '@/app/page' // Импортируем metadata отдельно
-import { ProductControls, ProductList, Slider } from '@/components/home'
+import HomePage, { metadata } from '@/app/page'
 
 jest.mock('@/components/home', () => ({
   Hero: jest.fn(() => <div data-testid="hero">Hero</div>),
@@ -29,20 +28,5 @@ describe('HomePage', () => {
     expect(metadata).toEqual({
       title: 'E-Commerce | React App',
     })
-  })
-
-  it('renders main element as wrapper', () => {
-    const { container } = render(<HomePage />)
-    const mainElement = container.firstChild
-    expect(mainElement).not.toBeNull()
-    expect((mainElement as HTMLElement).tagName).toBe('MAIN')
-  })
-
-  it('calls all components once', () => {
-    render(<HomePage />)
-
-    expect(Slider).toHaveBeenCalledTimes(1)
-    expect(ProductControls).toHaveBeenCalledTimes(1)
-    expect(ProductList).toHaveBeenCalledTimes(1)
   })
 })

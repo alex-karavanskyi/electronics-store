@@ -233,7 +233,7 @@ describe('filterSlice', () => {
       ...initialState,
       filters: {
         text: 'Product A',
-        category: 'electronics',
+        category: ['electronics'],
         min_price: 0,
         max_price: 200,
         price: 150,
