@@ -2,17 +2,21 @@
 import Link from 'next/link'
 
 import { motion } from 'framer-motion'
-import styled from 'styled-components'
 
 import { closeModal } from '@/redux/features/modalSlice'
 import { useAppDispatch } from '@/redux/hooks'
+
+import styles from './NavbarLinks.module.scss'
 
 const links = [
   { href: '/contact', label: 'contact' },
   { href: '/favorites', label: 'favorites' },
 ]
 
-const NavbarLinks: React.FC<{ parentClass?: string }> = ({ parentClass }) => {
+const NavbarLinks: React.FC<{
+  parentClass?: string
+  variant?: 'default' | 'sidebar' | 'dark'
+}> = ({ parentClass, variant = 'default' }) => {
   const dispatch = useAppDispatch()
 
   const listVariants = {
@@ -30,9 +34,11 @@ const NavbarLinks: React.FC<{ parentClass?: string }> = ({ parentClass }) => {
   }
 
   return (
-    <Container>
+    <nav className={styles.container}>
       <motion.ul
-        className={parentClass}
+        className={[parentClass, variant === 'default' ? '' : styles[variant]]
+          .filter(Boolean)
+          .join(' ')}
         variants={listVariants}
         initial="hidden"
         animate="visible"
@@ -48,66 +54,8 @@ const NavbarLinks: React.FC<{ parentClass?: string }> = ({ parentClass }) => {
           </motion.li>
         ))}
       </motion.ul>
-    </Container>
+    </nav>
   )
 }
-
-const Container = styled.nav`
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    gap: 2rem;
-  }
-
-  li {
-    position: relative;
-    cursor: pointer;
-    transition: color 0.3s ease;
-  }
-
-  a {
-    position: relative;
-    display: inline-block;
-    text-decoration: none;
-    font-family: var(--font-main);
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    color: rgba(255, 255, 255, 0.72);
-    transition: color 0.3s ease;
-  }
-
-  a::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background-color: var(--copper);
-    transition: width 0.3s ease;
-  }
-
-  li:hover a::after {
-    width: 100%;
-  }
-
-  .navbar__links--color a {
-    color: var(--ink);
-  }
-
-  .sidebar__links {
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-  }
-
-  .sidebar__links a {
-    font-size: 2rem;
-  }
-`
 
 export default NavbarLinks

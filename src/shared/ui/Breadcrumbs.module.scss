@@ -1,0 +1,39 @@
+@use '../styles' as shared;
+
+.container {
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.container .breadcrumbs {
+  &__link {
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: var(--copper-dark);
+    }
+  }
+
+  &__separator {
+    color: var(--copper);
+  }
+
+  &__current {
+    color: var(--ink);
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+}
+
+@include shared.from(shared.$desktop) {
+  .container {
+    padding-left: 0;
+  }
+}

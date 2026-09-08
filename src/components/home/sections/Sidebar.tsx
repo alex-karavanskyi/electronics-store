@@ -1,14 +1,14 @@
 'use client'
 import { useState } from 'react'
 
-import styled, { css } from 'styled-components'
-
 import { Category, ClearButton, Price, Search, Sort } from '@/components/home'
 import {
   FilterFields,
   HandleClearButtonFn,
   HandleFiltersFn,
 } from '@/shared/types/productsType'
+
+import styles from './Sidebar.module.scss'
 
 interface SidebarProps extends FilterFields {
   isSidebarOpen: boolean
@@ -33,19 +33,33 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      <Conteiner>
-        <MobileFiltersToggle onClick={() => setIsSidebarOpen(true)}>
+      <aside className={styles.conteiner}>
+        <button
+          className={styles.mobileFiltersToggle}
+          onClick={() => setIsSidebarOpen(true)}
+        >
           Filters
-        </MobileFiltersToggle>
-        <HorizontalLine />
-        <MobileFiltersToggle onClick={() => setIsSortOpen(true)}>
+        </button>
+        <hr className={styles.horizontalLine} />
+        <button
+          className={styles.mobileFiltersToggle}
+          onClick={() => setIsSortOpen(true)}
+        >
           Sort
-        </MobileFiltersToggle>
-      </Conteiner>
+        </button>
+      </aside>
 
       {isSidebarOpen && (
-        <SidebarOverlay onClick={() => setIsSidebarOpen(false)}>
-          <SidebarContent side="right" onClick={e => e.stopPropagation()}>
+        <div
+          className={styles.sidebarOverlay}
+          onClick={() => setIsSidebarOpen(false)}
+        >
+          <div
+            className={[styles.sidebarContent, styles['right']]
+              .filter(Boolean)
+              .join(' ')}
+            onClick={e => e.stopPropagation()}
+          >
             <Category
               selectedCategories={category}
               handleFilters={handleFilters}
@@ -59,82 +73,27 @@ const Sidebar: React.FC<SidebarProps> = ({
               handleFilters={handleFilters}
             />
             <ClearButton handleClearButton={handleClearButton} />
-          </SidebarContent>
-        </SidebarOverlay>
+          </div>
+        </div>
       )}
 
       {isSortOpen && (
-        <SidebarOverlay onClick={() => setIsSortOpen(false)}>
-          <SidebarContent side="left" onClick={e => e.stopPropagation()}>
+        <div
+          className={styles.sidebarOverlay}
+          onClick={() => setIsSortOpen(false)}
+        >
+          <div
+            className={[styles.sidebarContent, styles['left']]
+              .filter(Boolean)
+              .join(' ')}
+            onClick={e => e.stopPropagation()}
+          >
             <Sort handleFilters={handleFilters} />
-          </SidebarContent>
-        </SidebarOverlay>
+          </div>
+        </div>
       )}
     </>
   )
 }
-
-const Conteiner = styled.aside`
-  display: flex;
-  justify-content: space-evenly;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-`
-const HorizontalLine = styled.hr`
-  width: 50%;
-  height: 1px;
-  background-color: black;
-  border: none;
-  margin: 0.75rem 0;
-`
-
-const MobileFiltersToggle = styled.button`
-  background-color: #111;
-  color: #fff;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-`
-
-const SidebarOverlay = styled.div`
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-`
-
-const SidebarContent = styled.div<{ side: 'left' | 'right' }>`
-  ${props => props.side}: 0;
-  position: fixed;
-  top: var(--navbar-height);
-  width: min(320px, 85vw);
-  height: 100%;
-  background: var(--gradient-navbar-footer-bg);
-  padding: 1rem 1.25rem 2rem;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  box-sizing: border-box;
-
-  ${({ side }) =>
-    side === 'right' &&
-    css`
-      && label,
-      && .price__header h5,
-      && .price__header p {
-        color: rgba(255, 255, 255, 0.88);
-      }
-    `}
-
-  ${({ side }) =>
-    side === 'left' &&
-    css`
-      && .sort__title,
-      && .sort__label {
-        color: rgba(255, 255, 255, 0.88);
-      }
-    `}
-`
 
 export default Sidebar

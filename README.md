@@ -18,7 +18,7 @@ VOLT is a responsive technology storefront built with the Next.js App Router. It
 
 - Next.js 14, React 18, and TypeScript
 - Redux Toolkit and React Redux
-- styled-components
+- Sass (SCSS Modules)
 - React Hook Form, Zod, and `@hookform/resolvers`
 - Airtable API and Axios
 - Vercel AI SDK with OpenAI

@@ -1,0 +1,51 @@
+@use '../../styles' as shared;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.container .list__view-skeleton {
+  &-img,
+  &-title,
+  &-price,
+  &-desc,
+  &-btn {
+    @include shared.skeleton-base;
+  }
+
+  &-img {
+    width: 100%;
+    max-width: 300px;
+    height: 200px;
+  }
+
+  &-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  &-title {
+    height: 20px;
+    width: 50%;
+  }
+
+  &-price {
+    height: 20px;
+    width: 25%;
+  }
+
+  &-desc {
+    height: 60px;
+    width: 100%;
+  }
+
+  &-btn {
+    height: 36px;
+    width: 120px;
+    border-radius: 6px;
+  }
+}

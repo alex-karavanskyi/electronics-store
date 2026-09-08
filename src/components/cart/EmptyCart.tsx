@@ -5,16 +5,16 @@ import { HiOutlineShoppingBag } from 'react-icons/hi2'
 import { closeCart } from '@/redux/features/cartSlice'
 import { useAppDispatch } from '@/redux/hooks'
 
-import * as S from './CartDrawer.styles'
+import styles from './EmptyCart.module.scss'
 
 const EmptyCart = () => {
   const dispatch = useAppDispatch()
 
   return (
-    <S.EmptyState>
-      <S.EmptyIcon>
+    <div className={styles.emptyState}>
+      <div className={styles.emptyIcon}>
         <HiOutlineShoppingBag />
-      </S.EmptyIcon>
+      </div>
       <h3>Your cart is empty</h3>
       <p id="cart-empty">
         Add something you like and it will stay here for your next visit.
@@ -22,7 +22,7 @@ const EmptyCart = () => {
       <Link href="/" onClick={() => dispatch(closeCart())}>
         Explore products
       </Link>
-    </S.EmptyState>
+    </div>
   )
 }
 

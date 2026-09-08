@@ -4,9 +4,7 @@ import { useEffect } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import styled from 'styled-components'
-
-import { containerStyles } from '@/shared/ui/styles/containerStyles'
+import styles from './Error.module.scss'
 
 interface ErrorProps {
   message?: string
@@ -32,35 +30,17 @@ const Error: React.FC<ErrorProps> = ({
   }, [redirectTo, redirectDelay, router])
 
   return (
-    <ErrorWrapper>
-      <ErrorTitle>{message}</ErrorTitle>
+    <div className={styles.errorWrapper}>
+      <h2 className={styles.errorTitle}>{message}</h2>
 
       {redirectTo && (
-        <RedirectText>
+        <p className={styles.redirectText}>
           You will be redirected in {Math.floor(redirectDelay / 1000)}{' '}
           seconds...
-        </RedirectText>
+        </p>
       )}
-    </ErrorWrapper>
+    </div>
   )
 }
-
-const ErrorWrapper = styled.div`
-  ${containerStyles}
-  width: 70vw;
-  padding: 5rem 0;
-  text-align: center;
-`
-
-const ErrorTitle = styled.h2`
-  color: white;
-  margin-bottom: 1rem;
-`
-
-const RedirectText = styled.p`
-  color: #acb4be;
-  font-size: 1rem;
-  opacity: 0.9;
-`
 
 export default Error

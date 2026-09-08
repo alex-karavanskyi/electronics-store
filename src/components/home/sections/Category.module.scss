@@ -1,0 +1,99 @@
+@use '../../../shared/styles' as shared;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1rem;
+
+  @include shared.from(shared.$tablet) {
+    justify-content: center;
+  }
+}
+
+.categoryLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-soft);
+  font: 600 0.9rem var(--font-main);
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: color 0.25s ease;
+
+  &:hover {
+    color: #e65c00;
+  }
+
+  &.active:hover {
+    color: var(--clr-primary-5);
+  }
+}
+
+.categoryInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkboxIndicator {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid var(--clr-grey-4);
+
+  border-radius: 0.4rem;
+
+  background-color: transparent;
+
+  box-shadow: none;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
+}
+
+.categoryLabel:hover .checkboxIndicator {
+  border-color: #e65c00;
+  transform: scale(1.05);
+}
+
+.checkboxIndicator::after {
+  content: '';
+  width: 0.45rem;
+  height: 0.25rem;
+
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+
+  opacity: 0;
+  transform: rotate(-45deg) scale(0);
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.checkboxIndicator.active {
+  border: 2px solid var(--clr-primary-5);
+
+  background-color: var(--clr-primary-5);
+
+  box-shadow: 0 0 0 6px rgb(255, 104, 10, 0.15);
+
+  &::after {
+    opacity: 1;
+    transform: rotate(-45deg) scale(1);
+  }
+}
+
+.labelText {
+  text-transform: capitalize;
+}

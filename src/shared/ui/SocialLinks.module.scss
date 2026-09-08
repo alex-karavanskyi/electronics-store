@@ -1,0 +1,20 @@
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 5rem;
+}
+
+.container .social__links-icon {
+  display: inline-flex;
+  font-size: 1.5rem;
+  color: var(--social-icon);
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+
+  &:hover {
+    color: var(--social-icon-hover);
+    transform: translateY(-2px);
+  }
+}

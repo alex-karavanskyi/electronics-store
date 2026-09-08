@@ -1,0 +1,101 @@
+@use '../../shared/styles' as shared;
+
+$product-image-size: 5.5rem;
+$quantity-step-size: 2rem;
+
+.items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 1.5rem;
+  scrollbar-width: thin;
+}
+
+.cartItem {
+  display: grid;
+  grid-template-columns: $product-image-size minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1.35rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.productImage {
+  width: $product-image-size;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 0.9rem;
+  background: var(--sand);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.itemDetails {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+
+  > a {
+    overflow: hidden;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.itemPrice {
+  margin-top: 0.25rem;
+  color: var(--copper-dark);
+  font: 0.8rem var(--font-utility);
+}
+
+.itemActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.quantity {
+  height: $quantity-step-size;
+  display: inline-grid;
+  grid-template-columns: repeat(3, $quantity-step-size);
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: shared.$pill-radius;
+  background: var(--porcelain);
+
+  button {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    border: 0;
+    color: var(--navy);
+    background: transparent;
+    cursor: pointer;
+  }
+
+  output {
+    text-align: center;
+    font: 700 0.78rem var(--font-utility);
+  }
+}
+
+.removeButton {
+  @include shared.icon-button(2rem);
+  border: 0;
+  color: var(--ink-soft);
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--copper-dark);
+    background: var(--porcelain);
+  }
+}

@@ -1,5 +1,4 @@
 'use client'
-import styled from 'styled-components'
 
 import { ClearButton, Price, Search } from '@/components/home'
 import {
@@ -7,6 +6,8 @@ import {
   HandleClearButtonFn,
   HandleFiltersFn,
 } from '@/shared/types/productsType'
+
+import styles from './Filters.module.scss'
 
 interface FiltersProps extends FilterFields {
   handleFilters: HandleFiltersFn
@@ -21,8 +22,8 @@ const Filters: React.FC<FiltersProps> = ({
   handleClearButton,
 }) => {
   return (
-    <Container>
-      <SectionTitle>Search & price</SectionTitle>
+    <aside className={styles.container}>
+      <h5 className={styles.sectionTitle}>Search & price</h5>
       <Search handleFilters={handleFilters} />
       <Price
         price={price}
@@ -31,26 +32,8 @@ const Filters: React.FC<FiltersProps> = ({
         handleFilters={handleFilters}
       />
       <ClearButton handleClearButton={handleClearButton} />
-    </Container>
+    </aside>
   )
 }
-
-const Container = styled.aside`
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  padding: 1rem;
-  border: 1px solid var(--line);
-  border-radius: 1.1rem;
-  background: #f7f8f5;
-`
-
-const SectionTitle = styled.h5`
-  color: var(--navy);
-  font-size: 0.95rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-align: left;
-`
 
 export default Filters

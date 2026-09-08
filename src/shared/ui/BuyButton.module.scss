@@ -1,0 +1,50 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: fit-content;
+
+  border: none;
+  border-radius: var(--radius);
+  background: var(--clr-primary-5);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--clr-primary-4);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &.fullWidth {
+    width: 100%;
+  }
+
+  &.sm {
+    height: 2.5rem;
+    padding: 0 1rem;
+    font-size: 0.875rem;
+  }
+
+  &.md {
+    height: 3rem;
+    padding: 0 1.5rem;
+    font-size: 1rem;
+  }
+
+  &.lg {
+    height: 3.5rem;
+    padding: 0 2rem;
+    font-size: 1.125rem;
+  }
+}

@@ -1,0 +1,101 @@
+@use '../shared/styles' as shared;
+
+.container {
+  margin-top: 2rem;
+  padding: 4.5rem 1rem 1.5rem;
+  background: var(--navy);
+  border-top: 1px solid rgb(255, 255, 255, 0.1);
+}
+
+.container .footer {
+  &__container {
+    @include shared.container;
+  }
+
+  &__intro {
+    display: grid;
+    gap: 1.25rem;
+    padding-bottom: 4rem;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid rgb(255, 255, 255, 0.14);
+  }
+
+  &__wordmark {
+    color: var(--copper);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    letter-spacing: 0.14em;
+  }
+
+  &__intro h2 {
+    color: white;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+  }
+
+  &__intro em {
+    color: var(--copper);
+    font-weight: 400;
+  }
+
+  &__intro p {
+    max-width: 30rem;
+    color: rgb(255, 255, 255, 0.55);
+  }
+
+  &__grid {
+    display: grid;
+    gap: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 250px));
+    justify-content: space-between;
+  }
+
+  &__column {
+    font-size: 0.95rem;
+  }
+
+  &__title {
+    color: white;
+    font-weight: 600;
+    font-family: var(--font-main);
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-transform: capitalize;
+    margin-bottom: 1.5rem;
+  }
+
+  &__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  &__link {
+    color: rgb(255, 255, 255, 0.5);
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: var(--copper);
+    }
+  }
+}
+
+@include shared.from(shared.$mobile) {
+  .container {
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .container .footer {
+    &__intro {
+      grid-template-columns: 0.35fr 1fr 0.7fr;
+      align-items: end;
+    }
+
+    &__grid {
+      justify-content: center;
+    }
+  }
+}

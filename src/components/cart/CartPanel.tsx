@@ -7,7 +7,7 @@ import { useAppDispatch } from '@/redux/hooks'
 import { formatPrice } from '@/shared/utils/formatPrice'
 
 import CartContents from './CartContents'
-import * as S from './CartDrawer.styles'
+import styles from './CartPanel.module.scss'
 import EmptyCart from './EmptyCart'
 
 interface CartPanelProps {
@@ -26,47 +26,49 @@ const CartPanel = ({
   const dispatch = useAppDispatch()
 
   return (
-    <S.Panel
+    <aside
+      className={styles.panel}
       role="dialog"
       aria-modal="true"
       aria-labelledby="cart-title"
       aria-describedby={items.length === 0 ? 'cart-empty' : undefined}
     >
-      <S.Header>
+      <header className={styles.header}>
         <div>
-          <S.Eyebrow>Your selection</S.Eyebrow>
-          <S.Title id="cart-title">
+          <p className={styles.eyebrow}>Your selection</p>
+          <h2 className={styles.title} id="cart-title">
             Cart <span>{totalQuantity}</span>
-          </S.Title>
+          </h2>
         </div>
-        <S.CloseButton
+        <button
+          className={styles.closeButton}
           ref={closeButtonRef}
           type="button"
           onClick={() => dispatch(closeCart())}
           aria-label="Close cart"
         >
           <HiXMark />
-        </S.CloseButton>
-      </S.Header>
+        </button>
+      </header>
 
       {items.length === 0 ? (
         <EmptyCart />
       ) : (
         <>
           <CartContents items={items} />
-          <S.Footer>
+          <footer className={styles.footer}>
             <button type="button" onClick={() => dispatch(clearCart())}>
               Clear cart
             </button>
-            <S.Total>
+            <div className={styles.total}>
               <span>Total</span>
               <strong>{formatPrice(totalPrice)}</strong>
-            </S.Total>
+            </div>
             <p>Taxes and delivery are calculated at checkout.</p>
-          </S.Footer>
+          </footer>
         </>
       )}
-    </S.Panel>
+    </aside>
   )
 }
 

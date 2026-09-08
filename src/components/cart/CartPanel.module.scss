@@ -1,0 +1,115 @@
+@use '../../shared/styles' as shared;
+
+.panel {
+  width: min(100%, 31rem);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--paper);
+  box-shadow: -20px 0 60px rgb(9, 25, 31, 0.22);
+  animation: cart-slide-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes cart-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+.header {
+  min-height: 8.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  color: white;
+  background: var(--navy);
+}
+
+.eyebrow {
+  margin-bottom: 0.35rem;
+  color: rgb(255, 255, 255, 0.58);
+  font-family: var(--font-utility);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: white;
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
+
+  span {
+    min-width: 1.7rem;
+    height: 1.7rem;
+    display: inline-grid;
+    place-items: center;
+    padding: 0 0.4rem;
+    border-radius: shared.$pill-radius;
+    background: var(--copper);
+    font:
+      700 0.75rem Arial,
+      sans-serif;
+  }
+}
+
+.closeButton {
+  @include shared.icon-button(2.75rem);
+  border: 1px solid rgb(255, 255, 255, 0.22);
+  color: white;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgb(255, 255, 255, 0.1);
+  }
+
+  svg {
+    width: 1.45rem;
+    height: 1.45rem;
+  }
+}
+
+.footer {
+  padding: 1.25rem 1.5rem max(1.5rem, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--porcelain);
+
+  > button {
+    margin-bottom: 1rem;
+    border: 0;
+    border-bottom: 1px solid currentcolor;
+    color: var(--ink-soft);
+    background: transparent;
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+
+  > p {
+    margin-top: 0.35rem;
+    font-size: 0.72rem;
+    text-align: right;
+  }
+}
+
+.total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-display);
+
+  span {
+    font-size: 1.1rem;
+  }
+
+  strong {
+    color: var(--navy);
+    font-size: 1.6rem;
+  }
+}

@@ -1,0 +1,39 @@
+@use '../../../shared/styles' as shared;
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.container .clear__btn {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  text-transform: capitalize;
+  background: var(--navy);
+  border: 1px solid var(--navy);
+  border-radius: shared.$filter-control-radius;
+  letter-spacing: var(--spacing);
+  color: white;
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &.animate {
+    animation: pop 0.3s ease;
+  }
+}

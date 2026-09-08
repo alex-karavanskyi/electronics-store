@@ -1,0 +1,19 @@
+@use '../shared/styles' as shared;
+
+.errorWrapper {
+  @include shared.container;
+  width: 70vw;
+  padding: 5rem 0;
+  text-align: center;
+}
+
+.errorTitle {
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.redirectText {
+  color: #acb4be;
+  font-size: 1rem;
+  opacity: 0.9;
+}

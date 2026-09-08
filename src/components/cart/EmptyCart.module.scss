@@ -1,0 +1,47 @@
+@use '../../shared/styles' as shared;
+
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+
+  h3 {
+    margin-top: 1.35rem;
+    font-size: 1.45rem;
+  }
+
+  p {
+    max-width: 19rem;
+    margin-top: 0.65rem;
+  }
+
+  a {
+    margin-top: 1.5rem;
+    padding: 0.8rem 1.25rem;
+    border-radius: shared.$pill-radius;
+    color: white;
+    background: var(--copper);
+    font-weight: 600;
+  }
+}
+
+.emptyIcon {
+  width: 5.5rem;
+  height: 5.5rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--navy);
+  background: var(--porcelain);
+  box-shadow: 0 0 0 0.75rem rgb(244, 246, 243, 0.65);
+
+  svg {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}

@@ -4,17 +4,12 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import styled from 'styled-components'
-
-import { device } from '@/shared/constants/device'
 import { Product } from '@/shared/types/productsType'
 import CartButton from '@/shared/ui/CartButton'
 import ProductInfo from '@/shared/ui/ProductInfo'
 import ListViewSkeleton from '@/shared/ui/skeletons/ListViewSkeleton'
-import {
-  containerCart,
-  containerStyles,
-} from '@/shared/ui/styles/containerStyles'
+
+import styles from './ListView.module.scss'
 
 interface ListProductsProps {
   products: Product[]
@@ -30,32 +25,34 @@ const ListView = ({ products, isLoading }: ListProductsProps) => {
   }
 
   return (
-    <Container>
-      <div className="list__view-products">
+    <section className={styles.container}>
+      <div className={styles['list__view-products']}>
         {isLoading && <ListViewSkeleton />}
         {!isLoading &&
           visibleProducts.map(product => {
             const { id, image, description } = product
             return (
-              <article className="list__view-article" key={id}>
+              <article className={styles['list__view-article']} key={id}>
                 <Image
                   alt={product.name}
                   width={300}
                   height={200}
                   priority
                   src={image}
-                  className="list__view-image"
+                  className={styles['list__view-image']}
                 />
 
-                <div className="list__view-products-info">
+                <div className={styles['list__view-products-info']}>
                   <ProductInfo
+                    favoriteClassName={styles['product__info-favorite-icon']}
                     product={product}
                     variant="compact"
                     showHeader={true}
                     showPrice={false}
                   />
-                  <div className="list__view-price-cart">
+                  <div className={styles['list__view-price-cart']}>
                     <ProductInfo
+                      favoriteClassName={styles['product__info-favorite-icon']}
                       product={product}
                       variant="compact"
                       showHeader={false}
@@ -65,13 +62,13 @@ const ListView = ({ products, isLoading }: ListProductsProps) => {
                     <CartButton product={product} />
                   </div>
 
-                  <p className="list__view-products-description">
+                  <p className={styles['list__view-products-description']}>
                     {description.substring(0, 150)}...
                   </p>
 
                   <Link
                     href={`/product/${id}`}
-                    className="list__view-products-btn-details"
+                    className={styles['list__view-products-btn-details']}
                   >
                     Details
                   </Link>
@@ -81,151 +78,16 @@ const ListView = ({ products, isLoading }: ListProductsProps) => {
           })}
       </div>
       {!isLoading && visibleCount < products.length && (
-        <button className="list__view-load-more-btn" onClick={handleLoadMore}>
+        <button
+          className={styles['list__view-load-more-btn']}
+          onClick={handleLoadMore}
+        >
           Load More
           <span>→</span>
         </button>
       )}
-    </Container>
+    </section>
   )
 }
-
-const Container = styled.section`
-  ${containerStyles}
-  padding-bottom: 1rem;
-  padding-left: 1rem;
-
-  .list__view-products {
-    display: grid;
-    row-gap: 1.5rem;
-    color: var(--clr-primary-4);
-  }
-
-  .list__view-article {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .list__view-products-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .list__view-image {
-    width: 100%;
-    max-width: 300px;
-    height: 200px;
-    object-fit: cover;
-    border-radius: var(--radius);
-  }
-
-  .list__view-products-description {
-    max-width: 45em;
-    line-height: 1.6;
-  }
-
-  .list__view-products-btn-details {
-    padding: 0.7rem 1.6rem;
-    color: var(--copper-dark);
-    text-transform: uppercase;
-    font-size: 0.95rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    background: transparent;
-    border: 1px solid var(--copper);
-    border-radius: 8px;
-    width: max-content;
-    cursor: pointer;
-    transition:
-      background-color 0.25s ease,
-      border-color 0.25s ease,
-      color 0.25s ease,
-      box-shadow 0.25s ease,
-      transform 0.25s ease;
-  }
-
-  .list__view-products-btn-details:hover {
-    color: var(--paper);
-    background: var(--copper);
-    border-color: var(--copper-dark);
-    box-shadow: 0 8px 18px var(--clr-list-hover-shadow);
-    transform: translateY(-2px);
-  }
-
-  .list__view-products-btn-details:active {
-    transform: translateY(0);
-  }
-
-  .list__view-load-more-btn {
-    margin: 3rem auto 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-
-    min-width: 180px;
-    padding: 0.9rem 2.2rem;
-    border: 1px solid var(--navy);
-    border-radius: 999px;
-    background: var(--navy);
-    color: var(--paper);
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    cursor: pointer;
-    box-shadow: 0 10px 24px rgb(16 42 53 / 16%);
-
-    transition:
-      background-color 0.25s ease,
-      border-color 0.3s ease,
-      box-shadow 0.3s ease,
-      transform 0.3s ease;
-  }
-
-  .list__view-load-more-btn:hover {
-    background: var(--navy-light);
-    border-color: var(--navy-light);
-    box-shadow: 0 12px 28px rgb(16 42 53 / 24%);
-    transform: translateY(-3px);
-  }
-
-  .list__view-load-more-btn span {
-    transition: transform 0.3s ease;
-  }
-
-  .list__view-load-more-btn:hover span {
-    transform: translateX(5px);
-  }
-
-  .list__view-load-more-btn:active {
-    transform: translateY(0);
-  }
-
-  .list__view-price-cart {
-    ${containerCart}
-  }
-
-  .product__info-favorite-icon {
-    width: 1.2rem;
-    height: 1.2rem;
-    cursor: pointer;
-  }
-
-  @media ${device.mobile} {
-    .list__view-article,
-    .list__view-skeleton-card {
-      flex-direction: row;
-      column-gap: 2rem;
-      align-items: center;
-    }
-  }
-
-  @media ${device.desktop} {
-    padding-left: 0;
-  }
-`
 
 export default ListView

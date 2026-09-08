@@ -1,0 +1,55 @@
+.container ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+}
+
+.container li {
+  position: relative;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.container a {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  font-family: var(--font-main);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: rgb(255, 255, 255, 0.72);
+  transition: color 0.3s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--copper);
+    transition: width 0.3s ease;
+  }
+}
+
+.container li:hover a::after {
+  width: 100%;
+}
+
+.container .dark a {
+  color: var(--ink);
+}
+
+.container .sidebar {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sidebar-links-gap, 1.5rem);
+
+  a {
+    font-size: 2rem;
+  }
+}

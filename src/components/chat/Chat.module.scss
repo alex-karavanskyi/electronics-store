@@ -1,0 +1,163 @@
+@use '../../shared/styles' as shared;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 650px;
+  background: #121418;
+  border: 1px solid var(--clr-secondary-2);
+  overflow: hidden;
+
+  box-shadow:
+    0 20px 50px rgb(0, 0, 0, 0.35),
+    inset 0 1px var(--clr-secondary-5);
+}
+
+.messagesContainer {
+  flex: 1;
+  padding: 24px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: linear-gradient(180deg, #17191f, #111317);
+}
+
+.message {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  color: white;
+
+  flex-direction: row;
+
+  animation: fadeUp 0.25s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message.user {
+  color: var(--clr-primary-1);
+
+  flex-direction: row-reverse;
+}
+
+.formContainer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--clr-secondary-6);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--clr-secondary-6);
+}
+
+.input {
+  flex: 1;
+  padding: 15px 20px;
+  background: #23272f;
+  color: white;
+  border: 1px solid transparent;
+  border-radius: shared.$pill-radius;
+  font-size: 15px;
+  transition: 0.25s;
+
+  &::placeholder {
+    color: #8b95a7;
+  }
+
+  &:focus {
+    border-color: #4f8cff;
+    background: #292e38;
+    box-shadow: 0 0 0 4px rgb(79, 140, 255, 0.15);
+  }
+}
+
+.sendButton {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--clr-primary-1);
+  color: white;
+  cursor: pointer;
+  transition: 0.25s;
+
+  &:hover {
+    transform: translateY(-2px) scale(1.05);
+
+    background: #4b91ff;
+  }
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.55rem;
+  height: 1rem;
+  margin-left: 0.25rem;
+  vertical-align: bottom;
+  background: currentcolor;
+  border-radius: shared.$pill-radius;
+  animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 18px 20px;
+
+  background: #1a1d23;
+
+  border-bottom: 1px solid var(--clr-secondary-1);
+
+  color: white;
+
+  span {
+    font-size: 28px;
+  }
+
+  strong {
+    display: block;
+    font-size: 15px;
+  }
+
+  small {
+    color: #9ca3af;
+  }
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--clr-secondary-4);
+  text-align: center;
+  padding: 2rem;
+  font-size: 0.95rem;
+
+  svg {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+}

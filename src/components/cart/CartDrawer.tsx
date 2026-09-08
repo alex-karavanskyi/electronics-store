@@ -5,7 +5,7 @@ import { closeCart } from '@/redux/features/cartSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import useModalInteractions from '@/shared/hooks/useModalInteractions'
 
-import * as S from './CartDrawer.styles'
+import styles from './CartDrawer.module.scss'
 import CartPanel from './CartPanel'
 
 const CartDrawer = () => {
@@ -29,7 +29,8 @@ const CartDrawer = () => {
   if (!isOpen) return null
 
   return (
-    <S.Backdrop
+    <div
+      className={styles.backdrop}
       onMouseDown={event => {
         if (event.target === event.currentTarget) dispatch(closeCart())
       }}
@@ -40,7 +41,7 @@ const CartDrawer = () => {
         totalPrice={totalPrice}
         closeButtonRef={closeButtonRef}
       />
-    </S.Backdrop>
+    </div>
   )
 }
 

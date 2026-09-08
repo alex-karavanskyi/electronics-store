@@ -1,11 +1,10 @@
 'use client'
-import styled, { css } from 'styled-components'
 
 import { Product } from '@/shared/types/productsType'
 import { FavoriteButton } from '@/shared/ui'
 import { formatPrice } from '@/shared/utils/formatPrice'
 
-import { device } from '../constants/device'
+import styles from './ProductInfo.module.scss'
 
 interface ProductInfoProps {
   product: Product
@@ -15,6 +14,7 @@ interface ProductInfoProps {
   showPrice?: boolean
   showFavorite?: boolean
   className?: string
+  favoriteClassName?: string
 }
 
 const ProductInfo: React.FC<ProductInfoProps> = ({
@@ -25,74 +25,47 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
   showPrice = true,
   showFavorite = true,
   className = '',
+  favoriteClassName,
 }) => {
   const { name, price } = product
   const PriceTag = priceTag
   const isDetailed = variant === 'detailed'
 
   return (
-    <Container className={className} $isDetailed={isDetailed}>
+    <div
+      className={[
+        styles.container,
+        className,
+        isDetailed ? styles.detailed : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       {showHeader && (
-        <Header $isDetailed={isDetailed}>
-          <Name $isDetailed={isDetailed}>{name}</Name>
+        <div
+          className={[styles.header, isDetailed ? styles.detailed : '']
+            .filter(Boolean)
+            .join(' ')}
+        >
+          <h5
+            className={[styles.name, isDetailed ? styles.detailed : '']
+              .filter(Boolean)
+              .join(' ')}
+          >
+            {name}
+          </h5>
           {showFavorite && (
-            <FavoriteButton
-              product={product}
-              classIcon="product__info-favorite-icon"
-            />
+            <FavoriteButton product={product} classIcon={favoriteClassName} />
           )}
-        </Header>
+        </div>
       )}
       {showPrice && (
-        <PriceTag className="product__info-price">
+        <PriceTag className={styles['product__info-price']}>
           {formatPrice(price)}
         </PriceTag>
       )}
-    </Container>
+    </div>
   )
 }
-
-const baseStyles = css`
-  color: var(--ink);
-`
-
-const Container = styled.div<{ $isDetailed: boolean }>`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ $isDetailed }) => ($isDetailed ? '0.75rem' : '0.5rem')};
-  ${baseStyles}
-
-  .product__info-price {
-    margin: 0;
-    color: var(--ink);
-    font-family: inherit;
-    font-size: ${({ $isDetailed }) =>
-      $isDetailed ? 'clamp(1.125rem, 1.4vw, 1.375rem)' : '1rem'};
-    font-weight: 650;
-    letter-spacing: 0.01em;
-    line-height: 1.2;
-  }
-`
-
-const Header = styled.div<{ $isDetailed: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: ${({ $isDetailed }) => ($isDetailed ? '0.75rem' : '0.5rem')};
-`
-
-const Name = styled.h5<{ $isDetailed: boolean }>`
-  font-weight: 500;
-  color: var(--ink);
-  font-size: ${({ $isDetailed }) => ($isDetailed ? '1.5rem' : '1.15rem')};
-  line-height: 1.25;
-
-  & + svg {
-    flex: 0 0 auto;
-  }
-
-  @media ${device.laptop} {
-    font-size: ${({ $isDetailed }) => ($isDetailed ? '2rem' : 'inherit')};
-  }
-`
 
 export default ProductInfo

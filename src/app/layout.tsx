@@ -1,4 +1,4 @@
-import './globals.css'
+import './globals.scss'
 import { Inter, Sora } from 'next/font/google'
 
 import { Metadata } from 'next'

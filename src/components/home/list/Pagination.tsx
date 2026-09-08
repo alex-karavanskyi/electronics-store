@@ -4,10 +4,11 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 
 import { IoChevronBack, IoChevronForward } from 'react-icons/io5'
-import styled from 'styled-components'
 
 import { numberPagination } from '@/redux/features/paginationSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+
+import styles from './Pagination.module.scss'
 
 interface PaginationProducts {
   postsPerPage: number
@@ -55,14 +56,19 @@ const Pagination: React.FC<PaginationProducts> = ({
   }, [dispatch])
 
   return (
-    <Container>
-      <ul className="pagination__container">
+    <nav className={styles.container}>
+      <ul className={styles.pagination__container}>
         <li
-          className={`pagination pagination-arrow ${currentPage === 1 ? 'pagination--disabled' : ''}`}
+          className={[
+            [styles.pagination, styles['pagination-arrow']].join(' '),
+            currentPage === 1 ? styles['pagination--disabled'] : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
         >
           <Link
             href="/"
-            className="pagination__link"
+            className={styles.pagination__link}
             onClick={goToPrev}
             aria-disabled={currentPage === 1}
           >
@@ -72,27 +78,32 @@ const Pagination: React.FC<PaginationProducts> = ({
         {pageNumbers.map(number => (
           <li
             key={number}
-            className={`${
+            className={
               number === currentPage
-                ? 'pagination pagination--active'
-                : 'pagination'
-            }`}
+                ? [styles.pagination, styles['pagination--active']].join(' ')
+                : styles.pagination
+            }
           >
             <Link
               onClick={handleClick(number)}
               href="/"
-              className="pagination__link"
+              className={styles.pagination__link}
             >
               {number}
             </Link>
           </li>
         ))}
         <li
-          className={`pagination pagination-arrow ${currentPage === totalPages ? 'pagination--disabled' : ''}`}
+          className={[
+            [styles.pagination, styles['pagination-arrow']].join(' '),
+            currentPage === totalPages ? styles['pagination--disabled'] : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
         >
           <Link
             href="/"
-            className="pagination__link"
+            className={styles.pagination__link}
             onClick={goToNext}
             aria-disabled={currentPage === totalPages}
           >
@@ -100,87 +111,8 @@ const Pagination: React.FC<PaginationProducts> = ({
           </Link>
         </li>
       </ul>
-    </Container>
+    </nav>
   )
 }
-
-const Container = styled.nav`
-  padding: 2rem 0;
-
-  .pagination__container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .pagination {
-    border: 1px solid var(--clr-grey-4);
-    border-radius: 50%;
-    overflow: hidden;
-    transition: all 0.25s ease;
-
-    &:not(.pagination--active):not(.pagination--disabled):hover {
-      border-color: var(--clr-pagination-hover-border);
-      background-color: var(--clr-pagination-hover-background);
-      transform: translateY(-2px);
-    }
-
-    &.pagination--active {
-      background-color: var(--navy);
-      border-color: var(--navy);
-
-      .pagination__link {
-        color: #fff;
-      }
-
-      &:hover {
-        background-color: var(--copper);
-      }
-    }
-
-    &.pagination-arrow {
-      border: 1px solid transparent;
-      background-color: transparent;
-
-      &:not(.pagination--disabled):hover {
-        border-color: var(--clr-pagination-hover-border);
-        background-color: var(--clr-pagination-hover-background);
-      }
-    }
-
-    &.pagination--disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
-  }
-
-  .pagination,
-  .pagination-arrow {
-    width: 2.3rem;
-    height: 2.3rem;
-  }
-
-  .pagination__link {
-    display: grid;
-    place-items: center;
-    width: 100%;
-    height: 100%;
-    text-decoration: none;
-    color: var(--ink);
-    transition: color 0.25s ease;
-  }
-
-  .pagination-arrow:first-child {
-    margin-right: 0.75rem;
-  }
-  .pagination-arrow:last-child {
-    margin-left: 0.75rem;
-  }
-`
 
 export default Pagination

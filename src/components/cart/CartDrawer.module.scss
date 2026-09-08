@@ -1,0 +1,17 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  justify-content: flex-end;
+  background: rgb(9, 25, 31, 0.56);
+  backdrop-filter: blur(3px);
+  animation: cart-fade-in 0.22s ease-out;
+}
+
+@keyframes cart-fade-in {
+  from {
+    background: rgb(9, 25, 31, 0);
+    backdrop-filter: blur(0);
+  }
+}

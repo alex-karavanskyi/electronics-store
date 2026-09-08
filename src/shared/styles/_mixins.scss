@@ -1,0 +1,38 @@
+@use 'tokens';
+
+@mixin container {
+  width: 100%;
+  margin: 0 auto;
+  max-width: tokens.$container-width;
+}
+
+@mixin cart-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@mixin skeleton-base {
+  border-radius: 4px;
+  background: var(--clr-grey-3);
+  animation: skeleton-pulse 1.5s infinite ease-in-out;
+
+  @keyframes skeleton-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.4;
+    }
+  }
+}
+
+@mixin icon-button($size) {
+  width: $size;
+  height: $size;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}

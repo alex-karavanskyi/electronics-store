@@ -1,9 +1,9 @@
 'use client'
 import { useState } from 'react'
 
-import styled, { keyframes } from 'styled-components'
-
 import { HandleClearButtonFn } from '@/shared/types/productsType'
+
+import styles from './ClearButton.module.scss'
 
 interface ClearButtonProps {
   handleClearButton: HandleClearButtonFn
@@ -19,54 +19,18 @@ const ClearButton: React.FC<ClearButtonProps> = ({ handleClearButton }) => {
   }
 
   return (
-    <Container>
+    <div className={styles.container}>
       <button
         type="button"
-        className={`clear__btn ${clicked ? 'animate' : ''}`}
+        className={[styles.clear__btn, clicked ? styles.animate : '']
+          .filter(Boolean)
+          .join(' ')}
         onClick={handleClick}
       >
         clear filters
       </button>
-    </Container>
+    </div>
   )
 }
-
-const pop = keyframes`
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.08);
-  }
-  100% {
-    transform: scale(1);
-  }
-`
-
-const Container = styled.div`
-  .clear__btn {
-    width: 100%;
-    padding: 0.75rem 0.9rem;
-    text-transform: capitalize;
-    background: var(--navy);
-    border: 1px solid var(--navy);
-    border-radius: 77px;
-    letter-spacing: var(--spacing);
-    color: white;
-    font-family: var(--font-main);
-    font-weight: 700;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-
-  .clear__btn:hover {
-    transform: translateY(-1px);
-  }
-
-  .clear__btn.animate {
-    animation: ${pop} 0.3s ease;
-  }
-`
 
 export default ClearButton

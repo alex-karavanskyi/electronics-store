@@ -1,0 +1,201 @@
+@use '../shared/styles' as shared;
+
+.container {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 3000;
+  height: var(--navbar-height);
+  padding: 0 1rem;
+  background: var(--navy);
+  border-bottom: 1px solid rgb(255, 255, 255, 0.1);
+  box-shadow: none;
+  backdrop-filter: blur(16px);
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.container .navbar {
+  width: 100%;
+  max-width: shared.$container-width;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &__brand {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    color: white;
+
+    span {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      letter-spacing: 0.13em;
+    }
+
+    small {
+      display: none;
+      padding-left: 0.75rem;
+      border-left: 1px solid rgb(255, 255, 255, 0.25);
+      color: rgb(255, 255, 255, 0.55);
+      font-family: var(--font-utility);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+  }
+
+  &__right {
+    display: none;
+    align-items: center;
+    gap: 2.25rem;
+  }
+
+  &__links {
+    display: flex;
+    gap: 1.75rem;
+
+    a {
+      color: rgb(255, 255, 255, 0.72);
+    }
+  }
+
+  &__icons {
+    display: flex;
+    gap: 0.45rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid rgb(255, 255, 255, 0.18);
+
+    button {
+      position: relative;
+
+      @include shared.icon-button(2.5rem);
+      border: 0;
+      background: transparent;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: rgb(255, 255, 255, 0.1);
+    }
+
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+
+  &__cart-count {
+    position: absolute;
+    top: -0.1rem;
+    right: -0.15rem;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    display: grid;
+    place-items: center;
+    padding: 0 0.22rem;
+    border-radius: shared.$pill-radius;
+    color: white;
+    background: var(--copper);
+    font-size: 0.58rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  &__menu {
+    width: 2.75rem;
+    height: 2.75rem;
+    display: grid;
+    align-content: center;
+    gap: 6px;
+    padding: 0 0.65rem;
+    border: 1px solid rgb(255, 255, 255, 0.3);
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+
+    span {
+      height: 1px;
+      background: white;
+      transition: transform 0.25s ease;
+    }
+  }
+}
+
+.container.scrolled .navbar__menu span {
+  background: var(--navy);
+}
+
+.container .navbar__menu[aria-expanded='true'] {
+  span:first-child {
+    transform: translateY(3.5px) rotate(45deg);
+  }
+
+  span:last-child {
+    transform: translateY(-3.5px) rotate(-45deg);
+  }
+}
+
+@include shared.from(shared.$mobile) {
+  .container {
+    padding: 0 1.5rem;
+  }
+
+  .container .navbar__brand small {
+    display: inline;
+  }
+}
+
+@include shared.from(shared.$tablet) {
+  .container .navbar {
+    &__menu {
+      display: none;
+    }
+
+    &__right {
+      display: flex;
+    }
+  }
+}
+
+.container.scrolled {
+  background: rgb(244, 246, 243, 0.94);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 12px 35px rgb(16, 42, 53, 0.08);
+
+  .navbar {
+    &__brand {
+      color: var(--navy);
+    }
+
+    &__brand small {
+      border-left: 1px solid var(--line);
+      color: var(--ink-soft);
+    }
+
+    &__links a {
+      color: var(--navy);
+    }
+
+    &__icons {
+      border-left: 1px solid var(--line);
+    }
+
+    &__icons button {
+      color: var(--navy);
+    }
+
+    &__icons button:hover {
+      background: white;
+    }
+
+    &__menu {
+      border: 1px solid var(--line);
+    }
+  }
+}

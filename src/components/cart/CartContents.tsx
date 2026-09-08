@@ -13,7 +13,7 @@ import {
 import { useAppDispatch } from '@/redux/hooks'
 import { formatPrice } from '@/shared/utils/formatPrice'
 
-import * as S from './CartDrawer.styles'
+import styles from './CartContents.module.scss'
 
 interface CartContentsProps {
   items: CartItemType[]
@@ -23,22 +23,25 @@ const CartContents = ({ items }: CartContentsProps) => {
   const dispatch = useAppDispatch()
 
   return (
-    <S.Items aria-label="Products in cart">
+    <ul className={styles.items} aria-label="Products in cart">
       {items.map(({ product, quantity }) => (
-        <S.CartItem key={product.id}>
-          <S.ProductImage>
+        <li className={styles.cartItem} key={product.id}>
+          <div className={styles.productImage}>
             <Image src={product.image} alt="" width={112} height={112} />
-          </S.ProductImage>
-          <S.ItemDetails>
+          </div>
+          <div className={styles.itemDetails}>
             <Link
               href={`/product/${product.id}`}
               onClick={() => dispatch(closeCart())}
             >
               {product.name}
             </Link>
-            <S.ItemPrice>{formatPrice(product.price)}</S.ItemPrice>
-            <S.ItemActions>
-              <S.Quantity aria-label={`Quantity of ${product.name}`}>
+            <p className={styles.itemPrice}>{formatPrice(product.price)}</p>
+            <div className={styles.itemActions}>
+              <div
+                className={styles.quantity}
+                aria-label={`Quantity of ${product.name}`}
+              >
                 <button
                   type="button"
                   onClick={() => dispatch(decrementQuantity(product.id))}
@@ -54,19 +57,20 @@ const CartContents = ({ items }: CartContentsProps) => {
                 >
                   <HiPlus />
                 </button>
-              </S.Quantity>
-              <S.RemoveButton
+              </div>
+              <button
+                className={styles.removeButton}
                 type="button"
                 onClick={() => dispatch(removeFromCart(product.id))}
                 aria-label={`Remove ${product.name} from cart`}
               >
                 <HiOutlineTrash />
-              </S.RemoveButton>
-            </S.ItemActions>
-          </S.ItemDetails>
-        </S.CartItem>
+              </button>
+            </div>
+          </div>
+        </li>
       ))}
-    </S.Items>
+    </ul>
   )
 }
 
