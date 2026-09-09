@@ -20,7 +20,11 @@ export const useInitializeFiltersFromUrl = () => {
     dispatch(
       initializeFilters({
         text: searchParams.get(FilterName.Text) ?? '',
-        price: Number(searchParams.get(FilterName.Price) ?? 0),
+        price:
+          searchParams.has(FilterName.Price) &&
+          Number.isFinite(Number(searchParams.get(FilterName.Price)))
+            ? Math.max(0, Number(searchParams.get(FilterName.Price)))
+            : null,
         sort: searchParams.get(FilterName.Sort) ?? 'price-lowest',
         category: searchParams.getAll(FilterName.Category),
       })

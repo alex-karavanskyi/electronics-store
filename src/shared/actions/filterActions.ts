@@ -93,13 +93,6 @@ export const updateSortFilter = ({
 
   dispatch(updateSort(value))
 
-  dispatch(
-    updateFilters({
-      name: FilterName.Sort,
-      value,
-    })
-  )
-
   dispatch(numberPagination(1))
 
   debouncedUpdateFilters(params)

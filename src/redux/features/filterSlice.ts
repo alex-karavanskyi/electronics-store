@@ -2,41 +2,22 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 import { loadGridViewFromStorage } from '@/shared/lib/localStorageFilters'
-import { FilterState, Product } from '@/shared/types/productsType'
-
-const initialGridView = loadGridViewFromStorage()
+import { FilterState, ProductFilters } from '@/shared/types/productsType'
 
 const initialState: FilterState = {
-  filtered_products: [],
-  all_products: [],
-  grid_view: initialGridView,
+  grid_view: loadGridViewFromStorage(),
   sort: 'price-lowest',
-  filters: {
-    text: '',
-    category: [],
-    min_price: 0,
-    max_price: 0,
-    price: 0,
-  },
+  filters: { text: '', category: [], price: null },
 }
+
+type FilterUpdate = {
+  [K in keyof ProductFilters]: { name: K; value: ProductFilters[K] }
+}[keyof ProductFilters]
 
 const filterSlice = createSlice({
   name: 'filter',
   initialState,
   reducers: {
-    loadProducts: (state, action: PayloadAction<Product[]>) => {
-      const products = action.payload
-      const prices = products.map(product => product.price)
-      const maxPrice = Math.max(...prices)
-      const minPrice = Math.min(...prices)
-
-      state.all_products = products
-      state.filters.min_price = minPrice
-      state.filters.max_price = maxPrice
-      if (state.filters.price === 0) {
-        state.filters.price = maxPrice
-      }
-    },
     setGridView: state => {
       state.grid_view = true
     },
@@ -46,82 +27,35 @@ const filterSlice = createSlice({
     updateSort: (state, action: PayloadAction<string>) => {
       state.sort = action.payload
     },
-    updateFilters: (
-      state,
-      action: PayloadAction<{ name: string; value: string | number | string[] }>
-    ) => {
-      const { name, value } = action.payload
-      state.filters[name] = value
+    updateFilters: (state, { payload }: PayloadAction<FilterUpdate>) => {
+      if (payload.name === 'text') state.filters.text = payload.value
+      if (payload.name === 'category') state.filters.category = payload.value
+      if (payload.name === 'price') state.filters.price = payload.value
     },
     initializeFilters: (
       state,
-      action: PayloadAction<{
-        text: string
-        category: string[]
-        price: number
-        sort: string
-      }>
+      { payload }: PayloadAction<ProductFilters & { sort: string }>
     ) => {
-      const { text, category, price, sort } = action.payload
-
-      state.filters.text = text
-      state.filters.category = category
-      state.filters.price = price
-      state.sort = sort
-    },
-    filterProducts: state => {
-      const { all_products, filters } = state
-      const { text, category, price } = filters
-      const selectedCategories = Array.isArray(category) ? category : []
-
-      state.filtered_products = all_products.filter(product => {
-        const matchesText =
-          !text || product.name.toLowerCase().startsWith(text.toLowerCase())
-        const matchesCategory =
-          selectedCategories.length === 0 ||
-          selectedCategories.includes(product.category)
-        const matchesPrice = product.price <= price
-
-        return matchesText && matchesCategory && matchesPrice
-      })
-    },
-    sortProducts: state => {
-      const { sort, filtered_products } = state
-
-      const sorted = [...filtered_products].sort((a, b) => {
-        if (sort === 'price-lowest') return a.price - b.price
-        if (sort === 'price-highest') return b.price - a.price
-        if (sort === 'name-a') return a.name.localeCompare(b.name)
-        if (sort === 'name-z') return b.name.localeCompare(a.name)
-        return 0
-      })
-
-      state.filtered_products = sorted
+      state.filters = {
+        text: payload.text,
+        category: payload.category,
+        price: payload.price,
+      }
+      state.sort = payload.sort
     },
     clearFilters: state => {
-      const { max_price } = state.filters
-
-      state.filters = {
-        ...state.filters,
-        text: '',
-        category: [],
-        price: max_price,
-      }
+      state.filters = { text: '', category: [], price: null }
       state.sort = 'price-lowest'
     },
   },
 })
 
 export const {
-  loadProducts,
   setGridView,
   setListView,
   updateSort,
   updateFilters,
   clearFilters,
   initializeFilters,
-  filterProducts,
-  sortProducts,
 } = filterSlice.actions
-
 export default filterSlice.reducer

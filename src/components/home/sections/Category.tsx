@@ -1,7 +1,7 @@
 'use client'
 import { motion } from 'framer-motion'
 
-import { useAppSelector } from '@/redux/hooks'
+import { useProducts } from '@/shared/hooks/useProducts'
 import { FilterName, HandleFiltersFn } from '@/shared/types/productsType'
 import SkeletonList from '@/shared/ui/skeletons/CategorySkeleton'
 import { getUniqueValues } from '@/shared/utils/formatPrice'
@@ -19,7 +19,7 @@ const Category: React.FC<CategoryProps> = ({
   handleFilters,
   loading,
 }) => {
-  const { all_products } = useAppSelector(store => store.filter)
+  const { data: all_products = [] } = useProducts()
   const categories = getUniqueValues(all_products, 'category')
 
   return (

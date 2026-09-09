@@ -23,7 +23,13 @@ const Price: React.FC<PriceProps> = ({
   max_price,
   handleFilters,
 }) => {
-  const progress = ((price - min_price) / (max_price - min_price)) * 100
+  const progress =
+    max_price > min_price
+      ? Math.max(
+          0,
+          Math.min(100, ((price - min_price) / (max_price - min_price)) * 100)
+        )
+      : 0
 
   const rangeStyle = { '--price-progress': `${progress}%` } as CSSProperties
 

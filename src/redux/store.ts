@@ -5,7 +5,6 @@ import favoriteSlice from '@/redux/features/favoriteSlice'
 import filterReducer from '@/redux/features/filterSlice'
 import modalReducer from '@/redux/features/modalSlice'
 import paginationSlice from '@/redux/features/paginationSlice'
-import productReducer from '@/redux/features/productSlice'
 
 import { persistCartMiddleware } from './middleware/persistCartMiddleware'
 import { persistGridViewMiddleware } from './middleware/persistGridViewMiddleware'
@@ -18,7 +17,6 @@ export const store = configureStore({
     filter: filterReducer,
     modal: modalReducer,
     pagination: paginationSlice,
-    products: productReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(

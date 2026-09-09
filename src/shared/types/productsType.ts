@@ -1,15 +1,10 @@
-type ProductFilters = {
+export type ProductFilters = {
   text: string
   category: string[]
-  price: number
-  min_price: number
-  max_price: number
-  [key: string]: string | number | string[]
+  price: number | null
 }
 
 export type FilterState = {
-  filtered_products: Product[]
-  all_products: Product[]
   grid_view: boolean
   sort: string
   filters: ProductFilters

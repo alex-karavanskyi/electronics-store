@@ -9,6 +9,7 @@ import { ReduxProvider } from '@/redux/provider'
 import CartHydrator from '@/shared/lib/CartHydrator'
 import ClientOnly from '@/shared/lib/ClientOnly'
 import FiltersCleaner from '@/shared/lib/FiltersCleaner'
+import QueryProvider from '@/shared/lib/QueryProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 const sora = Sora({
@@ -32,13 +33,15 @@ export default function RootLayout({
       <body className={`${inter.className} ${sora.variable}`}>
         <ClientOnly>
           <ReduxProvider>
-            <CartHydrator />
-            <FiltersCleaner />
-            <Navbar />
-            <main style={{ flex: 1 }}>{children}</main>
-            <Footer />
-            <Sidebar />
-            <CartDrawer />
+            <QueryProvider>
+              <CartHydrator />
+              <FiltersCleaner />
+              <Navbar />
+              <main style={{ flex: 1 }}>{children}</main>
+              <Footer />
+              <Sidebar />
+              <CartDrawer />
+            </QueryProvider>
           </ReduxProvider>
         </ClientOnly>
       </body>

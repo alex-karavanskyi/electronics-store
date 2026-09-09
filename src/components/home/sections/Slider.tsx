@@ -16,7 +16,7 @@ import {
 import { Autoplay, EffectFade, Pagination } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { useAppSelector } from '@/redux/hooks'
+import { useProducts } from '@/shared/hooks/useProducts'
 import { Product } from '@/shared/types/productsType'
 
 import styles from './Slider.module.scss'
@@ -149,9 +149,7 @@ const HighlightsBar = () => (
 )
 
 const Slider = () => {
-  const { products, products_loading: loading } = useAppSelector(
-    state => state.products
-  )
+  const { data: products = [], isPending: loading } = useProducts()
   const slides = products.slice(0, MAX_SLIDES)
 
   return (

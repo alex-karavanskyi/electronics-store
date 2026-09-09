@@ -11,6 +11,7 @@ import {
   Sort,
 } from '@/components/home'
 import { useAppSelector } from '@/redux/hooks'
+import { useCatalog } from '@/shared/hooks/useCatalog'
 import { useFilters } from '@/shared/hooks/useFilters'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 
@@ -26,14 +27,14 @@ const ProductList = () => {
   const { handleFilters, handleClearButton } = useFilters()
   const { pagination } = useAppSelector(store => store.pagination)
 
-  const { products_loading: loading, products_error: error } = useAppSelector(
-    store => store.products
-  )
   const {
-    filtered_products: products,
-    grid_view,
+    products,
+    isPending: loading,
+    isLoadingError: error,
+    refetch,
     filters: { category, price, min_price, max_price },
-  } = useAppSelector(store => store.filter)
+  } = useCatalog()
+  const grid_view = useAppSelector(store => store.filter.grid_view)
 
   const currentPosts = products.slice(
     (pagination - 1) * postsPerPage,
@@ -65,6 +66,22 @@ const ProductList = () => {
 
     return () => observer.disconnect()
   }, [grid_view, isMobile])
+
+  if (error) {
+    return (
+      <div role="alert" className={styles.message}>
+        <p>Unable to load products. Please try again.</p>
+        <button
+          type="button"
+          onClick={() => {
+            void refetch()
+          }}
+        >
+          Try again
+        </button>
+      </div>
+    )
+  }
 
   if (isMobile) {
     if (!loading && !error && products.length < 1) {

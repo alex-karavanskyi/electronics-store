@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useParams } from 'next/navigation'
 
@@ -8,9 +8,8 @@ import { HiOutlineShoppingCart } from 'react-icons/hi2'
 import Chat from '@/components/chat/Chat'
 import { Error, Loading } from '@/layout'
 import { addToCart } from '@/redux/features/cartSlice'
-import { getSingleProduct } from '@/redux/features/productSlice'
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { url } from '@/shared/constants/db'
+import { useAppDispatch } from '@/redux/hooks'
+import { useProduct } from '@/shared/hooks/useProducts'
 import { Breadcrumbs } from '@/shared/ui'
 import ProductInfo from '@/shared/ui/ProductInfo'
 
@@ -19,22 +18,12 @@ import styles from './SingleProduct.module.scss'
 
 const SingleProduct = () => {
   const [isChatOpen, setIsChatOpen] = useState(false)
-  const {
-    single_product_loading: loading,
-    single_product_error: error,
-    single_product: product,
-  } = useAppSelector(store => store.products)
-
-  const { id } = useParams()
-
+  const { id } = useParams<{ id: string }>()
+  const { data: product, isPending: loading, isError: error } = useProduct(id)
   const dispatch = useAppDispatch()
 
-  useEffect(() => {
-    dispatch(getSingleProduct(`${url}/${id}`))
-  }, [dispatch, id])
-
   if (loading) return <Loading />
-  if (error) {
+  if (error && !product) {
     return (
       <Error
         message="Oops! Something went wrong. Try again later."

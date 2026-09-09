@@ -5,6 +5,7 @@ import { BsFillGridFill, BsList } from 'react-icons/bs'
 
 import { setGridView, setListView } from '@/redux/features/filterSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { useCatalog } from '@/shared/hooks/useCatalog'
 import { FilterName, HandleFiltersFn } from '@/shared/types/productsType'
 
 import styles from './Sort.module.scss'
@@ -14,13 +15,9 @@ interface SortProps {
 }
 
 const Sort: React.FC<SortProps> = ({ handleFilters }) => {
-  const {
-    filtered_products: products,
-    grid_view,
-    sort,
-  } = useAppSelector(store => store.filter)
+  const { grid_view, sort } = useAppSelector(store => store.filter)
 
-  const { products_loading: loading } = useAppSelector(store => store.products)
+  const { products, isPending: loading } = useCatalog()
 
   const dispatch = useAppDispatch()
 
