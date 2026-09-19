@@ -1,0 +1,11 @@
+// Global shell and system font defaults.
+body {
+  --font-sora: arial;
+}
+
+#root {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 100vh;
+}

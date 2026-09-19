@@ -1,2 +1,9 @@
-.next
 node_modules
+client/node_modules
+server/node_modules
+client/dist
+server/dist
+coverage
+client/coverage
+client/.verification
+server/.verification

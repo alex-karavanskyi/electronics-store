@@ -1,7 +1,0 @@
-node_modules
-.next
-coverage
-cypress
-jest.config.js
-jest.setup.js
-next-env.d.ts
