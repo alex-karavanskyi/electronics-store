@@ -19,6 +19,7 @@ export function createApp({
   const app = express()
   app.disable('x-powered-by')
   app.use(
+    '/api',
     cors({
       origin(origin, callback) {
         if (!origin || config.CORS_ORIGINS.includes(origin))

@@ -268,3 +268,17 @@ test('accepts zero and fractional prices and normalizes missing optional product
     )
   }
 })
+
+test('CORS does not reject requests outside the API', async () => {
+  await withApi(
+    async () => Response.json({ records: [] }),
+    async url => {
+      const response = await fetch(url + '/client-route', {
+        method: 'POST',
+        headers: { Origin: 'https://electronics-store-523e.onrender.com' },
+      })
+      assert.equal(response.status, 404)
+      assert.deepEqual(await response.json(), { error: 'Endpoint not found' })
+    }
+  )
+})
