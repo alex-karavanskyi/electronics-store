@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom'
 import { GoPerson } from 'react-icons/go'
 import { SlBasket } from 'react-icons/sl'
 
-import { openCart } from '@/redux/features/cartSlice'
-import { closeModal, toggleModal } from '@/redux/features/modalSlice'
+import { openCart, selectCartQuantity } from '@/redux/features/cartSlice'
+import { closeNavigation, toggleNavigation } from '@/redux/features/navigationSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import NavbarLinks from '@/shared/ui/NavbarLinks'
 
@@ -15,10 +15,8 @@ import styles from './Navbar.module.scss'
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false)
   const dispatch = useAppDispatch()
-  const isModalOpen = useAppSelector(state => state.modal.isOpen)
-  const cartCount = useAppSelector(state =>
-    state.cart.items.reduce((total, item) => total + item.quantity, 0)
-  )
+  const isNavigationOpen = useAppSelector(state => state.navigation.isOpen)
+  const cartCount = useAppSelector(selectCartQuantity)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 36)
@@ -27,7 +25,7 @@ const Navbar = () => {
   }, [])
 
   useEffect(() => {
-    const onResize = () => window.innerWidth >= 768 && dispatch(closeModal())
+    const onResize = () => window.innerWidth >= 768 && dispatch(closeNavigation())
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [dispatch])
@@ -46,9 +44,9 @@ const Navbar = () => {
 
         <button
           className={styles.navbar__menu}
-          onClick={() => dispatch(toggleModal())}
-          aria-label={isModalOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={isModalOpen}
+          onClick={() => dispatch(toggleNavigation())}
+          aria-label={isNavigationOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isNavigationOpen}
         >
           <span />
           <span />

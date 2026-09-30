@@ -1,11 +1,10 @@
-import type { CSSProperties } from 'react'
-
 import {
   FilterFields,
   FilterName,
   HandleFiltersFn,
-} from '@/shared/types/productsType'
+} from './filterTypes'
 import { formatPrice } from '@/shared/utils/formatPrice'
+import { getPriceRangeStyle } from './getPriceRangeStyle'
 
 import styles from './Price.module.scss'
 
@@ -22,16 +21,6 @@ const Price: React.FC<PriceProps> = ({
   max_price,
   handleFilters,
 }) => {
-  const progress =
-    max_price > min_price
-      ? Math.max(
-          0,
-          Math.min(100, ((price - min_price) / (max_price - min_price)) * 100)
-        )
-      : 0
-
-  const rangeStyle = { '--price-progress': `${progress}%` } as CSSProperties
-
   return (
     <div className={styles.container}>
       <div className={styles.price__header}>
@@ -47,7 +36,7 @@ const Price: React.FC<PriceProps> = ({
         max={max_price}
         value={price}
         className={styles.price__input}
-        style={rangeStyle}
+        style={getPriceRangeStyle(price, min_price, max_price)}
         onChange={e => handleFilters(FilterName.Price, Number(e.target.value))}
       />
     </div>

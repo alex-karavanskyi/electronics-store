@@ -5,6 +5,7 @@ import { CartDrawer } from '@/components/cart'
 import { Footer, Navbar, Sidebar } from '@/layout'
 import { ReduxProvider } from '@/redux/provider'
 import CartHydrator from '@/shared/lib/CartHydrator'
+import ProductImagesSync from '@/shared/lib/ProductImagesSync'
 import QueryProvider from '@/shared/lib/QueryProvider'
 import ScrollToPage from './ScrollToPage'
 
@@ -13,6 +14,7 @@ export default function AppLayout() {
     <ReduxProvider>
       <QueryProvider>
         <CartHydrator />
+        <ProductImagesSync />
         <ScrollToPage />
         <Navbar />
         <main style={{ flex: 1 }}>

@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { MemoryRouter, useLocation } from 'react-router-dom'
-import { useFilters } from '@/shared/hooks/useFilters'
-import { FilterName } from '@/shared/types/productsType'
+import { useFilters } from '@/components/home/hooks/useFilters'
+import { FilterName } from '@/components/home/filters/filterTypes'
 it('adapts existing controls to URL changes without Redux', () => {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <MemoryRouter initialEntries={['/?category=laptops&page=3&campaign=sale']}>

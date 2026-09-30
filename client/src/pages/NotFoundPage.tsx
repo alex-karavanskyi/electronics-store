@@ -1,5 +1,6 @@
 import Error from '@/layout/Error'
 import PageTitle from '@/shared/ui/PageTitle'
+
 export default function NotFoundPage() {
   return (
     <>

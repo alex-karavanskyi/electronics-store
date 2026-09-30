@@ -1,4 +1,5 @@
 import { RefObject, useEffect, useRef } from 'react'
+import { getFocusableElements } from '@/shared/lib/focusableElements'
 
 interface UseModalInteractionsOptions {
   isOpen: boolean
@@ -34,30 +35,7 @@ const useModalInteractions = ({
     document.body.style.overflow = 'hidden'
     document.documentElement.style.overflow = 'hidden'
 
-    const getFocusable = () =>
-      Array.from(
-        dialog.querySelectorAll<HTMLElement>(
-          'a[href], button, input, select, textarea, [tabindex]'
-        )
-      ).filter(element => {
-        if (
-          element.tabIndex < 0 ||
-          element.matches(':disabled') ||
-          element.closest('[hidden], [inert]')
-        )
-          return false
-        for (
-          let parent: HTMLElement | null = element;
-          parent;
-          parent = parent.parentElement
-        ) {
-          const style = getComputedStyle(parent)
-          if (style.display === 'none' || style.visibility === 'hidden')
-            return false
-        }
-        return true
-      })
-    const focusFirst = () => (getFocusable()[0] ?? dialog).focus()
+    const focusFirst = () => (getFocusableElements(dialog)[0] ?? dialog).focus()
     if (initialFocusRef.current !== dialog) initialFocusRef.current?.focus()
     else focusFirst()
 
@@ -72,7 +50,7 @@ const useModalInteractions = ({
         onCloseRef.current()
       }
       if (event.key !== 'Tab') return
-      const focusable = getFocusable()
+      const focusable = getFocusableElements(dialog)
       const first = focusable[0]
       const last = focusable[focusable.length - 1]
       if (!first) {

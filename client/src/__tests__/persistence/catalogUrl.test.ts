@@ -1,4 +1,7 @@
-import { parseFilters as parseCatalogUrl, clampPage } from '@/shared/filters/productFilters'
+import {
+  parseFilters as parseCatalogUrl,
+  clampPage,
+} from '@/shared/filters/productFilters'
 it.each([
   'page=0',
   'page=-2',
@@ -27,3 +30,16 @@ it('clamps pages to available results without changing the URL', () => {
   expect(clampPage(9, 0, 6)).toBe(1)
   expect(params.toString()).toBe('page=99&campaign=sale')
 })
+
+it.each([
+  [0, 13, 6, 1],
+  [-2, 13, 6, 1],
+  [0, 0, 6, 1],
+  [2, 13, 6, 2],
+  [99, 13, 6, 3],
+])(
+  'clamps page %s with %s results and page size %s to %s',
+  (page, total, perPage, expected) => {
+    expect(clampPage(page, total, perPage)).toBe(expected)
+  }
+)

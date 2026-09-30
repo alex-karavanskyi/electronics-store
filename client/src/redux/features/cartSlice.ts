@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { Product } from '@/shared/types/productsType'
+import { Product } from '@/shared/types/productSchema'
+import type { RootState } from '@/redux/store'
 
 export interface CartItem {
   product: Product
@@ -23,6 +24,17 @@ const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
+    updateCartProductImages: (
+      state,
+      action: PayloadAction<Pick<Product, 'id' | 'image' | 'images'>>
+    ) => {
+      const product = state.items.find(
+        item => item.product.id === action.payload.id
+      )?.product
+      if (!product) return
+      product.image = action.payload.image
+      product.images = action.payload.images
+    },
     addToCart: (state, action: PayloadAction<Product>) => {
       const item = state.items.find(
         ({ product }) => product.id === action.payload.id
@@ -77,6 +89,7 @@ const cartSlice = createSlice({
 })
 
 export const {
+  updateCartProductImages,
   addToCart,
   clearCart,
   closeCart,
@@ -86,5 +99,8 @@ export const {
   openCart,
   removeFromCart,
 } = cartSlice.actions
+
+export const selectCartQuantity = (state: RootState): number =>
+  state.cart.items.reduce((total, item) => total + item.quantity, 0)
 
 export default cartSlice.reducer

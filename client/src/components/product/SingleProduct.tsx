@@ -1,5 +1,4 @@
-import Modal from '@/shared/ui/Modal'
-import { lazy, Suspense, useState } from 'react'
+import { useState } from 'react'
 
 import { Link, useParams } from 'react-router-dom'
 
@@ -10,14 +9,15 @@ import { addToCart } from '@/redux/features/cartSlice'
 import { useAppDispatch } from '@/redux/hooks'
 import { useProduct } from '@/shared/hooks/useProducts'
 import { Breadcrumbs } from '@/shared/ui'
-import ProductInfo from '@/shared/ui/ProductInfo'
+import FavoriteButton from '@/shared/ui/FavoriteButton'
+import ProductHeader from '@/shared/ui/ProductHeader'
+import ProductPrice from '@/shared/ui/ProductPrice'
 import RequestError from '@/shared/ui/RequestError'
 import { ApiError } from '@/shared/api/http'
 
+import ProductChatModal from './ProductChatModal'
 import ProductImages from './ProductImages'
 import styles from './SingleProduct.module.scss'
-
-const Chat = lazy(() => import('@/components/chat/Chat'))
 
 const SingleProduct = () => {
   const [isChatOpen, setIsChatOpen] = useState(false)
@@ -71,16 +71,21 @@ const SingleProduct = () => {
         />
       )}
       <div className={styles['single__product-container']}>
-        <ProductImages images={images} onChatOpen={() => setIsChatOpen(true)} />
+        <ProductImages
+          images={images}
+          productName={product.name}
+          onChatOpen={() => setIsChatOpen(true)}
+        />
         <section className={styles['single__product-info']}>
-          <ProductInfo
-            favoriteClassName={styles['product__info-favorite-icon']}
-            product={product}
-            variant="detailed"
-            showHeader
-            showPrice
-            priceTag="h5"
-          />
+          <div className={styles.productSummary}>
+            <ProductHeader name={product.name} variant="detailed">
+              <FavoriteButton
+                product={product}
+                classIcon={styles['product__info-favorite-icon']}
+              />
+            </ProductHeader>
+            <ProductPrice price={product.price} variant="detailed" as="h5" />
+          </div>
 
           <button
             type="button"
@@ -99,33 +104,10 @@ const SingleProduct = () => {
       </div>
 
       {isChatOpen && (
-        <Modal
-          className={styles.chatModal}
-          label="Product assistant"
+        <ProductChatModal
+          productId={product.id}
           onClose={() => setIsChatOpen(false)}
-        >
-          <div
-            aria-hidden="true"
-            className={styles.chatOverlay}
-            onClick={() => setIsChatOpen(false)}
-          />
-          <div className={styles.chatContent}>
-            <div className={styles.chatHeader}>
-              <button
-                className={styles.closeButton}
-                onClick={() => setIsChatOpen(false)}
-                aria-label="Close chat"
-              >
-                ✕
-              </button>
-            </div>
-            <div className={styles.chatWrapper}>
-              <Suspense fallback={<p role="status">Loading assistant...</p>}>
-                <Chat product={product} />
-              </Suspense>
-            </div>
-          </div>
-        </Modal>
+        />
       )}
     </div>
   )

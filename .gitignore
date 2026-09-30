@@ -9,3 +9,7 @@ yarn-error.log*
 .env*.local
 *.tsbuildinfo
 /.agents/
+
+/.vercel/
+
+.env*

@@ -1,4 +1,4 @@
-import { closeCart } from '@/redux/features/cartSlice'
+import { closeCart, selectCartQuantity } from '@/redux/features/cartSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import Modal from '@/shared/ui/Modal'
 
@@ -8,8 +8,7 @@ import CartPanel from './CartPanel'
 const CartDrawer = () => {
   const dispatch = useAppDispatch()
   const { isOpen, items } = useAppSelector(state => state.cart)
-
-  const totalQuantity = items.reduce((total, item) => total + item.quantity, 0)
+  const totalQuantity = useAppSelector(selectCartQuantity)
 
   const totalPrice = items.reduce(
     (total, item) => total + item.product.price * item.quantity,

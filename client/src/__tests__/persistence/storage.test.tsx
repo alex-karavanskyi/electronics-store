@@ -11,7 +11,7 @@ import filter, { setListView } from '@/redux/features/catalogViewSlice'
 import { persistCartMiddleware } from '@/redux/middleware/persistCartMiddleware'
 import { persistGridViewMiddleware } from '@/redux/middleware/persistGridViewMiddleware'
 import CartHydrator from '@/shared/lib/CartHydrator'
-import { loadGridViewFromStorage } from '@/shared/lib/filtersStorage'
+import { loadGridViewFromStorage } from '@/shared/lib/catalogViewStorage'
 const product = {
   id: 'one',
   name: 'Phone',

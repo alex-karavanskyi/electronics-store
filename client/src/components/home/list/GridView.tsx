@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom'
 
 import { FaSearch } from 'react-icons/fa'
 
-import { Product } from '@/shared/types/productsType'
+import { Product } from '@/shared/types/productSchema'
 import CartButton from '@/shared/ui/CartButton'
-import ProductInfo from '@/shared/ui/ProductInfo'
-import GridViewSkeleton from '@/shared/ui/skeletons/GridViewSkeleton'
+import FavoriteButton from '@/shared/ui/FavoriteButton'
+import ProductHeader from '@/shared/ui/ProductHeader'
+import ProductPrice from '@/shared/ui/ProductPrice'
+import GridViewSkeleton from './GridViewSkeleton'
 
 import styles from './GridView.module.scss'
 
@@ -50,22 +52,15 @@ const GridView: React.FC<GridProducts> = ({ products, isLoading }) => {
                 </div>
 
                 <footer className={styles['grid__view-footer']}>
-                  <ProductInfo
-                    favoriteClassName={styles['product__info-favorite-icon']}
-                    product={product}
-                    variant="compact"
-                    showHeader
-                    showPrice={false}
-                  />
+                  <ProductHeader name={product.name}>
+                    <FavoriteButton
+                      product={product}
+                      classIcon={styles['product__info-favorite-icon']}
+                    />
+                  </ProductHeader>
 
                   <div className={styles['grid__view-price-cart']}>
-                    <ProductInfo
-                      favoriteClassName={styles['product__info-favorite-icon']}
-                      product={product}
-                      variant="compact"
-                      showHeader={false}
-                      showPrice
-                    />
+                    <ProductPrice price={product.price} />
                     <CartButton product={product} />
                   </div>
                 </footer>

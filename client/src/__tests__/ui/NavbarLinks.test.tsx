@@ -3,14 +3,14 @@ import { configureStore } from '@reduxjs/toolkit'
 import { render as baseRender, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 
-import modalReducer from '@/redux/features/modalSlice'
+import navigationReducer from '@/redux/features/navigationSlice'
 import { NavbarLinks } from '@/shared/ui'
 
 describe('NavbarLinks', () => {
   const createTestStore = () =>
     configureStore({
       reducer: {
-        modal: modalReducer,
+        navigation: navigationReducer,
       },
     })
 

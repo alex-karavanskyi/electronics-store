@@ -1,10 +1,9 @@
 import { z } from 'zod'
+
 const schema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(3001),
   HOST: z.string().min(1).default('127.0.0.1'),
-  AIRTABLE_API_KEY: z.string().trim().min(1),
-  AIRTABLE_BASE_ID: z.string().trim().min(1),
-  AIRTABLE_TABLE_NAME: z.string().trim().min(1),
+  MONGODB_URI: z.string().regex(/^mongodb(?:\+srv)?:\/\//),
   OPENAI_API_KEY: z.string().trim().optional(),
   CORS_ORIGINS: z
     .string()

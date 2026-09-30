@@ -6,9 +6,7 @@ import { simulateReadableStream } from 'ai'
 import { createApp } from '../src/app.js'
 import { parseEnv } from '../src/config/env.js'
 const config = parseEnv({
-  AIRTABLE_API_KEY: 'test',
-  AIRTABLE_BASE_ID: 'base',
-  AIRTABLE_TABLE_NAME: 'table',
+  MONGODB_URI: 'mongodb://127.0.0.1:27017/test',
 })
 const product = {
   id: 'rec1',

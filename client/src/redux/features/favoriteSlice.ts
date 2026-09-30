@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { Product } from '@/shared/types/productsType'
+import { Product } from '@/shared/types/productSchema'
 
 interface FavoriteState {
   favorites_products: Product[]
@@ -14,6 +14,17 @@ const favoriteSlice = createSlice({
   name: 'favorite',
   initialState,
   reducers: {
+    updateFavoriteProductImages: (
+      state,
+      action: PayloadAction<Pick<Product, 'id' | 'image' | 'images'>>
+    ) => {
+      const product = state.favorites_products.find(
+        item => item.id === action.payload.id
+      )
+      if (!product) return
+      product.image = action.payload.image
+      product.images = action.payload.images
+    },
     addFavorite: (state, action: PayloadAction<Product>) => {
       const exists = state.favorites_products.some(
         product => product.id === action.payload.id
@@ -60,6 +71,11 @@ const favoriteSlice = createSlice({
   },
 })
 
-export const { addFavorite, removeFavorite, toggleFavorite, reorderFavorite } =
-  favoriteSlice.actions
+export const {
+  updateFavoriteProductImages,
+  addFavorite,
+  removeFavorite,
+  toggleFavorite,
+  reorderFavorite,
+} = favoriteSlice.actions
 export default favoriteSlice.reducer

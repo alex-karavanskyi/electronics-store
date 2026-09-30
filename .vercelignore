@@ -1,0 +1,15 @@
+.git
+.agents
+.codex
+.env*
+**/.env*
+**/node_modules
+**/dist
+**/.migration
+**/.verification
+**/coverage
+client/cypress/videos
+client/cypress/screenshots
+*.log
+
+.vercel

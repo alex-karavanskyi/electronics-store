@@ -15,9 +15,7 @@ const products = Array.from({ length: 14 }, (_, i) => ({
 }))
 test('catalog endpoint applies filters, sorting and pagination without changing legacy list', async () => {
   const config = parseEnv({
-    AIRTABLE_API_KEY: 'test',
-    AIRTABLE_BASE_ID: 'base',
-    AIRTABLE_TABLE_NAME: 'table',
+    MONGODB_URI: 'mongodb://127.0.0.1:27017/test',
   })
   const server = createApp({
     config,

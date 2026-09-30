@@ -7,14 +7,17 @@ import type { ProductsService } from './services/products.js'
 import { productsRouter } from './routes/products.js'
 import { chatRouter } from './routes/chat.js'
 import { errorHandler, HttpError } from './middleware/errors.js'
+
 export function createApp({
   config,
   products,
   model,
+  serveClient = true,
 }: {
   config: Config
   products: ProductsService
   model?: LanguageModel
+  serveClient?: boolean
 }) {
   const app = express()
   app.disable('x-powered-by')
@@ -41,13 +44,17 @@ export function createApp({
     res.status(404).json({ error: 'Endpoint not found' })
   })
 
-  const clientDist = fileURLToPath(new URL('../../client/dist/', import.meta.url))
-  app.use(express.static(clientDist))
-  app.get('/{*path}', (_req, res, next) => {
-    res.sendFile('index.html', { root: clientDist }, error => {
-      if (error) next(error)
+  if (serveClient) {
+    const clientDist = fileURLToPath(
+      new URL('../../client/dist/', import.meta.url)
+    )
+    app.use(express.static(clientDist))
+    app.get('/{*path}', (_req, res, next) => {
+      res.sendFile('index.html', { root: clientDist }, error => {
+        if (error) next(error)
+      })
     })
-  })
+  }
   app.use((_req, res) => {
     res.status(404).json({ error: 'Endpoint not found' })
   })

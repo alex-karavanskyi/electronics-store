@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import favoriteReducer from '@/redux/features/favoriteSlice'
 import FavoriteButton from '@/shared/ui/FavoriteButton'
-import { Product } from '@/shared/types/productsType'
+import { Product } from '@/shared/types/productSchema'
 
 const product: Product = {
   id: 'one',

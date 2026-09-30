@@ -3,7 +3,7 @@ import { MdFavorite, MdFavoriteBorder } from 'react-icons/md'
 
 import { toggleFavorite } from '@/redux/features/favoriteSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { Product } from '@/shared/types/productsType'
+import { Product } from '@/shared/types/productSchema'
 
 interface FavoriteButtonProps {
   product: Product

@@ -5,7 +5,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import cartReducer from '@/redux/features/cartSlice'
 import favoriteSlice from '@/redux/features/favoriteSlice'
 import catalogViewReducer from '@/redux/features/catalogViewSlice'
-import modalReducer from '@/redux/features/modalSlice'
+import navigationReducer from '@/redux/features/navigationSlice'
 
 import { persistCartMiddleware } from './middleware/persistCartMiddleware'
 import { persistGridViewMiddleware } from './middleware/persistGridViewMiddleware'
@@ -15,7 +15,7 @@ export const store = configureStore({
     cart: cartReducer,
     favorite: favoriteSlice,
     catalogView: catalogViewReducer,
-    modal: modalReducer,
+    navigation: navigationReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(

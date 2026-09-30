@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import { HandleClearButtonFn } from '@/shared/types/productsType'
+import { HandleClearButtonFn } from './filterTypes'
 
 import styles from './ClearButton.module.scss'
 
@@ -11,10 +11,20 @@ interface ClearButtonProps {
 const ClearButton: React.FC<ClearButtonProps> = ({ handleClearButton }) => {
   const [clicked, setClicked] = useState(false)
 
+  const animationTimer = useRef<ReturnType<typeof setTimeout>>()
+
+  useEffect(() => {
+    return () => clearTimeout(animationTimer.current)
+  }, [])
+
   const handleClick = () => {
+    clearTimeout(animationTimer.current)
     setClicked(true)
+    animationTimer.current = setTimeout(() => {
+      setClicked(false)
+      animationTimer.current = undefined
+    }, 300)
     handleClearButton()
-    setTimeout(() => setClicked(false), 300)
   }
 
   return (

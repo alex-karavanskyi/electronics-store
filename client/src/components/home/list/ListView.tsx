@@ -3,10 +3,12 @@ import { useState } from 'react'
 import Image from '@/shared/ui/Image'
 import { Link } from 'react-router-dom'
 
-import { Product } from '@/shared/types/productsType'
+import { Product } from '@/shared/types/productSchema'
 import CartButton from '@/shared/ui/CartButton'
-import ProductInfo from '@/shared/ui/ProductInfo'
-import ListViewSkeleton from '@/shared/ui/skeletons/ListViewSkeleton'
+import FavoriteButton from '@/shared/ui/FavoriteButton'
+import ProductHeader from '@/shared/ui/ProductHeader'
+import ProductPrice from '@/shared/ui/ProductPrice'
+import ListViewSkeleton from './ListViewSkeleton'
 
 import styles from './ListView.module.scss'
 
@@ -41,21 +43,14 @@ const ListView = ({ products, isLoading }: ListProductsProps) => {
                 />
 
                 <div className={styles['list__view-products-info']}>
-                  <ProductInfo
-                    favoriteClassName={styles['product__info-favorite-icon']}
-                    product={product}
-                    variant="compact"
-                    showHeader={true}
-                    showPrice={false}
-                  />
-                  <div className={styles['list__view-price-cart']}>
-                    <ProductInfo
-                      favoriteClassName={styles['product__info-favorite-icon']}
+                  <ProductHeader name={product.name}>
+                    <FavoriteButton
                       product={product}
-                      variant="compact"
-                      showHeader={false}
-                      showPrice
+                      classIcon={styles['product__info-favorite-icon']}
                     />
+                  </ProductHeader>
+                  <div className={styles['list__view-price-cart']}>
+                    <ProductPrice price={product.price} />
 
                     <CartButton product={product} />
                   </div>

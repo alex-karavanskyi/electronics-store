@@ -4,3 +4,5 @@ dist/
 .env.*
 !.env.example
 .verification/
+# Keep any restored local archives out of version control.
+.migration/

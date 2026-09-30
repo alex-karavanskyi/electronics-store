@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom'
 import { parseFilters, serializeFilters } from '@/shared/filters/productFilters'
-import { useProductFilters } from '@/shared/hooks/useProductFilters'
+import { useProductFilters } from '@/components/home/hooks/useProductFilters'
 it('validates input, canonicalizes categories and omits defaults without dropping unrelated values', () => {
   const parsed = parseFilters(
     new URLSearchParams(

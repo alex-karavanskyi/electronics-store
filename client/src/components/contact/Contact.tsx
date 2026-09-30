@@ -1,5 +1,3 @@
-import { useId } from 'react'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -7,6 +5,7 @@ import { z } from 'zod'
 import { Breadcrumbs } from '@/shared/ui'
 
 import styles from './Contact.module.scss'
+import FormField from './FormField'
 
 const contactSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
@@ -17,7 +16,6 @@ const contactSchema = z.object({
 type FormData = z.infer<typeof contactSchema>
 
 const Contact = () => {
-  const id = useId()
   const {
     register,
     formState: { errors, isValid },
@@ -51,69 +49,29 @@ const Contact = () => {
           className={styles.contact__form}
           onSubmit={handleSubmit(onSubmit)}
         >
-          <div className={styles.field}>
-            <label htmlFor={`${id}-name`}> Name</label>
-
-            <input
-              className={errors.name ? styles.error : ''}
-              placeholder="Alex"
-              id={`${id}-name`}
-              aria-invalid={Boolean(errors.name)}
-              aria-describedby={errors.name ? `${id}-name-error` : undefined}
-              autoComplete="name"
-              {...register('name')}
-            />
-
-            {errors.name && (
-              <span id={`${id}-name-error`} className={styles['error-text']}>
-                {errors.name.message}
-              </span>
-            )}
-          </div>
-
-          <div className={styles.field}>
-            <label htmlFor={`${id}-email`}> Email</label>
-
-            <input
-              className={errors.email ? styles.error : ''}
-              placeholder="alex@email.com"
-              id={`${id}-email`}
-              aria-invalid={Boolean(errors.email)}
-              aria-describedby={errors.email ? `${id}-email-error` : undefined}
-              type="email"
-              autoComplete="email"
-              {...register('email')}
-            />
-
-            {errors.email && (
-              <span id={`${id}-email-error`} className={styles['error-text']}>
-                {errors.email.message}
-              </span>
-            )}
-          </div>
-
-          <div className={styles.field}>
-            <label htmlFor={`${id}-message`}> Message</label>
-
-            <textarea
-              rows={7}
-              className={errors.message ? styles.error : ''}
-              placeholder="Tell us how we can help..."
-              id={`${id}-message`}
-              aria-invalid={Boolean(errors.message)}
-              aria-describedby={
-                errors.message ? `${id}-message-error` : undefined
-              }
-              {...register('message')}
-            />
-
-            {errors.message && (
-              <span id={`${id}-message-error`} className={styles['error-text']}>
-                {errors.message.message}
-              </span>
-            )}
-          </div>
-
+          <FormField
+            label="Name"
+            placeholder="Alex"
+            autoComplete="name"
+            registration={register('name')}
+            error={errors.name?.message}
+          />
+          <FormField
+            label="Email"
+            placeholder="alex@email.com"
+            type="email"
+            autoComplete="email"
+            registration={register('email')}
+            error={errors.email?.message}
+          />
+          <FormField
+            label="Message"
+            placeholder="Tell us how we can help..."
+            as="textarea"
+            rows={7}
+            registration={register('message')}
+            error={errors.message?.message}
+          />
           <button disabled={!isValid} type="submit">
             Send Message
           </button>

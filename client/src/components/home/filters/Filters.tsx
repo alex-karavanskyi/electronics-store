@@ -1,14 +1,18 @@
-
-import { ClearButton, Price, Search } from '@/components/home'
+import ClearButton from './ClearButton'
+import Price from './Price'
+import Search from './Search'
 import {
   FilterFields,
   HandleClearButtonFn,
   HandleFiltersFn,
-} from '@/shared/types/productsType'
+} from './filterTypes'
 
 import styles from './Filters.module.scss'
 
-interface FiltersProps extends FilterFields {
+interface FiltersProps extends Pick<
+  FilterFields,
+  'price' | 'min_price' | 'max_price'
+> {
   handleFilters: HandleFiltersFn
   handleClearButton: HandleClearButtonFn
 }

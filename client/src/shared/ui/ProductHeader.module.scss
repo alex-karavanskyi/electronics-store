@@ -1,0 +1,31 @@
+@use '../styles' as shared;
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink);
+
+  &.detailed {
+    gap: 0.75rem;
+  }
+}
+
+.name {
+  font-weight: 500;
+  color: var(--ink);
+  font-size: 1.15rem;
+  line-height: 1.25;
+
+  @include shared.from(shared.$laptop) {
+    font-size: inherit;
+  }
+}
+
+.name.detailed {
+  font-size: 1.5rem;
+
+  @include shared.from(shared.$laptop) {
+    font-size: 2rem;
+  }
+}

@@ -5,6 +5,7 @@ import {
   CART_STORAGE_KEY,
   CART_STORAGE_VERSION,
 } from '@/shared/constants/localStorage'
+
 const cartSchema = z.object({
   version: z.literal(CART_STORAGE_VERSION),
   items: z

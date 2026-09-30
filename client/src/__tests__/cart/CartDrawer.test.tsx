@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 
 import CartDrawer from '@/components/cart/CartDrawer'
 import cartReducer from '@/redux/features/cartSlice'
-import { Product } from '@/shared/types/productsType'
+import { Product } from '@/shared/types/productSchema'
 
 const product: Product = {
   id: 'product-1',

@@ -6,8 +6,8 @@ import { mockFetch, jsonResponse } from '../support/fetch'
 import { store } from '@/redux/store'
 import { productKeys } from '@/shared/hooks/useProducts'
 import SingleProduct from '@/components/product/SingleProduct'
-import Category from '@/components/home/sections/Category'
-import Slider from '@/components/home/sections/Slider'
+import Category from '@/components/home/filters/Category'
+import Slider from '@/components/home/slider/Slider'
 
 // Keep query and application UI real; replace browser-only carousel and AI UI.
 jest.mock('@/components/chat/Chat', () => () => null)

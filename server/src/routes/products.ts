@@ -1,8 +1,10 @@
 import { Router } from 'express'
 import { selectCatalog } from '../services/catalog.js'
 import type { ProductsService } from '../services/products.js'
+
 export function productsRouter(products: ProductsService) {
   const router = Router()
+
   router.use((_req, res, next) => {
     res.setHeader('Cache-Control', 'no-store')
     next()

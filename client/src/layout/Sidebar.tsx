@@ -2,18 +2,16 @@ import Modal from '@/shared/ui/Modal'
 import { GoPerson } from 'react-icons/go'
 import { SlBasket } from 'react-icons/sl'
 
-import { openCart } from '@/redux/features/cartSlice'
-import { closeModal } from '@/redux/features/modalSlice'
+import { openCart, selectCartQuantity } from '@/redux/features/cartSlice'
+import { closeNavigation } from '@/redux/features/navigationSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { NavbarLinks, SocialLinks } from '@/shared/ui'
 
 import styles from './Sidebar.module.scss'
 
 const Sidebar = () => {
-  const { isOpen } = useAppSelector(store => store.modal)
-  const cartCount = useAppSelector(state =>
-    state.cart.items.reduce((total, item) => total + item.quantity, 0)
-  )
+  const { isOpen } = useAppSelector(store => store.navigation)
+  const cartCount = useAppSelector(selectCartQuantity)
   const dispatch = useAppDispatch()
 
   if (!isOpen) return null
@@ -22,7 +20,7 @@ const Sidebar = () => {
     <Modal
       className={styles.container}
       label="Navigation menu"
-      onClose={() => dispatch(closeModal())}
+      onClose={() => dispatch(closeNavigation())}
     >
       <aside
         className={[styles.sidebar, isOpen ? styles['sidebar--show'] : '']
@@ -34,7 +32,7 @@ const Sidebar = () => {
           <button
             type="button"
             className={styles.closeButton}
-            onClick={() => dispatch(closeModal())}
+            onClick={() => dispatch(closeNavigation())}
             aria-label="Close navigation menu"
           >
             Close menu
@@ -47,7 +45,7 @@ const Sidebar = () => {
                 className={styles.sidebar__cart}
                 aria-label={'Open cart, ' + cartCount + ' items'}
                 onClick={() => {
-                  dispatch(closeModal())
+                  dispatch(closeNavigation())
                   dispatch(openCart())
                 }}
               >

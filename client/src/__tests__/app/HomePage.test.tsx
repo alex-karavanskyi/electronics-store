@@ -5,10 +5,10 @@ import HomePage from '@/pages/HomePage'
 jest.mock('@/components/home', () => ({
   Hero: jest.fn(() => <div data-testid="hero">Hero</div>),
   Slider: jest.fn(() => <div data-testid="slider">Slider</div>),
-  ProductControls: jest.fn(() => (
-    <div data-testid="product-controls">ProductControls</div>
+  MobileCatalogControlsContainer: jest.fn(() => (
+    <div data-testid="product-controls">MobileCatalogControlsContainer</div>
   )),
-  ProductList: jest.fn(() => <div data-testid="product-list">ProductList</div>),
+  CatalogSection: jest.fn(() => <div data-testid="product-list">CatalogSection</div>),
 }))
 
 describe('HomePage', () => {

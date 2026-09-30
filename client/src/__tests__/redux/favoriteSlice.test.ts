@@ -3,7 +3,7 @@ import reducer, {
   removeFavorite,
   toggleFavorite,
 } from '@/redux/features/favoriteSlice'
-import { Product } from '@/shared/types/productsType'
+import { Product } from '@/shared/types/productSchema'
 
 const product: Product = {
   id: 'product-1',

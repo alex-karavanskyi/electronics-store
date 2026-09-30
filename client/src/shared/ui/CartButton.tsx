@@ -2,7 +2,7 @@ import { HiOutlineShoppingCart } from 'react-icons/hi2'
 
 import { addToCart } from '@/redux/features/cartSlice'
 import { useAppDispatch } from '@/redux/hooks'
-import { Product } from '@/shared/types/productsType'
+import { Product } from '@/shared/types/productSchema'
 
 import styles from './CartButton.module.scss'
 

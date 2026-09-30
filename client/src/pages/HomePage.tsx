@@ -1,13 +1,13 @@
 import PageTitle from '@/shared/ui/PageTitle'
-import { ProductControls, ProductList, Slider } from '@/components/home'
+import { MobileCatalogControlsContainer, CatalogSection, Slider } from '@/components/home'
 
 export default function HomePage() {
   return (
     <>
       <PageTitle title="E-Commerce" />
       <Slider />
-      <ProductControls />
-      <ProductList />
+      <MobileCatalogControlsContainer />
+      <CatalogSection />
     </>
   )
 }

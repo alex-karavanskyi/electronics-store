@@ -20,7 +20,7 @@ it('uses URL pagination over saved data, preserves parameters and supports histo
     <Provider store={store}>
       <MemoryRouter initialEntries={['/?page=2&text=Phone&campaign=sale']}>
         <Location />
-        <Pagination postsPerPage={6} totalPosts={18} />
+        <Pagination pageSize={6} totalItems={18} />
       </MemoryRouter>
     </Provider>
   )

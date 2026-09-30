@@ -3,6 +3,7 @@ import { convertToModelMessages, streamText, type LanguageModel } from 'ai'
 import { z } from 'zod'
 import { HttpError } from '../middleware/errors.js'
 import type { ProductsService } from '../services/products.js'
+
 // This chat only accepts text/reasoning history from the existing product assistant.
 const bodySchema = z.object({
   messages: z

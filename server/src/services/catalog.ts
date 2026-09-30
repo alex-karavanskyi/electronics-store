@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { Product } from './products.js'
+
 export function selectCatalog(products: Product[], params: URLSearchParams) {
   const price = params.get('price')?.trim()
     ? z

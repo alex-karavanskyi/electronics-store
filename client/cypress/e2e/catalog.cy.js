@@ -272,6 +272,7 @@ describe('Accessible controls and modal interactions', () => {
     cy.wait('@detail')
     cy.get('button[aria-label="Open chat"]').click()
     cy.focused().should('have.attr', 'aria-label', 'Close chat')
+    cy.get('input[aria-label="Your question"]').should('be.visible')
     cy.press(Cypress.Keyboard.Keys.TAB)
     cy.focused()
       .should('have.attr', 'aria-label', 'Your question')
@@ -366,13 +367,17 @@ describe('Deferred feature loading', () => {
   it('loads the assistant on demand and keeps its dialog closable while loading', () => {
     installApi()
     let assistantRequests = 0
+    let releaseAssistantCode
+    const assistantCodeReady = new Promise(resolve => {
+      releaseAssistantCode = resolve
+    })
     // Match both Vite source modules and production chunks.
     cy.intercept(
       'GET',
       /\/(?:assets\/Chat-[^/?]+\.js|src\/components\/chat\/Chat\.tsx)(?:\?|$)/,
-      req => {
+      () => {
         assistantRequests += 1
-        req.on('response', res => res.setDelay(1000))
+        return assistantCodeReady
       }
     ).as('assistantCode')
     cy.visit('/')
@@ -390,6 +395,7 @@ describe('Deferred feature loading', () => {
     cy.get('button[aria-label="Close chat"]').click()
     cy.get('[role="dialog"]').should('not.exist')
     cy.get('#root').should('not.have.attr', 'inert')
+    cy.then(() => releaseAssistantCode())
     cy.wait('@assistantCode')
     cy.get('button[aria-label="Open chat"]').click()
     cy.get('input[aria-label="Your question"]').should('be.visible')

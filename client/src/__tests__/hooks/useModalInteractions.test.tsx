@@ -56,3 +56,89 @@ it('keeps form controls in the focus loop and restores focus on Escape', async (
   expect(opener).toHaveFocus()
   expect(document.body.style.overflow).toBe('')
 })
+
+function FocusableExample({ dynamic = false }: { dynamic?: boolean }) {
+  const [open, setOpen] = useState(false)
+  const [showExtra, setShowExtra] = useState(false)
+  const closeRef = useRef<HTMLButtonElement>(null)
+  useModalInteractions({
+    isOpen: open,
+    initialFocusRef: closeRef,
+    onClose: () => setOpen(false),
+  })
+
+  return (
+    <>
+      <button onClick={() => setOpen(true)}>Open focus example</button>
+      {open &&
+        createPortal(
+          <div role="dialog" aria-label="Focus example">
+            <button ref={closeRef} onClick={() => setOpen(false)}>
+              Close focus example
+            </button>
+            <div hidden>
+              <button>Hidden ancestor action</button>
+            </div>
+            <div
+              ref={node => {
+                node?.setAttribute('inert', '')
+              }}
+            >
+              <button>Inert ancestor action</button>
+            </div>
+            <div style={{ display: 'none' }}>
+              <button>Display hidden action</button>
+            </div>
+            <div style={{ visibility: 'hidden' }}>
+              <button>Visibility hidden action</button>
+            </div>
+            <button disabled>Disabled action</button>
+            {dynamic ? (
+              <>
+                <button onClick={() => setShowExtra(value => !value)}>
+                  Toggle action
+                </button>
+                {showExtra && <button>Added action</button>}
+              </>
+            ) : (
+              <button>Last action</button>
+            )}
+          </div>,
+          document.body
+        )}
+    </>
+  )
+}
+
+it('skips disabled controls and controls inside hidden or inert ancestors', async () => {
+  const user = userEvent.setup()
+  render(<FocusableExample />)
+  await user.click(screen.getByRole('button', { name: 'Open focus example' }))
+  expect(screen.getByRole('button', { name: 'Close focus example' })).toHaveFocus()
+
+  await user.tab({ shift: true })
+  expect(screen.getByRole('button', { name: 'Last action' })).toHaveFocus()
+  await user.tab()
+  expect(screen.getByRole('button', { name: 'Close focus example' })).toHaveFocus()
+})
+
+it('updates the focus loop as controls are added and removed', async () => {
+  const user = userEvent.setup()
+  render(<FocusableExample dynamic />)
+  await user.click(screen.getByRole('button', { name: 'Open focus example' }))
+  const close = screen.getByRole('button', { name: 'Close focus example' })
+  const toggle = screen.getByRole('button', { name: 'Toggle action' })
+
+  await user.tab({ shift: true })
+  expect(toggle).toHaveFocus()
+
+  await user.click(toggle)
+  close.focus()
+  await user.tab({ shift: true })
+  expect(screen.getByRole('button', { name: 'Added action' })).toHaveFocus()
+
+  await user.click(toggle)
+  close.focus()
+  await user.tab({ shift: true })
+  expect(toggle).toHaveFocus()
+})

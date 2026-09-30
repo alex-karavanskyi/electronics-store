@@ -15,7 +15,7 @@ import { setGridView, setListView } from '@/redux/features/catalogViewSlice'
 import { removeFavorite } from '@/redux/features/favoriteSlice'
 
 // External carousel/AI UI is not part of this routing test. Product UI stays real.
-jest.mock('@/components/home/sections/Slider', () => () => null)
+jest.mock('@/components/home/slider/Slider', () => () => null)
 jest.mock('@/components/chat/Chat', () => () => null)
 const products = [
   {

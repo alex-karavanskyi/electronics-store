@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 
 import { motion } from 'framer-motion'
 
-import { closeModal } from '@/redux/features/modalSlice'
+import { closeNavigation } from '@/redux/features/navigationSlice'
 import { useAppDispatch } from '@/redux/hooks'
 
 import styles from './NavbarLinks.module.scss'
@@ -47,7 +47,7 @@ const NavbarLinks: React.FC<{
             key={link.href}
             variants={itemVariants}
             whileHover={{ scale: 1.05 }}
-            onClick={() => dispatch(closeModal())}
+            onClick={() => dispatch(closeNavigation())}
           >
             <NavLink to={link.href}>{link.label}</NavLink>
           </motion.li>

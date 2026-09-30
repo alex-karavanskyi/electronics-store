@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { loadGridViewFromStorage } from '@/shared/lib/filtersStorage'
+import { loadGridViewFromStorage } from '@/shared/lib/catalogViewStorage'
+
 const catalogViewSlice = createSlice({
   name: 'catalogView',
   initialState: { grid_view: loadGridViewFromStorage() },

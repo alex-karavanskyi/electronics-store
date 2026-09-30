@@ -8,7 +8,7 @@ import reducer, {
   openCart,
   removeFromCart,
 } from '@/redux/features/cartSlice'
-import { Product } from '@/shared/types/productsType'
+import { Product } from '@/shared/types/productSchema'
 
 const product: Product = {
   id: 'product-1',
