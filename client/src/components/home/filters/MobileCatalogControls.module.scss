@@ -1,3 +1,5 @@
+@use '../../../shared/styles' as shared;
+
 .conteiner {
   display: flex;
   justify-content: space-evenly;
@@ -26,6 +28,56 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgb(255, 255, 255, 0.25);
+  border-radius: shared.$filter-control-radius;
+  background: rgb(255, 255, 255, 0.08);
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+
+  svg {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: rgb(255, 255, 255, 0.5);
+      background: rgb(255, 255, 255, 0.16);
+    }
+  }
+
+  &:active {
+    background: rgb(255, 255, 255, 0.22);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 }
 
 .sidebarContent {

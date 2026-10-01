@@ -37,8 +37,12 @@ const Category: React.FC<CategoryProps> = ({
         />
       )}
       {isPending ? (
-        <div role="status" aria-label="Loading categories">
-          <span>Loading categories...</span>
+        <div
+          className={styles.loading}
+          role="status"
+          aria-label="Loading categories"
+        >
+          <span className={styles.loadingText}>Loading categories...</span>
           <CategorySkeleton />
         </div>
       ) : !error && categories.length === 0 ? (

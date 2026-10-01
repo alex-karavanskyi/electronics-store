@@ -1,8 +1,11 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, Reorder } from 'framer-motion'
 
-import { removeFavorite, reorderFavorite } from '@/redux/features/favoriteSlice'
+import {
+  removeFavorite,
+  reorderFavorite,
+  setFavoriteOrder,
+} from '@/redux/features/favoriteSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { useDragAndDropFavorites } from './useDragAndDropFavorites'
 import Breadcrumbs from '@/shared/ui/Breadcrumbs'
 
 import FavoriteItem from './FavoriteItem'
@@ -11,8 +14,10 @@ import styles from './Favorites.module.scss'
 const Favorites = () => {
   const products = useAppSelector(store => store.favorite.favorites_products)
   const dispatch = useAppDispatch()
-  const { handleDragStart, handleDragOver, handleDragEnd } =
-    useDragAndDropFavorites()
+  const handlePrepareDrag = () => {
+    // Refresh Reorder's cached row positions before starting another gesture.
+    dispatch(setFavoriteOrder(products.map(product => product.id)))
+  }
 
   return (
     <div className={styles.container}>
@@ -24,7 +29,12 @@ const Favorites = () => {
       {products.length === 0 ? (
         <p className={styles.favorites__empty}>Your wishlist is empty</p>
       ) : (
-        <motion.ul layout initial={false} className={styles.favorites__list}>
+        <Reorder.Group
+          axis="y"
+          values={products.map(product => product.id)}
+          onReorder={ids => dispatch(setFavoriteOrder(ids))}
+          className={styles.favorites__list}
+        >
           <AnimatePresence>
             {products.map((product, index) => (
               <FavoriteItem
@@ -39,13 +49,11 @@ const Favorites = () => {
                   dispatch(reorderFavorite({ from: index, to: index + 1 }))
                 }
                 onRemove={() => dispatch(removeFavorite(product.id))}
-                onDragStart={event => handleDragStart(event, index)}
-                onDragOver={event => handleDragOver(event, index)}
-                onDragEnd={handleDragEnd}
+                onPrepareDrag={handlePrepareDrag}
               />
             ))}
           </AnimatePresence>
-        </motion.ul>
+        </Reorder.Group>
       )}
     </div>
   )

@@ -1,5 +1,6 @@
 import Modal from '@/shared/ui/Modal'
 import { useState } from 'react'
+import { HiOutlineXMark } from 'react-icons/hi2'
 import type { Sorting } from '@/shared/filters/productFilters'
 
 import ClearButton from './ClearButton'
@@ -70,8 +71,13 @@ const MobileCatalogControls: React.FC<MobileCatalogControlsProps> = ({
               .join(' ')}
             onClick={e => e.stopPropagation()}
           >
-            <button type="button" onClick={() => setIsFiltersOpen(false)}>
+            <button
+              type="button"
+              className={styles.closeButton}
+              onClick={() => setIsFiltersOpen(false)}
+            >
               Close filters
+              <HiOutlineXMark aria-hidden="true" focusable="false" />
             </button>
             <Category
               selectedCategories={category}
@@ -101,8 +107,13 @@ const MobileCatalogControls: React.FC<MobileCatalogControlsProps> = ({
               .join(' ')}
             onClick={e => e.stopPropagation()}
           >
-            <button type="button" onClick={() => setIsSortOpen(false)}>
+            <button
+              type="button"
+              className={styles.closeButton}
+              onClick={() => setIsSortOpen(false)}
+            >
               Close sorting
+              <HiOutlineXMark aria-hidden="true" focusable="false" />
             </button>
             <Sort
               total={total}

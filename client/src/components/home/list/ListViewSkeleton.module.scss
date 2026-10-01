@@ -1,9 +1,7 @@
 @use '../../../shared/styles' as shared;
 
 .container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  pointer-events: none;
 }
 
 .container .list__view-skeleton {
@@ -11,21 +9,26 @@
   &-title,
   &-price,
   &-desc,
-  &-btn {
+  &-btn,
+  &-favorite,
+  &-cart {
     @include shared.skeleton-base;
   }
 
   &-img {
-    width: 100%;
-    max-width: 300px;
-    height: 200px;
+    border-radius: var(--radius);
   }
 
   &-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &-header {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 100%;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
   }
 
   &-title {
@@ -39,13 +42,25 @@
   }
 
   &-desc {
-    height: 60px;
+    color: transparent;
     width: 100%;
   }
 
   &-btn {
-    height: 36px;
-    width: 120px;
-    border-radius: 6px;
+    color: transparent;
+    border-color: transparent;
+    border-radius: 8px;
+  }
+
+  &-favorite {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+  }
+
+  &-cart {
+    width: 2.45rem;
+    height: 2.45rem;
+    border-radius: 50%;
   }
 }

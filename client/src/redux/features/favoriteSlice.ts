@@ -50,6 +50,22 @@ const favoriteSlice = createSlice({
         state.favorites_products.push(action.payload)
       }
     },
+    setFavoriteOrder: (state, action: PayloadAction<string[]>) => {
+      const ids = action.payload
+      const productsById = new Map(
+        state.favorites_products.map(product => [product.id, product])
+      )
+      if (
+        ids.length !== productsById.size ||
+        new Set(ids).size !== ids.length ||
+        ids.some(id => !productsById.has(id))
+      )
+        return
+
+      // Reorder.Group needs a controlled update for every proposed order,
+      // including repeated orders, to release its internal reordering lock.
+      state.favorites_products = ids.map(id => productsById.get(id)!)
+    },
     reorderFavorite: (
       state,
       action: PayloadAction<{ from: number; to: number }>
@@ -77,5 +93,6 @@ export const {
   removeFavorite,
   toggleFavorite,
   reorderFavorite,
+  setFavoriteOrder,
 } = favoriteSlice.actions
 export default favoriteSlice.reducer

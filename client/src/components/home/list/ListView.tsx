@@ -28,7 +28,7 @@ const ListView = ({ products, isLoading }: ListProductsProps) => {
   return (
     <section className={styles.container}>
       <div className={styles['list__view-products']}>
-        {isLoading && <ListViewSkeleton />}
+        {isLoading && <ListViewSkeleton count={visibleCount} />}
         {!isLoading &&
           visibleProducts.map(product => {
             const { id, image, description } = product

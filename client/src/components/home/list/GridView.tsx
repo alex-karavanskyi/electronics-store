@@ -49,15 +49,17 @@ const GridView: React.FC<GridProducts> = ({ products, isLoading }) => {
                   >
                     <FaSearch aria-hidden="true" />
                   </Link>
-                </div>
 
-                <footer className={styles['grid__view-footer']}>
-                  <ProductHeader name={product.name}>
+                  <div className={styles['grid__view-favorite']}>
                     <FavoriteButton
                       product={product}
                       classIcon={styles['product__info-favorite-icon']}
                     />
-                  </ProductHeader>
+                  </div>
+                </div>
+
+                <footer className={styles['grid__view-footer']}>
+                  <ProductHeader name={product.name} />
 
                   <div className={styles['grid__view-price-cart']}>
                     <ProductPrice price={product.price} />

@@ -109,6 +109,16 @@
     padding: 1.1rem 1.15rem 1.25rem;
   }
 
+  &-favorite {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    border-radius: 50%;
+    background: var(--paper);
+    box-shadow: 0 2px 8px rgb(16 42 53 / 10%);
+  }
+
   &-price-cart {
     @include shared.cart-row;
   }

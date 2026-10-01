@@ -102,3 +102,19 @@
   outline: 2px solid var(--clr-primary-5);
   outline-offset: 3px;
 }
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+}
+
+.loadingText {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

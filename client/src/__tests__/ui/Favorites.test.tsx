@@ -1,13 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
-import {
-  createEvent,
-  fireEvent,
-  render,
-  screen,
-  within,
-} from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import Favorites from '@/components/favorites/Favorites'
@@ -74,35 +68,16 @@ it('moves the selected favorite with the keyboard and updates the boundary butto
   ).toEqual(['Phone', 'Tablet'])
 })
 
-it('reorders the dragged favorite and stops reordering after drag end', () => {
-  const store = setup()
-  const phone = screen
-    .getByRole('heading', { name: 'Phone' })
-    .closest('[draggable="true"]')!
-  const laptop = screen.getByRole('heading', { name: 'Laptop' }).closest('li')!
-  const bounds = jest
-    .spyOn(laptop, 'getBoundingClientRect')
-    .mockReturnValue({ top: 0, height: 100 } as DOMRect)
-  const dragOver = () => {
-    const event = createEvent.dragOver(laptop)
-    Object.defineProperty(event, 'clientY', { value: 75 })
-    fireEvent(laptop, event)
-  }
-
-  try {
-    fireEvent.dragStart(phone, { dataTransfer: { effectAllowed: 'none' } })
-    dragOver()
-    expect(displayedOrder()).toEqual(['Laptop', 'Phone', 'Tablet'])
-    expect(
-      store.getState().favorite.favorites_products.map(product => product.name)
-    ).toEqual(['Laptop', 'Phone', 'Tablet'])
-
-    fireEvent.dragEnd(phone)
-    const event = createEvent.dragOver(laptop)
-    Object.defineProperty(event, 'clientY', { value: 25 })
-    fireEvent(laptop, event)
-    expect(displayedOrder()).toEqual(['Laptop', 'Phone', 'Tablet'])
-  } finally {
-    bounds.mockRestore()
-  }
+it('reorders from the focused handle with arrow keys and respects list boundaries', async () => {
+  const user = userEvent.setup()
+  setup()
+  const handle = screen.getByRole('button', { name: 'Drag to reorder Phone' })
+  handle.focus()
+  await user.keyboard('{ArrowUp}')
+  expect(displayedOrder()).toEqual(['Phone', 'Laptop', 'Tablet'])
+  await user.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}')
+  expect(displayedOrder()).toEqual(['Laptop', 'Tablet', 'Phone'])
+  expect(handle).toHaveFocus()
+  await user.keyboard('{ArrowUp}')
+  expect(displayedOrder()).toEqual(['Laptop', 'Phone', 'Tablet'])
 })
