@@ -4,12 +4,18 @@ import { useLocation, useNavigationType } from 'react-router-dom'
 export default function ScrollToPage() {
   const { pathname, hash } = useLocation()
   const navigationType = useNavigationType()
-  const previousPage = useRef<string | null>(null)
+  const previousScrollKey = useRef<string | null>(null)
 
   useEffect(() => {
-    const page = pathname + hash
-    if (previousPage.current === page) return
-    previousPage.current = page
+    const isInitialNavigation = previousScrollKey.current === null
+    // Query-only filter changes should not trigger another scroll.
+    const scrollKey = pathname + hash
+    if (previousScrollKey.current === scrollKey) return
+    previousScrollKey.current = scrollKey
+
+    // Initial URL loads also use POP, so allow their hash navigation.
+    if (navigationType === 'POP' && !isInitialNavigation) return
+
     if (hash) {
       let id = hash.slice(1)
       try {

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { once } from 'node:events'
+import { EventEmitter, once } from 'node:events'
+import express, { type ErrorRequestHandler } from 'express'
 import { MockLanguageModelV3 } from 'ai/test'
 import { simulateReadableStream } from 'ai'
 import { createApp } from '../src/app.js'
@@ -27,48 +28,52 @@ const body = {
     },
   ],
 }
+
+function createModel(fails = false) {
+  return new MockLanguageModelV3({
+    doStream: async options => {
+      const prompt = JSON.stringify(options.prompt)
+      assert.ok(prompt.includes('125'))
+      if (fails) throw new Error('provider-secret')
+      return {
+        stream: simulateReadableStream({
+          chunks: [
+            { type: 'text-start' as const, id: 'text-1' },
+            {
+              type: 'text-delta' as const,
+              id: 'text-1',
+              delta: 'The price is 125.',
+            },
+            { type: 'text-end' as const, id: 'text-1' },
+            {
+              type: 'finish' as const,
+              finishReason: { unified: 'stop' as const, raw: undefined },
+              usage: {
+                inputTokens: {
+                  total: 3,
+                  noCache: 3,
+                  cacheRead: undefined,
+                  cacheWrite: undefined,
+                },
+                outputTokens: { total: 5, text: 5, reasoning: undefined },
+              },
+            },
+          ],
+        }),
+      }
+    },
+  })
+}
+
 for (const fails of [false, true]) {
   test(
     fails
       ? 'stream errors stay safe and preserve the UI protocol'
       : 'chat streams UI messages with authoritative product data',
     async () => {
-      const model = new MockLanguageModelV3({
-        doStream: async options => {
-          const prompt = JSON.stringify(options.prompt)
-          assert.ok(prompt.includes('125'))
-          if (fails) throw new Error('provider-secret')
-          return {
-            stream: simulateReadableStream({
-              chunks: [
-                { type: 'text-start' as const, id: 'text-1' },
-                {
-                  type: 'text-delta' as const,
-                  id: 'text-1',
-                  delta: 'The price is 125.',
-                },
-                { type: 'text-end' as const, id: 'text-1' },
-                {
-                  type: 'finish' as const,
-                  finishReason: { unified: 'stop' as const, raw: undefined },
-                  usage: {
-                    inputTokens: {
-                      total: 3,
-                      noCache: 3,
-                      cacheRead: undefined,
-                      cacheWrite: undefined,
-                    },
-                    outputTokens: { total: 5, text: 5, reasoning: undefined },
-                  },
-                },
-              ],
-            }),
-          }
-        },
-      })
       const server = createApp({
         config,
-        model,
+        model: createModel(fails),
         products: {
           list: async () => [product],
           get: async id => {
@@ -117,3 +122,53 @@ for (const fails of [false, true]) {
     }
   )
 }
+
+test('chat forwards response write failures to Express error handling', async t => {
+  const writeError = new Error('response-write-failure')
+  const errorEvents = new EventEmitter()
+  const app = express()
+  app.use((_req, res, next) => {
+    t.mock.method(res, 'write', () => {
+      throw writeError
+    })
+    next()
+  })
+  app.use(
+    createApp({
+      config,
+      model: createModel(),
+      products: {
+        list: async () => [product],
+        get: async () => product,
+      },
+    })
+  )
+  const captureError: ErrorRequestHandler = (error, _req, _res, _next) => {
+    errorEvents.emit('handled', error)
+  }
+  app.use(captureError)
+
+  const server = app.listen(0, '127.0.0.1')
+  await once(server, 'listening')
+  const url =
+    'http://127.0.0.1:' +
+    (server.address() as import('node:net').AddressInfo).port
+  try {
+    const errorReceived = once(errorEvents, 'handled', {
+      signal: AbortSignal.timeout(5000),
+    })
+    const [response, [receivedError]] = await Promise.all([
+      fetch(url + '/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }),
+      errorReceived,
+    ])
+    await response.text()
+    assert.equal(receivedError, writeError)
+  } finally {
+    server.closeAllConnections()
+    await new Promise<void>(resolve => server.close(() => resolve()))
+  }
+})
