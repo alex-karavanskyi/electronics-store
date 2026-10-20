@@ -6,9 +6,13 @@ import { GoPerson } from 'react-icons/go'
 import { SlBasket } from 'react-icons/sl'
 
 import { openCart, selectCartQuantity } from '@/redux/features/cartSlice'
-import { closeNavigation, toggleNavigation } from '@/redux/features/navigationSlice'
+import {
+  closeNavigation,
+  toggleNavigation,
+} from '@/redux/features/navigationSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import NavbarLinks from '@/shared/ui/NavbarLinks'
+import ThemeSwitcher from '@/shared/ui/ThemeSwitcher'
 
 import styles from './Navbar.module.scss'
 
@@ -25,7 +29,8 @@ const Navbar = () => {
   }, [])
 
   useEffect(() => {
-    const onResize = () => window.innerWidth >= 768 && dispatch(closeNavigation())
+    const onResize = () =>
+      window.innerWidth >= 768 && dispatch(closeNavigation())
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [dispatch])
@@ -42,19 +47,10 @@ const Navbar = () => {
           <small>Technology store</small>
         </Link>
 
-        <button
-          className={styles.navbar__menu}
-          onClick={() => dispatch(toggleNavigation())}
-          aria-label={isNavigationOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={isNavigationOpen}
-        >
-          <span />
-          <span />
-        </button>
-
         <div className={styles.navbar__right}>
           <NavbarLinks parentClass={styles.navbar__links} />
           <div className={styles.navbar__icons}>
+            <ThemeSwitcher />
             <button aria-label="Your account">
               <GoPerson />
             </button>
@@ -74,6 +70,18 @@ const Navbar = () => {
               )}
             </button>
           </div>
+        </div>
+
+        <div className={styles.navbar__controls}>
+          <button
+            className={styles.navbar__menu}
+            onClick={() => dispatch(toggleNavigation())}
+            aria-label={isNavigationOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isNavigationOpen}
+          >
+            <span />
+            <span />
+          </button>
         </div>
       </div>
     </nav>

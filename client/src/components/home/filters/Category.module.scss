@@ -22,11 +22,11 @@
   transition: color 0.25s ease;
 
   &:hover {
-    color: #e65c00;
+    color: var(--accent-text);
   }
 
   &.active:hover {
-    color: var(--clr-primary-5);
+    color: var(--accent-text);
   }
 }
 
@@ -61,7 +61,7 @@
 }
 
 .categoryLabel:hover .checkboxIndicator {
-  border-color: #e65c00;
+  border-color: var(--accent-text);
   transform: scale(1.05);
 }
 
@@ -70,8 +70,8 @@
   width: 0.45rem;
   height: 0.25rem;
 
-  border-left: 2px solid #fff;
-  border-bottom: 2px solid #fff;
+  border-left: 2px solid var(--text-on-accent);
+  border-bottom: 2px solid var(--text-on-accent);
 
   opacity: 0;
   transform: rotate(-45deg) scale(0);
@@ -84,7 +84,7 @@
 .checkboxIndicator.active {
   border: 2px solid var(--clr-primary-5);
 
-  background-color: var(--clr-primary-5);
+  background-color: var(--accent-text);
 
   box-shadow: 0 0 0 6px rgb(255, 104, 10, 0.15);
 

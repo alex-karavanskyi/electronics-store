@@ -259,12 +259,12 @@ it('keeps search draft local, preserves focus on commit and resets only owned UR
  await waitFor(()=>expect(screen.getByTestId('location')).toHaveTextContent('text=Fixture+Laptop'))
  expect(input).toHaveFocus()
  expect(screen.getByTestId('location')).not.toHaveTextContent('page=')
- fireEvent.change(screen.getByRole('combobox'),{target:{value:'name-z'}})
+ fireEvent.change(screen.getByRole('combobox', {name: 'Sort by:'}),{target:{value:'name-z'}})
  expect(screen.getByTestId('location')).toHaveTextContent('sort=name-z')
  fireEvent.click(screen.getByRole('button',{name:/clear filters/i}))
  expect(screen.getByTestId('location')).toHaveTextContent(/^\/\?campaign=sale$/)
  expect(input).toHaveValue('')
- expect(screen.getByRole('combobox')).toHaveValue('price-lowest')
+ expect(screen.getByRole('combobox', {name: 'Sort by:'})).toHaveValue('price-lowest')
 })
 
 

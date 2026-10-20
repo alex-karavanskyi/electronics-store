@@ -14,14 +14,14 @@
   svg {
     width: 1.3rem;
     height: 1.3rem;
-    color: var(--navy);
+    color: var(--ink);
     transition:
       color 0.2s ease,
       transform 0.2s ease;
   }
 
   &:hover svg {
-    color: white;
+    color: var(--text-on-accent);
     transform: scale(1.15);
   }
 

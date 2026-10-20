@@ -49,13 +49,20 @@
   }
 
   &__right {
-    display: none;
+    display: flex;
     align-items: center;
     gap: 2.25rem;
+    margin-left: auto;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    margin-left: 0.75rem;
   }
 
   &__links {
-    display: flex;
+    display: none;
     gap: 1.75rem;
 
     a {
@@ -64,15 +71,17 @@
   }
 
   &__icons {
+    --theme-switcher-hover: rgb(255, 255, 255, 0.1);
+
     display: flex;
     gap: 0.45rem;
-    padding-left: 1.5rem;
-    border-left: 1px solid rgb(255, 255, 255, 0.18);
+    color: white;
 
-    button {
+    > button {
       position: relative;
 
-      @include shared.icon-button(2.5rem);
+      @include shared.icon-button(2.75rem);
+      display: none;
       border: 0;
       background: transparent;
       color: white;
@@ -80,13 +89,13 @@
       transition: background 0.2s ease;
     }
 
-    button:hover {
+    > button:hover {
       background: rgb(255, 255, 255, 0.1);
     }
 
-    svg {
-      width: 1.25rem;
-      height: 1.25rem;
+    > button svg {
+      width: 1.5rem;
+      height: 1.5rem;
     }
   }
 
@@ -100,7 +109,7 @@
     place-items: center;
     padding: 0 0.22rem;
     border-radius: shared.$pill-radius;
-    color: white;
+    color: var(--text-on-accent);
     background: var(--copper);
     font-size: 0.58rem;
     font-weight: 700;
@@ -128,7 +137,7 @@
 }
 
 .container.scrolled .navbar__menu span {
-  background: var(--navy);
+  background: var(--ink);
 }
 
 .container .navbar__menu[aria-expanded='true'] {
@@ -145,7 +154,9 @@
   .container {
     padding: 0 1.5rem;
   }
+}
 
+@include shared.from(shared.$laptop) {
   .container .navbar__brand small {
     display: inline;
   }
@@ -153,24 +164,33 @@
 
 @include shared.from(shared.$tablet) {
   .container .navbar {
-    &__menu {
+    &__controls {
       display: none;
     }
 
-    &__right {
+    &__links {
       display: flex;
+    }
+
+    &__icons {
+      padding-left: 1.5rem;
+      border-left: 1px solid rgb(255, 255, 255, 0.18);
+    }
+
+    &__icons > button {
+      display: grid;
     }
   }
 }
 
 .container.scrolled {
-  background: rgb(244, 246, 243, 0.94);
+  background: var(--navbar-scrolled);
   border-bottom: 1px solid var(--line);
   box-shadow: 0 12px 35px rgb(16, 42, 53, 0.08);
 
   .navbar {
     &__brand {
-      color: var(--navy);
+      color: var(--ink);
     }
 
     &__brand small {
@@ -179,19 +199,22 @@
     }
 
     &__links a {
-      color: var(--navy);
+      color: var(--ink);
     }
 
     &__icons {
-      border-left: 1px solid var(--line);
+      --theme-switcher-hover: var(--surface);
+
+      border-left-color: var(--line);
+      color: var(--ink);
     }
 
-    &__icons button {
-      color: var(--navy);
+    &__icons > button {
+      color: var(--ink);
     }
 
-    &__icons button:hover {
-      background: white;
+    &__icons > button:hover {
+      background: var(--surface);
     }
 
     &__menu {

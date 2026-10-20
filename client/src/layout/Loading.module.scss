@@ -8,7 +8,7 @@ $device-stagger: 0.38s;
   0%,
   18%,
   100% {
-    color: var(--navy);
+    color: var(--ink);
     opacity: 0.35;
     transform: translateY(0) scale(0.94);
   }
@@ -76,7 +76,7 @@ $device-stagger: 0.38s;
   &__device {
     display: grid;
     height: 3.5rem;
-    color: var(--navy);
+    color: var(--ink);
     opacity: 0.35;
     place-items: center;
     animation: devicePulse $cycle-duration cubic-bezier(0.4, 0, 0.2, 1) infinite;

@@ -89,7 +89,7 @@
 
   &__basket {
     font-size: 2.5rem;
-    color: var(--clr-primary-4);
+    color: var(--social-icon);
     cursor: pointer;
     transition:
       color 0.3s ease,
@@ -102,7 +102,7 @@
     display: grid;
     place-items: center;
     border: 0;
-    color: var(--clr-primary-4);
+    color: var(--social-icon);
     background: transparent;
     cursor: pointer;
 
@@ -121,7 +121,7 @@
       place-items: center;
       padding: 0 0.25rem;
       border-radius: shared.$pill-radius;
-      color: white;
+      color: var(--text-on-accent);
       background: var(--copper);
       font-size: 0.65rem;
       font-weight: 700;

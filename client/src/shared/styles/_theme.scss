@@ -1,0 +1,84 @@
+:root {
+  color-scheme: light;
+
+  --native-color-scheme: light;
+  --background: #f4f6f3;
+  --background-dot: rgb(16, 42, 53, 0.06);
+  --surface: #fff;
+  --surface-muted: #e8e2d8;
+  --surface-hover: rgb(16, 42, 53, 0.08);
+  --surface-glass: rgb(255, 255, 255, 0.92);
+  --navbar-scrolled: rgb(244, 246, 243, 0.94);
+  --filter-surface: #f7f8f5;
+  --text: #17212b;
+  --text-muted: #52606d;
+  --border: #dce1dc;
+  --control-border: #7d898f;
+  --accent: #c87845;
+  --accent-text: #a85d31;
+  --text-on-accent: #17212b;
+  --text-on-dark: #fff;
+  --button-background: #102a35;
+  --button-hover: #193b47;
+  --button-text: #fff;
+  --danger: #b42318;
+  --focus-ring: #a85d31;
+  --skeleton-gradient: linear-gradient(
+    90deg,
+    #e5e8e4 25%,
+    #f2f4f1 50%,
+    #e5e8e4 75%
+  );
+  --panel-background: var(--surface);
+  --panel-input: var(--background);
+  --panel-text: var(--text);
+  --panel-muted: var(--text-muted);
+  --panel-danger: var(--danger);
+  --panel-focus: var(--focus-ring);
+  --panel-shadow: rgb(16, 42, 53, 0.12);
+  --panel-shadow-hover: rgb(16, 42, 53, 0.18);
+  --chat-background: var(--surface);
+  --chat-messages: linear-gradient(180deg, var(--surface), var(--background));
+  --chat-input: var(--background);
+  --chat-input-hover: var(--surface);
+  --chat-header: var(--background);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --native-color-scheme: dark;
+  --background: #111a20;
+  --background-dot: rgb(200, 215, 220, 0.06);
+  --surface: #1c2930;
+  --surface-muted: #29363d;
+  --surface-hover: rgb(220, 235, 240, 0.1);
+  --surface-glass: rgb(28, 41, 48, 0.94);
+  --navbar-scrolled: rgb(17, 26, 32, 0.96);
+  --filter-surface: #1c2930;
+  --text: #edf2f4;
+  --text-muted: #b5c3ca;
+  --border: #41525c;
+  --control-border: #81939d;
+  --accent: #e29b6c;
+  --accent-text: #efad7f;
+  --button-background: #294956;
+  --button-hover: #365d6c;
+  --danger: #ff9292;
+  --focus-ring: #efad7f;
+  --skeleton-gradient: linear-gradient(
+    90deg,
+    #25353e 25%,
+    #334650 50%,
+    #25353e 75%
+  );
+  --panel-background: #181818;
+  --panel-input: #262626;
+  --panel-shadow: rgb(0, 0, 0, 0.35);
+  --panel-shadow-hover: rgb(0, 0, 0, 0.45);
+  --chat-background: #121418;
+  --chat-messages: linear-gradient(180deg, #17191f, #111317);
+  --chat-input: #23272f;
+  --chat-input-hover: #292e38;
+  --chat-header: #1a1d23;
+}

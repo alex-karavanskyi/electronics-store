@@ -43,7 +43,7 @@
   border-radius: var(--radius);
 
   background: var(--clr-primary-5);
-  color: #fff;
+  color: var(--text-on-accent);
 
   font-size: 1rem;
   font-weight: 600;
@@ -61,7 +61,7 @@
   }
 
   &:hover {
-    background: #d95700;
+    background: var(--accent);
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgb(0, 0, 0, 0.15);
   }

@@ -1,0 +1,66 @@
+.switcher {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.trigger {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &:hover,
+  &[aria-expanded='true'] {
+    background: var(--theme-switcher-hover, var(--surface-hover));
+  }
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 1;
+  width: 10rem;
+  padding: 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 1.1rem;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 4px 8px var(--panel-shadow);
+
+  button {
+    width: 100%;
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.45rem 0.55rem;
+    border: 0;
+    border-radius: 0.65rem;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--surface-hover);
+    }
+
+    &:focus-visible {
+      outline-offset: -2px;
+    }
+  }
+}

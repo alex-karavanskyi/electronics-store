@@ -58,7 +58,7 @@
       transform 0.25s ease;
 
     &:hover {
-      color: var(--paper);
+      color: var(--text-on-accent);
       background: var(--copper);
       border-color: var(--copper-dark);
       box-shadow: 0 8px 18px var(--clr-list-hover-shadow);
@@ -79,10 +79,10 @@
 
     min-width: 180px;
     padding: 0.9rem 2.2rem;
-    border: 1px solid var(--navy);
+    border: 1px solid var(--button-background);
     border-radius: shared.$pill-radius;
-    background: var(--navy);
-    color: var(--paper);
+    background: var(--button-background);
+    color: var(--button-text);
     font-size: 1rem;
     font-weight: 600;
     letter-spacing: 1px;
@@ -97,8 +97,8 @@
       transform 0.3s ease;
 
     &:hover {
-      background: var(--navy-light);
-      border-color: var(--navy-light);
+      background: var(--button-hover);
+      border-color: var(--button-hover);
       box-shadow: 0 12px 28px rgb(16 42 53 / 24%);
       transform: translateY(-3px);
     }

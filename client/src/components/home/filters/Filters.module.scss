@@ -5,11 +5,11 @@
   padding: 1rem;
   border: 1px solid var(--line);
   border-radius: 1.1rem;
-  background: #f7f8f5;
+  background: var(--filter-surface);
 }
 
 .sectionTitle {
-  color: var(--navy);
+  color: var(--ink);
   font-size: 0.95rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;

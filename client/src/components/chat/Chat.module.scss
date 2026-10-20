@@ -5,12 +5,12 @@
   flex-direction: column;
   height: 100%;
   max-height: 650px;
-  background: #121418;
-  border: 1px solid var(--clr-secondary-2);
+  background: var(--chat-background);
+  border: 1px solid var(--border);
   overflow: hidden;
 
   box-shadow:
-    0 20px 50px rgb(0, 0, 0, 0.35),
+    0 20px 50px var(--panel-shadow),
     inset 0 1px var(--clr-secondary-5);
 }
 
@@ -21,14 +21,14 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-  background: linear-gradient(180deg, #17191f, #111317);
+  background: var(--chat-messages);
 }
 
 .message {
   display: flex;
   align-items: flex-end;
   gap: 0.75rem;
-  color: white;
+  color: var(--panel-text);
 
   flex-direction: row;
 
@@ -48,38 +48,43 @@
 }
 
 .message.user {
-  color: var(--clr-primary-1);
+  color: var(--accent-text);
 
   flex-direction: row-reverse;
+}
+
+.message p,
+.emptyState p {
+  color: inherit;
 }
 
 .formContainer {
   display: flex;
   gap: 0.5rem;
   padding: 1rem;
-  background: var(--clr-secondary-6);
+  background: var(--chat-background);
   backdrop-filter: blur(10px);
-  border-top: 1px solid var(--clr-secondary-6);
+  border-top: 1px solid var(--border);
 }
 
 .input {
   flex: 1;
   padding: 15px 20px;
-  background: #23272f;
-  color: white;
-  border: 1px solid transparent;
+  background: var(--chat-input);
+  color: var(--panel-text);
+  border: 1px solid var(--control-border);
   border-radius: shared.$pill-radius;
   font-size: 15px;
   transition: 0.25s;
 
   &::placeholder {
-    color: #8b95a7;
+    color: var(--panel-muted);
   }
 
   &:focus {
-    border-color: #4f8cff;
-    background: #292e38;
-    box-shadow: 0 0 0 4px rgb(79, 140, 255, 0.15);
+    border-color: var(--panel-focus);
+    background: var(--chat-input-hover);
+    box-shadow: 0 0 0 4px var(--surface-hover);
   }
 }
 
@@ -88,14 +93,15 @@
   height: 50px;
   border-radius: 50%;
   background: var(--clr-primary-1);
-  color: white;
+  color: var(--text-on-accent);
   cursor: pointer;
   transition: 0.25s;
 
   &:hover {
     transform: translateY(-2px) scale(1.05);
 
-    background: #4b91ff;
+    background: var(--surface-muted);
+    color: var(--text);
   }
 }
 
@@ -123,11 +129,11 @@
 
   padding: 18px 20px;
 
-  background: #1a1d23;
+  background: var(--chat-header);
 
   border-bottom: 1px solid var(--clr-secondary-1);
 
-  color: white;
+  color: var(--panel-text);
 
   span {
     font-size: 28px;
@@ -139,7 +145,7 @@
   }
 
   small {
-    color: #9ca3af;
+    color: var(--panel-muted);
   }
 }
 
@@ -149,7 +155,7 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: var(--clr-secondary-4);
+  color: var(--panel-muted);
   text-align: center;
   padding: 2rem;
   font-size: 0.95rem;

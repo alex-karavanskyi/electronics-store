@@ -41,16 +41,20 @@
   }
 
   &.pagination--active {
-    background-color: var(--navy);
-    border-color: var(--navy);
+    background-color: var(--button-background);
+    border-color: var(--button-background);
   }
 
   &.pagination--active .pagination__link {
-    color: #fff;
+    color: var(--button-text);
   }
 
   &.pagination--active:hover {
     background-color: var(--copper);
+
+    .pagination__link {
+      color: var(--text-on-accent);
+    }
   }
 
   &.pagination-arrow {

@@ -68,7 +68,7 @@
   padding: 1.25rem;
   border: 1px solid var(--line);
   border-radius: 1.25rem;
-  background: rgb(255, 255, 255, 0.78);
+  background: var(--surface-glass);
   box-shadow: 0 16px 40px rgb(16, 42, 53, 0.06);
   backdrop-filter: blur(12px);
   position: sticky;
@@ -76,7 +76,7 @@
 }
 
 .panelHeading {
-  color: var(--navy);
+  color: var(--ink);
   font-size: 1.4rem;
   text-align: left;
 }
@@ -95,6 +95,6 @@
   text-align: center;
   padding: 1rem 0 1.5rem;
   text-transform: none;
-  color: var(--clr-grey-6);
+  color: var(--text-muted);
   font-size: 1rem;
 }

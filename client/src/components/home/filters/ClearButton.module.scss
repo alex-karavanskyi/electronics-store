@@ -18,11 +18,11 @@
   width: 100%;
   padding: 0.75rem 0.9rem;
   text-transform: capitalize;
-  background: var(--navy);
-  border: 1px solid var(--navy);
+  background: var(--button-background);
+  border: 1px solid var(--button-background);
   border-radius: shared.$filter-control-radius;
   letter-spacing: var(--spacing);
-  color: white;
+  color: var(--button-text);
   font-family: var(--font-main);
   font-weight: 700;
   font-size: 0.95rem;

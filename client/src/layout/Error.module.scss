@@ -8,12 +8,12 @@
 }
 
 .errorTitle {
-  color: white;
+  color: var(--text);
   margin-bottom: 1rem;
 }
 
 .redirectText {
-  color: #acb4be;
+  color: var(--text-muted);
   font-size: 1rem;
   opacity: 0.9;
 }

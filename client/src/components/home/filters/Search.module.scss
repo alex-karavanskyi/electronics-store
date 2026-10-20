@@ -10,7 +10,7 @@
     padding: 0.8rem 3.25rem 0.8rem 1rem;
     border: 1px solid var(--clr-secondary-3);
     border-radius: shared.$filter-control-radius;
-    background: white;
+    background: var(--surface);
     color: var(--ink);
     letter-spacing: var(--spacing);
     outline: none;
@@ -23,14 +23,14 @@
     }
 
     &::placeholder {
-      color: #8a9499;
+      color: var(--text-muted);
       text-transform: capitalize;
     }
 
     &:hover,
     &:focus {
       border-color: var(--clr-secondary-7);
-      background: white;
+      background: var(--surface);
       box-shadow: 0 0 0 3px rgb(56, 189, 248, 0.16);
     }
   }
@@ -61,7 +61,7 @@
 
     &:hover {
       background: var(--clr-primary-5);
-      color: white;
+      color: var(--text-on-accent);
       transform: translateY(-50%) scale(1.08);
     }
 

@@ -1,41 +1,42 @@
 @use '../shared/styles' as shared;
+@use '../shared/styles/theme';
 
 :root {
-  --ink: #17212b;
-  --ink-soft: #38414a;
+  --ink: var(--text);
+  --ink-soft: var(--text-muted);
   --navy: #102a35;
   --navy-light: #193b47;
-  --porcelain: #f4f6f3;
-  --paper: #fff;
-  --sand: #e8e2d8;
-  --copper: #c87845;
-  --copper-dark: #a85d31;
+  --porcelain: var(--background);
+  --paper: var(--surface);
+  --sand: var(--surface-muted);
+  --copper: var(--accent);
+  --copper-dark: var(--accent-text);
   --social-icon: #93acb4;
   --social-icon-hover: #e28a52;
-  --line: #dce1dc;
-  --clr-primary-1: #c87845;
-  --clr-primary-2: #c87845;
-  --clr-primary-3: #fff;
-  --clr-primary-4: #52606d;
-  --clr-primary-5: #c87845;
-  --clr-secondary-1: rgb(16, 42, 53, 0.05);
-  --clr-secondary-2: rgb(16, 42, 53, 0.08);
-  --clr-secondary-3: rgb(16, 42, 53, 0.14);
-  --clr-secondary-4: rgb(255, 255, 255, 0.75);
-  --clr-secondary-5: rgb(16, 42, 53, 0.035);
+  --line: var(--border);
+  --clr-primary-1: var(--accent);
+  --clr-primary-2: var(--accent);
+  --clr-primary-3: var(--surface);
+  --clr-primary-4: var(--text-muted);
+  --clr-primary-5: var(--accent);
+  --clr-secondary-1: var(--surface-hover);
+  --clr-secondary-2: var(--surface-hover);
+  --clr-secondary-3: var(--border);
+  --clr-secondary-4: var(--text-muted);
+  --clr-secondary-5: var(--surface-hover);
   --clr-secondary-6: rgb(255, 255, 255, 0.1);
   --clr-secondary-7: rgb(200, 120, 69, 0.4);
-  --clr-secondary-8: rgb(16, 42, 53, 0.1);
-  --clr-secondary-9: rgb(16, 42, 53, 0.18);
-  --clr-secondary-10: rgb(16, 42, 53, 0.28);
-  --clr-secondary-11: rgb(255, 255, 255, 0.55);
-  --clr-grey-1: #17212b;
-  --clr-grey-2: #334e68;
-  --clr-grey-3: #9aa5ad;
-  --clr-grey-4: #8d989f;
-  --clr-grey-5: #dce1dc;
-  --clr-grey-6: #f4f6f3;
-  --clr-grey-7: #dce1dc;
+  --clr-secondary-8: var(--surface-hover);
+  --clr-secondary-9: var(--border);
+  --clr-secondary-10: var(--text-muted);
+  --clr-secondary-11: var(--text-muted);
+  --clr-grey-1: var(--text);
+  --clr-grey-2: var(--text-muted);
+  --clr-grey-3: var(--text-muted);
+  --clr-grey-4: var(--control-border);
+  --clr-grey-5: var(--border);
+  --clr-grey-6: var(--background);
+  --clr-grey-7: var(--border);
   --clr-list-hover-shadow: rgb(200, 120, 69, 0.22);
   --clr-list-hover-background: rgb(200, 120, 69, 0.1);
   --clr-pagination-hover-border: rgb(200, 120, 69, 0.5);
@@ -47,12 +48,6 @@
   --font-utility: monospace;
   --transition: all 0.25s ease;
   --gradient-navbar-footer-bg: #102a35;
-  --skeleton-gradient: linear-gradient(
-    90deg,
-    #e5e8e4 25%,
-    #f2f4f1 50%,
-    #e5e8e4 75%
-  );
 }
 
 *,
@@ -80,7 +75,7 @@ body {
   overflow-x: hidden;
   background-color: var(--porcelain);
   background-image: radial-gradient(
-    rgb(16, 42, 53, 0.06) 0.6px,
+    var(--background-dot) 0.6px,
     transparent 0.6px
   );
   background-size: 8px 8px;
@@ -137,13 +132,13 @@ p {
 }
 
 :focus-visible {
-  outline: 3px solid rgb(200, 120, 69, 0.55);
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
 
 ::selection {
   background: var(--copper);
-  color: white;
+  color: var(--text-on-accent);
 }
 
 @include shared.from(shared.$tablet) {
