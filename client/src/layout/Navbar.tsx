@@ -1,17 +1,13 @@
 import { useEffect, useState } from 'react'
 
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 
+import { FiHeart } from 'react-icons/fi'
 import { GoPerson } from 'react-icons/go'
 import { SlBasket } from 'react-icons/sl'
 
 import { openCart, selectCartQuantity } from '@/redux/features/cartSlice'
-import {
-  closeNavigation,
-  toggleNavigation,
-} from '@/redux/features/navigationSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import NavbarLinks from '@/shared/ui/NavbarLinks'
 import ThemeSwitcher from '@/shared/ui/ThemeSwitcher'
 
 import styles from './Navbar.module.scss'
@@ -19,7 +15,6 @@ import styles from './Navbar.module.scss'
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false)
   const dispatch = useAppDispatch()
-  const isNavigationOpen = useAppSelector(state => state.navigation.isOpen)
   const cartCount = useAppSelector(selectCartQuantity)
 
   useEffect(() => {
@@ -28,15 +23,9 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  useEffect(() => {
-    const onResize = () =>
-      window.innerWidth >= 768 && dispatch(closeNavigation())
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [dispatch])
-
   return (
     <nav
+      aria-label="Main navigation"
       className={[styles.container, scrolled ? styles.scrolled : '']
         .filter(Boolean)
         .join(' ')}
@@ -47,40 +36,30 @@ const Navbar = () => {
           <small>Technology store</small>
         </Link>
 
-        <div className={styles.navbar__right}>
-          <NavbarLinks parentClass={styles.navbar__links} />
-          <div className={styles.navbar__icons}>
-            <ThemeSwitcher />
-            <button aria-label="Your account">
-              <GoPerson />
-            </button>
-            <button
-              className={'navbar__cart'}
-              onClick={() => dispatch(openCart())}
-              aria-label={'Open cart, ' + cartCount + ' items'}
-            >
-              <SlBasket />
-              {cartCount > 0 && (
-                <span
-                  className={styles['navbar__cart-count']}
-                  aria-hidden="true"
-                >
-                  {cartCount > 99 ? '99+' : cartCount}
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-
-        <div className={styles.navbar__controls}>
+        <div className={styles.navbar__icons}>
+          <ThemeSwitcher />
+          <NavLink to="/favorites" aria-label="Favorites" title="Favorites">
+            <FiHeart aria-hidden="true" />
+          </NavLink>
           <button
-            className={styles.navbar__menu}
-            onClick={() => dispatch(toggleNavigation())}
-            aria-label={isNavigationOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={isNavigationOpen}
+            type="button"
+            className={styles.navbar__account}
+            aria-label="Your account"
           >
-            <span />
-            <span />
+            <GoPerson aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className={'navbar__cart'}
+            onClick={() => dispatch(openCart())}
+            aria-label={'Open cart, ' + cartCount + ' items'}
+          >
+            <SlBasket aria-hidden="true" />
+            {cartCount > 0 && (
+              <span className={styles['navbar__cart-count']} aria-hidden="true">
+                {cartCount > 99 ? '99+' : cartCount}
+              </span>
+            )}
           </button>
         </div>
       </div>

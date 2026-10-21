@@ -54,7 +54,7 @@ describe('Theme preferences', () => {
   afterEach(() => systemTheme('light'))
 
   it('opens the icon menu and selects a mode with the keyboard', () => {
-    cy.visit('/contact')
+    cy.visit('/checkout')
     chooseMode('light')
     switcher().focus().type('{downarrow}')
     cy.get('[role="menu"]').should('be.visible')
@@ -76,7 +76,7 @@ describe('Theme preferences', () => {
   })
 
   it('synchronizes separate windows using real storage events', () => {
-    cy.visit('/contact')
+    cy.visit('/checkout')
     chooseMode('light')
     cy.document()
       .then(
@@ -85,7 +85,7 @@ describe('Theme preferences', () => {
             const frame = document.createElement('iframe')
             frame.hidden = true
             frame.title = 'Second theme window'
-            frame.src = '/contact'
+            frame.src = '/checkout'
             frame.onload = () => resolve(frame.contentWindow)
             document.body.append(frame)
           })
@@ -119,26 +119,41 @@ describe('Theme preferences', () => {
   })
 
   for (const mode of ['light', 'dark']) {
-    it(`uses the ${mode} palette for the contact form and product chat`, () => {
+    it(`uses the ${mode} palette for the checkout form and product chat`, () => {
       const light = mode === 'light'
       const text = light ? 'rgb(23, 33, 43)' : 'rgb(237, 242, 244)'
-      cy.visit('/contact')
+      cy.visit('/checkout', {
+        onBeforeLoad(win) {
+          win.localStorage.setItem(
+            'volt_cart',
+            JSON.stringify({
+              version: 1,
+              items: [
+                {
+                  quantity: 1,
+                  product: {
+                    id: 'theme-product',
+                    name: 'Theme phone',
+                    description: '',
+                    category: 'phones',
+                    price: 125,
+                    image: '/favicon.png',
+                    images: [],
+                  },
+                },
+              ],
+            })
+          )
+        },
+      })
       chooseMode(mode)
-      cy.contains('h2', 'Contact Us')
-        .should('have.css', 'color', text)
-        .parent()
-        .parent()
-        .should(
-          'have.css',
-          'background-color',
-          light ? 'rgb(255, 255, 255)' : 'rgb(24, 24, 24)'
-        )
+      cy.contains('h1', 'Checkout').should('have.css', 'color', text)
       cy.get('input[autocomplete="name"]')
         .should('have.css', 'color', text)
         .and(
           'have.css',
           'background-color',
-          light ? 'rgb(244, 246, 243)' : 'rgb(38, 38, 38)'
+          light ? 'rgb(244, 246, 243)' : 'rgb(17, 26, 32)'
         )
         .and('have.css', 'color-scheme', mode)
       cy.get('input[autocomplete="name"]').should(readableField)
@@ -176,7 +191,7 @@ describe('Theme preferences', () => {
 
   it('tracks the OS live, honors manual choices and restores after reload', () => {
     systemTheme('dark')
-    cy.visit('/contact')
+    cy.visit('/checkout')
     switcher().should('have.attr', 'aria-label', 'Theme: system')
     cy.get('html').should('have.attr', 'data-theme', 'dark')
     cy.get('body').should('have.css', 'background-color', 'rgb(17, 26, 32)')
@@ -199,7 +214,7 @@ describe('Theme preferences', () => {
     cy.intercept('GET', '**/src/main.tsx*', req => {
       req.on('response', res => res.setDelay(800))
     })
-    cy.visit('/contact', {
+    cy.visit('/checkout', {
       onBeforeLoad(win) {
         win.localStorage.setItem('volt_theme', 'dark')
         const observer = new win.MutationObserver(() => {
@@ -225,10 +240,16 @@ describe('Theme preferences', () => {
   })
 
   it('keeps the switcher visible and navigation usable at phone and tablet widths', () => {
-    cy.visit('/contact')
-    for (const width of [320, 768, 1024]) {
+    cy.visit('/checkout')
+    for (const width of [320, 390, 768, 1024]) {
       cy.viewport(width, 800)
       switcher().should('be.visible')
+      cy.get('nav a[aria-label="Favorites"]').should('be.visible')
+      cy.get('nav button[aria-label^="Open cart"]').should('be.visible')
+      cy.get('button[aria-label="Your account"]').should(
+        width < 768 ? 'not.be.visible' : 'be.visible'
+      )
+      cy.get('button[aria-label="Open menu"]').should('not.exist')
       chooseMode('dark')
       switcher().click()
       cy.get('[role="menu"]').should(menu => {
@@ -245,13 +266,19 @@ describe('Theme preferences', () => {
             const rect = element.getBoundingClientRect()
             expect(rect.left).to.be.at.least(0)
             expect(rect.right).to.be.at.most(width)
+            if (element.matches('button, a[aria-label="Favorites"]')) {
+              expect(rect.width).to.be.at.least(44)
+              expect(rect.height).to.be.at.least(44)
+            }
           }
         })
     }
     cy.viewport(320, 800)
-    cy.get('button[aria-label="Open menu"]').click()
-    cy.get('[role="dialog"][aria-label="Navigation menu"]').should('be.visible')
-    cy.get('button[aria-label="Close navigation menu"]').click()
+    cy.get('nav a[aria-label="Favorites"]').click()
+    cy.location('pathname').should('eq', '/favorites')
+    cy.get('nav button[aria-label^="Open cart"]').click()
+    cy.get('[role="dialog"]').should('contain', 'Your cart is empty')
+    cy.get('button[aria-label="Close cart"]').click()
     switcher().should('be.visible')
   })
 })

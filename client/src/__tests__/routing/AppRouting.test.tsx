@@ -45,6 +45,7 @@ function HistoryControls() {
       <output data-testid="location">
         {location.pathname + location.search}
       </output>
+      <button onClick={() => navigate('/checkout')}>Test checkout</button>
       <button onClick={() => navigate(-1)}>Test back</button>
       <button onClick={() => navigate(1)}>Test forward</button>
       <button onClick={() => navigate('/?text=Fixture+Laptop')}>
@@ -74,8 +75,19 @@ beforeEach(() => {
   mockFetch.mockImplementation(async url => {
     if (String(url).startsWith('/api/products/catalog?')) {
       const params = new URL(String(url), 'http://localhost').searchParams
-      const selected = products.filter(p => !params.get('text') || p.name.toLowerCase().startsWith(params.get('text')!.toLowerCase()))
-      return jsonResponse({ items: selected, total: selected.length, page: 1, pageSize: 6, min_price: 125, max_price: 500 })
+      const selected = products.filter(
+        p =>
+          !params.get('text') ||
+          p.name.toLowerCase().startsWith(params.get('text')!.toLowerCase())
+      )
+      return jsonResponse({
+        items: selected,
+        total: selected.length,
+        page: 1,
+        pageSize: 6,
+        min_price: 125,
+        max_price: 500,
+      })
     }
     if (url === '/api/products') return jsonResponse(products)
     const product = products.find(
@@ -96,13 +108,11 @@ beforeEach(() => {
   })
 })
 
-it('matches contact from the router location and keeps a shared shell', async () => {
-  setup('/contact')
-  expect(
-    await screen.findByRole('heading', { name: 'Contact Us' })
-  ).toBeVisible()
+it('matches checkout from the router location and keeps a shared shell', async () => {
+  setup('/checkout')
+  expect(await screen.findByRole('heading', { name: 'Checkout' })).toBeVisible()
   expect(screen.getAllByRole('link', { name: 'VOLT home' })).toHaveLength(1)
-  expect(document.title).toBe('Contact | React App')
+  expect(document.title).toBe('Checkout | React App')
 })
 
 it('renders the home catalog and opens an encoded dynamic product link', async () => {
@@ -141,10 +151,8 @@ it('keeps cart state across navigation and follows a cart product link', async (
   fireEvent.click(
     await screen.findByRole('button', { name: 'Buy Fixture Phone' })
   )
-  fireEvent.click(screen.getAllByRole('link', { name: 'contact' })[0])
-  expect(
-    await screen.findByRole('heading', { name: 'Contact Us' })
-  ).toBeVisible()
+  fireEvent.click(screen.getByRole('button', { name: 'Test checkout' }))
+  expect(await screen.findByRole('heading', { name: 'Checkout' })).toBeVisible()
   fireEvent.click(
     screen.getAllByRole('button', { name: 'Open cart, 1 items' })[0]
   )
@@ -157,16 +165,18 @@ it('keeps cart state across navigation and follows a cart product link', async (
 })
 
 it('renders favorites and uses browser-style back and forward navigation', async () => {
-  setup('/contact')
-  await screen.findByRole('heading', { name: 'Contact Us' })
-  fireEvent.click(screen.getAllByRole('link', { name: 'favorites' })[0])
+  setup('/checkout')
+  await screen.findByRole('heading', { name: 'Checkout' })
+  const favoritesLink = screen.getByRole('link', { name: 'Favorites' })
+  expect(favoritesLink).not.toHaveAttribute('aria-current')
+  fireEvent.click(favoritesLink)
   await screen.findByRole('heading', { name: 'Wishlist' })
   expect(screen.getByTestId('location')).toHaveTextContent('/favorites')
   expect(document.title).toBe('Favorites | React App')
+  expect(favoritesLink).toHaveAttribute('aria-current', 'page')
   fireEvent.click(screen.getByRole('button', { name: 'Test back' }))
-  expect(
-    await screen.findByRole('heading', { name: 'Contact Us' })
-  ).toBeVisible()
+  expect(await screen.findByRole('heading', { name: 'Checkout' })).toBeVisible()
+  expect(favoritesLink).not.toHaveAttribute('aria-current')
   fireEvent.click(screen.getByRole('button', { name: 'Test forward' }))
   expect(screen.getByTestId('location')).toHaveTextContent('/favorites')
 })
@@ -216,11 +226,11 @@ it('does not apply a pending filter commit after leaving the catalog', async () 
   fireEvent.change(screen.getByRole('searchbox'), {
     target: { value: 'pending' },
   })
-  fireEvent.click(screen.getAllByRole('link', { name: 'contact' })[0])
+  fireEvent.click(screen.getByRole('button', { name: 'Test checkout' }))
   await act(async () => {
     await new Promise(resolve => setTimeout(resolve, 600))
   })
-  expect(screen.getByTestId('location')).toHaveTextContent(/^\/contact$/)
+  expect(screen.getByTestId('location')).toHaveTextContent(/^\/checkout$/)
 })
 
 it('renders an unknown-route 404 and replaces it with home after the delay', async () => {
@@ -244,40 +254,63 @@ it('preserves remembered view preference when leaving the catalog', async () => 
   await screen.findByRole('heading', { name: 'Fixture Phone' })
   fireEvent.click(screen.getByRole('button', { name: 'List view' }))
   expect(localStorage.getItem('grid_view')).toBe('false')
-  fireEvent.click(screen.getAllByRole('link', { name: 'contact' })[0])
-  await screen.findByRole('heading', { name: 'Contact Us' })
+  fireEvent.click(screen.getByRole('button', { name: 'Test checkout' }))
+  await screen.findByRole('heading', { name: 'Checkout' })
   expect(localStorage.getItem('grid_view')).toBe('false')
 })
 
 it('keeps search draft local, preserves focus on commit and resets only owned URL state', async () => {
- setup('/?campaign=sale&page=2')
- await screen.findByRole('heading', { name: 'Fixture Phone' })
- const input=screen.getByRole('searchbox');input.focus()
- fireEvent.change(input,{target:{value:'Fixture Laptop'}})
- expect(input).toHaveValue('Fixture Laptop')
- expect(screen.getByTestId('location')).not.toHaveTextContent('text=')
- await waitFor(()=>expect(screen.getByTestId('location')).toHaveTextContent('text=Fixture+Laptop'))
- expect(input).toHaveFocus()
- expect(screen.getByTestId('location')).not.toHaveTextContent('page=')
- fireEvent.change(screen.getByRole('combobox', {name: 'Sort by:'}),{target:{value:'name-z'}})
- expect(screen.getByTestId('location')).toHaveTextContent('sort=name-z')
- fireEvent.click(screen.getByRole('button',{name:/clear filters/i}))
- expect(screen.getByTestId('location')).toHaveTextContent(/^\/\?campaign=sale$/)
- expect(input).toHaveValue('')
- expect(screen.getByRole('combobox', {name: 'Sort by:'})).toHaveValue('price-lowest')
-})
-
-
-it.each([true, false])('keeps the mobile catalog anchor in grid mode %s, including empty results', async grid => {
-  window.matchMedia = jest.fn().mockReturnValue({ matches: true, addEventListener() {}, removeEventListener() {} })
-  store.dispatch(grid ? setGridView() : setListView())
-  const view = setup()
+  setup('/?campaign=sale&page=2')
   await screen.findByRole('heading', { name: 'Fixture Phone' })
-  expect(document.querySelectorAll('#collection')).toHaveLength(1)
-  expect(document.getElementById('collection')).toContainElement(screen.getByRole('heading', { name: 'Fixture Phone' }))
-  view.unmount()
-  setup('/?text=missing')
-  const empty = await screen.findByText('Sorry, no products matched your search...')
-  expect(document.getElementById('collection')).toContainElement(empty)
-  act(() => store.dispatch(setGridView()))
+  const input = screen.getByRole('searchbox')
+  input.focus()
+  fireEvent.change(input, { target: { value: 'Fixture Laptop' } })
+  expect(input).toHaveValue('Fixture Laptop')
+  expect(screen.getByTestId('location')).not.toHaveTextContent('text=')
+  await waitFor(() =>
+    expect(screen.getByTestId('location')).toHaveTextContent(
+      'text=Fixture+Laptop'
+    )
+  )
+  expect(input).toHaveFocus()
+  expect(screen.getByTestId('location')).not.toHaveTextContent('page=')
+  fireEvent.change(screen.getByRole('combobox', { name: 'Sort by:' }), {
+    target: { value: 'name-z' },
+  })
+  expect(screen.getByTestId('location')).toHaveTextContent('sort=name-z')
+  fireEvent.click(screen.getByRole('button', { name: /clear filters/i }))
+  expect(screen.getByTestId('location')).toHaveTextContent(
+    /^\/\?campaign=sale$/
+  )
+  expect(input).toHaveValue('')
+  expect(screen.getByRole('combobox', { name: 'Sort by:' })).toHaveValue(
+    'price-lowest'
+  )
 })
+
+it.each([true, false])(
+  'keeps the mobile catalog anchor in grid mode %s, including empty results',
+  async grid => {
+    window.matchMedia = jest
+      .fn()
+      .mockReturnValue({
+        matches: true,
+        addEventListener() {},
+        removeEventListener() {},
+      })
+    store.dispatch(grid ? setGridView() : setListView())
+    const view = setup()
+    await screen.findByRole('heading', { name: 'Fixture Phone' })
+    expect(document.querySelectorAll('#collection')).toHaveLength(1)
+    expect(document.getElementById('collection')).toContainElement(
+      screen.getByRole('heading', { name: 'Fixture Phone' })
+    )
+    view.unmount()
+    setup('/?text=missing')
+    const empty = await screen.findByText(
+      'Sorry, no products matched your search...'
+    )
+    expect(document.getElementById('collection')).toContainElement(empty)
+    act(() => store.dispatch(setGridView()))
+  }
+)

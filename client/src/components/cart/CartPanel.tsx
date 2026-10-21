@@ -1,4 +1,5 @@
 import { HiXMark } from 'react-icons/hi2'
+import { Link } from 'react-router-dom'
 
 import { CartItem, clearCart, closeCart } from '@/redux/features/cartSlice'
 import { useAppDispatch } from '@/redux/hooks'
@@ -50,6 +51,13 @@ const CartPanel = ({ items, totalQuantity, totalPrice }: CartPanelProps) => {
               <strong>{formatPrice(totalPrice)}</strong>
             </div>
             <p>Taxes and delivery are calculated at checkout.</p>
+            <Link
+              className={styles.checkout}
+              to="/checkout"
+              onClick={() => dispatch(closeCart())}
+            >
+              Checkout
+            </Link>
           </footer>
         </>
       )}

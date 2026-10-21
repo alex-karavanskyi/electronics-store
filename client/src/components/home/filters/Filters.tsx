@@ -11,7 +11,7 @@ import styles from './Filters.module.scss'
 
 interface FiltersProps extends Pick<
   FilterFields,
-  'price' | 'min_price' | 'max_price'
+  'minPrice' | 'price' | 'min_price' | 'max_price'
 > {
   handleFilters: HandleFiltersFn
   handleClearButton: HandleClearButtonFn
@@ -19,6 +19,7 @@ interface FiltersProps extends Pick<
 
 const Filters: React.FC<FiltersProps> = ({
   price,
+  minPrice,
   min_price,
   max_price,
   handleFilters,
@@ -30,6 +31,7 @@ const Filters: React.FC<FiltersProps> = ({
       <Search handleFilters={handleFilters} />
       <Price
         price={price}
+        minPrice={minPrice}
         min_price={min_price}
         max_price={max_price}
         handleFilters={handleFilters}

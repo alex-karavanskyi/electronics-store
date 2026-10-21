@@ -30,7 +30,14 @@ const catalog = {
   isLoadingError: false,
   isFetching: false,
   sort: 'price-lowest' as const,
-  filters: { text: '', category: [], price: 300, min_price: 0, max_price: 300 },
+  filters: {
+    text: '',
+    category: [],
+    price: 300,
+    minPrice: 0,
+    min_price: 0,
+    max_price: 300,
+  },
   refetch: jest.fn(),
 }
 const mockCatalog = jest.mocked(useCatalog)

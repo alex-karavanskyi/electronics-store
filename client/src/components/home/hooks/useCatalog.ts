@@ -31,6 +31,7 @@ export const useCatalog = () => {
     total: isPlaceholderData ? 0 : (data?.total ?? 0),
     filters: {
       ...filters,
+      minPrice: filters.minPrice ?? data?.min_price ?? 0,
       min_price: data?.min_price ?? 0,
       max_price: data?.max_price ?? 0,
       price: filters.price ?? data?.max_price ?? 0,

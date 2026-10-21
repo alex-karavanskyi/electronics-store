@@ -12,6 +12,8 @@ const sortSchema = z
   .catch('price-lowest')
 
 function parseCatalogParams(params: URLSearchParams) {
+  const minValue = params.get('minPrice')
+  const minResult = minValue?.trim() ? priceSchema.safeParse(Number(minValue)) : null
   const priceValue = params.get('price')
   const priceResult = priceValue?.trim()
     ? priceSchema.safeParse(Number(priceValue))
@@ -22,6 +24,7 @@ function parseCatalogParams(params: URLSearchParams) {
   )
 
   return {
+    minPrice: minResult?.success ? minResult.data : null,
     maxPrice: priceResult?.success ? priceResult.data : null,
     requestedPage: pageResult.success ? pageResult.data : 1,
     pageSize: pageSizeResult.success ? pageSizeResult.data : DEFAULT_PAGE_SIZE,
@@ -32,7 +35,7 @@ function parseCatalogParams(params: URLSearchParams) {
 }
 
 export function selectCatalog(products: Product[], params: URLSearchParams) {
-  const { maxPrice, requestedPage, pageSize, sort, text, categories } =
+  const { minPrice, maxPrice, requestedPage, pageSize, sort, text, categories } =
     parseCatalogParams(params)
 
   const filteredProducts = products
@@ -40,6 +43,7 @@ export function selectCatalog(products: Product[], params: URLSearchParams) {
       product =>
         (!text || product.name.toLowerCase().startsWith(text)) &&
         (!categories.length || categories.includes(product.category)) &&
+        (minPrice === null || product.price >= minPrice) &&
         (maxPrice === null || product.price <= maxPrice)
     )
     .sort((a, b) => {

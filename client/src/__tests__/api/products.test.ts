@@ -54,7 +54,7 @@ const product = {
   images: [],
 }
 const request = {
-  filters: { text: '', category: [], price: null },
+  filters: { text: '', category: [], price: null, minPrice: null },
   sort: 'price-lowest' as const,
   page: 1,
   pageSize: 6,

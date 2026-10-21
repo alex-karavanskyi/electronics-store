@@ -13,7 +13,7 @@ const MobileCatalogControlsContainer = () => {
     total,
     isPending: isLoading,
     sort,
-    filters: { category, price, min_price, max_price },
+    filters: { category, price, minPrice, min_price, max_price },
   } = useCatalog()
 
   return (
@@ -25,6 +25,7 @@ const MobileCatalogControlsContainer = () => {
           sort={sort}
           category={category}
           price={price}
+          minPrice={minPrice}
           min_price={min_price}
           max_price={max_price}
           isFiltersOpen={isFiltersOpen}

@@ -33,6 +33,7 @@ const MobileCatalogControls: React.FC<MobileCatalogControlsProps> = ({
   sort,
   category,
   price,
+  minPrice,
   min_price,
   max_price,
   handleFilters,
@@ -86,6 +87,7 @@ const MobileCatalogControls: React.FC<MobileCatalogControlsProps> = ({
             <Search handleFilters={handleFilters} />
             <Price
               price={price}
+              minPrice={minPrice}
               min_price={min_price}
               max_price={max_price}
               handleFilters={handleFilters}

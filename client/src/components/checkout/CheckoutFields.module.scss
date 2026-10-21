@@ -1,0 +1,113 @@
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.section {
+  border: 1px solid var(--line);
+  border-radius: 1.4rem;
+  background: var(--paper);
+
+  summary {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1.25rem;
+    font-weight: 600;
+    list-style: none;
+    cursor: pointer;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    svg {
+      margin-left: auto;
+      color: var(--copper-dark);
+    }
+  }
+
+  &[open] summary svg {
+    transform: rotate(180deg);
+  }
+}
+
+.step {
+  color: var(--copper-dark);
+  font: 0.75rem var(--font-utility);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 0 1.25rem 1.5rem;
+
+  label {
+    display: grid;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-width: 0;
+    padding: 0.8rem;
+    border: 1px solid var(--control-border);
+    border-radius: 0.6rem;
+    color: var(--ink);
+    background: var(--porcelain);
+    font: 0.875rem var(--font-main);
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  p {
+    font-size: 0.8rem;
+  }
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.callback {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+
+  input {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--copper-dark);
+  }
+}
+
+.field {
+  display: grid;
+  align-content: start;
+  gap: 0.4rem;
+
+  input[aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+}
+
+.error {
+  color: var(--danger);
+  font-size: 0.75rem;
+}
+
+@media (width <= 480px) {
+  .fields {
+    grid-template-columns: 1fr;
+  }
+}

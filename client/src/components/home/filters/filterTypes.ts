@@ -1,5 +1,6 @@
 export type FilterFields = {
   category: string[]
+  minPrice?: number
   price: number
   min_price: number
   max_price: number
@@ -8,6 +9,7 @@ export type FilterFields = {
 export const enum FilterName {
   Category = 'category',
   Price = 'price',
+  MinPrice = 'minPrice',
   Text = 'text',
   Sort = 'sort',
 }

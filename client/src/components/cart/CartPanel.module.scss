@@ -17,6 +17,21 @@
   }
 }
 
+.checkout {
+  display: block;
+  margin-top: 1rem;
+  padding: 0.9rem 1.5rem;
+  border-radius: 999px;
+  color: var(--button-text);
+  background: var(--button-background);
+  text-align: center;
+  font-weight: 600;
+
+  &:hover {
+    background: var(--button-hover);
+  }
+}
+
 .header {
   min-height: 8.75rem;
   display: flex;

@@ -27,6 +27,7 @@ const CatalogFiltersPanel = ({
     />
     <Filters
       price={filters.price}
+      minPrice={filters.minPrice}
       min_price={filters.min_price}
       max_price={filters.max_price}
       handleFilters={handleFilters}

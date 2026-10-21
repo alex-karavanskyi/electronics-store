@@ -41,6 +41,10 @@ describe('CartDrawer', () => {
     expect(screen.getByRole('dialog', { name: /cart/i })).toBeVisible()
     expect(screen.getByRole('heading', { name: /cart 2/i })).toBeVisible()
     expect(screen.getByText('$250.00')).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Checkout' })).toHaveAttribute(
+      'href',
+      '/checkout'
+    )
 
     await user.click(
       screen.getByRole('button', { name: 'Increase quantity of Test product' })

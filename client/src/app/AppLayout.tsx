@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import Loading from '@/layout/Loading'
 import { Outlet } from 'react-router-dom'
 import { CartDrawer } from '@/components/cart'
-import { Footer, Navbar, Sidebar } from '@/layout'
+import { Footer, Navbar } from '@/layout'
 import { ReduxProvider } from '@/redux/provider'
 import CartHydrator from '@/shared/lib/CartHydrator'
 import ProductImagesSync from '@/shared/lib/ProductImagesSync'
@@ -25,7 +25,6 @@ export default function AppLayout() {
             </Suspense>
           </main>
           <Footer />
-          <Sidebar />
           <CartDrawer />
         </QueryProvider>
       </ReduxProvider>

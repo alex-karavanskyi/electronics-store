@@ -48,55 +48,47 @@
     }
   }
 
-  &__right {
-    display: flex;
-    align-items: center;
-    gap: 2.25rem;
-    margin-left: auto;
-  }
-
-  &__controls {
-    display: flex;
-    align-items: center;
-    margin-left: 0.75rem;
-  }
-
-  &__links {
-    display: none;
-    gap: 1.75rem;
-
-    a {
-      color: rgb(255, 255, 255, 0.72);
-    }
-  }
-
   &__icons {
     --theme-switcher-hover: rgb(255, 255, 255, 0.1);
 
     display: flex;
+    align-items: center;
+    flex-shrink: 0;
     gap: 0.45rem;
+    margin-left: auto;
     color: white;
 
-    > button {
+    > button,
+    > a {
       position: relative;
 
       @include shared.icon-button(2.75rem);
-      display: none;
+      padding: 0;
       border: 0;
       background: transparent;
-      color: white;
+      color: inherit;
       cursor: pointer;
       transition: background 0.2s ease;
     }
 
-    > button:hover {
-      background: rgb(255, 255, 255, 0.1);
+    > button:hover,
+    > a:hover {
+      background: var(--theme-switcher-hover);
     }
 
-    > button svg {
+    > button svg,
+    > a svg {
       width: 1.5rem;
       height: 1.5rem;
     }
+
+    > a[aria-current='page'] {
+      background: var(--theme-switcher-hover);
+    }
+  }
+
+  &__icons > .navbar__account {
+    display: none;
   }
 
   &__cart-count {
@@ -115,39 +107,6 @@
     font-weight: 700;
     line-height: 1;
   }
-
-  &__menu {
-    width: 2.75rem;
-    height: 2.75rem;
-    display: grid;
-    align-content: center;
-    gap: 6px;
-    padding: 0 0.65rem;
-    border: 1px solid rgb(255, 255, 255, 0.3);
-    border-radius: 50%;
-    background: transparent;
-    cursor: pointer;
-
-    span {
-      height: 1px;
-      background: white;
-      transition: transform 0.25s ease;
-    }
-  }
-}
-
-.container.scrolled .navbar__menu span {
-  background: var(--ink);
-}
-
-.container .navbar__menu[aria-expanded='true'] {
-  span:first-child {
-    transform: translateY(3.5px) rotate(45deg);
-  }
-
-  span:last-child {
-    transform: translateY(-3.5px) rotate(-45deg);
-  }
 }
 
 @include shared.from(shared.$mobile) {
@@ -163,23 +122,8 @@
 }
 
 @include shared.from(shared.$tablet) {
-  .container .navbar {
-    &__controls {
-      display: none;
-    }
-
-    &__links {
-      display: flex;
-    }
-
-    &__icons {
-      padding-left: 1.5rem;
-      border-left: 1px solid rgb(255, 255, 255, 0.18);
-    }
-
-    &__icons > button {
-      display: grid;
-    }
+  .container .navbar__icons > .navbar__account {
+    display: grid;
   }
 }
 
@@ -198,27 +142,11 @@
       color: var(--ink-soft);
     }
 
-    &__links a {
-      color: var(--ink);
-    }
-
     &__icons {
       --theme-switcher-hover: var(--surface);
 
-      border-left-color: var(--line);
       color: var(--ink);
     }
 
-    &__icons > button {
-      color: var(--ink);
-    }
-
-    &__icons > button:hover {
-      background: var(--surface);
-    }
-
-    &__menu {
-      border: 1px solid var(--line);
-    }
   }
 }

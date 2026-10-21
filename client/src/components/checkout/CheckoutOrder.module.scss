@@ -1,0 +1,84 @@
+.order {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 1.4rem;
+  background: var(--paper);
+}
+
+.orderHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 1.5rem 0.5rem;
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  > span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+  }
+}
+
+.summary {
+  padding: 1.5rem;
+
+  > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.7rem;
+  }
+
+  > p {
+    font-size: 0.75rem;
+  }
+
+  .total {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    font-size: 1.2rem;
+  }
+}
+
+.submit {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1.4rem 0 0.7rem;
+  padding: 1rem 1.4rem;
+  border: 0;
+  border-radius: 999px;
+  color: var(--button-text);
+  background: var(--button-background);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled {
+    color: var(--text-muted);
+    background: var(--surface-muted);
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--button-hover);
+  }
+}
+
+.demo {
+  text-align: center;
+}
+
+.notice {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--copper-dark);
+  border-radius: 0.7rem;
+}

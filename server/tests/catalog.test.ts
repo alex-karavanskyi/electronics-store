@@ -13,6 +13,11 @@ const products = Array.from({ length: 14 }, (_, i) => ({
   image: '',
   images: [],
 }))
+test('price range includes both endpoints and excludes cheaper products', () => {
+  const result = selectCatalog(products, new URLSearchParams('minPrice=30&price=50'))
+  assert.deepEqual(result.items.map(product => product.price), [30, 40, 50])
+  assert.equal(result.total, 3)
+})
 test('catalog endpoint applies filters, sorting and pagination without changing legacy list', async () => {
   const config = parseEnv({
     MONGODB_URI: 'mongodb://127.0.0.1:27017/test',

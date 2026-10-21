@@ -11,6 +11,10 @@ function normalizeCategories(categories: string[]): string[] {
 }
 
 export function parseFilters(params: URLSearchParams) {
+  const minValue = params.get('minPrice')
+  const minResult = minValue?.trim()
+    ? priceSchema.safeParse(Number(minValue))
+    : null
   const priceValue = params.get('price')
   const priceResult = priceValue?.trim()
     ? priceSchema.safeParse(Number(priceValue))
@@ -22,6 +26,7 @@ export function parseFilters(params: URLSearchParams) {
       text: params.get('text') ?? '',
       category: normalizeCategories(params.getAll('category')),
       price: priceResult?.success ? priceResult.data : null,
+      minPrice: minResult?.success ? minResult.data : null,
     },
     sort: sortSchema.parse(params.get('sort')),
     page: pageResult.success ? pageResult.data : 1,
@@ -38,7 +43,7 @@ export function serializeFilters(
 ) {
   const params = new URLSearchParams(current)
 
-  for (const key of ['text', 'category', 'price', 'sort', 'page']) {
+  for (const key of ['text', 'category', 'price', 'minPrice', 'sort', 'page']) {
     params.delete(key)
   }
 
@@ -52,6 +57,10 @@ export function serializeFilters(
 
   if (state.filters.price !== null) {
     params.set('price', String(state.filters.price))
+  }
+
+  if (state.filters.minPrice != null) {
+    params.set('minPrice', String(state.filters.minPrice))
   }
 
   if (state.sort !== 'price-lowest') {

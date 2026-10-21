@@ -11,6 +11,7 @@ export const useFilters = () => {
 
   const handleFilters: HandleFiltersFn = (name, value) => {
     if (name === FilterName.Text) updateFilter('text', String(value))
+    if (name === FilterName.MinPrice) updateFilter('minPrice', Number(value))
     if (name === FilterName.Price) updateFilter('price', Number(value))
     if (name === FilterName.Sort) updateSort(String(value) as Sorting)
     if (name === FilterName.Category) {

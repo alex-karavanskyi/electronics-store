@@ -9,7 +9,7 @@ it('validates input, canonicalizes categories and omits defaults without droppin
     )
   )
   expect(parsed).toEqual({
-    filters: { text: '', category: ['a', 'b'], price: null },
+    filters: { text: '', category: ['a', 'b'], price: null, minPrice: null },
     sort: 'price-lowest',
     page: 1,
   })
@@ -50,6 +50,10 @@ it('updates filters atomically, resets page and restores history', () => {
   expect(result.current.page).toBe(1)
   act(() => result.current.navigate(-1))
   expect(result.current.page).toBe(2)
+  act(() => result.current.updateFilter('minPrice', 10))
+  expect(
+    new URLSearchParams(result.current.location.search).get('minPrice')
+  ).toBe('10')
   act(() => result.current.resetFilters())
   expect(result.current.location.search).toBe('?campaign=sale')
 })
