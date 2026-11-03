@@ -1,12 +1,19 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useProductFilters } from './useProductFilters'
 import { productKeys } from '@/shared/hooks/useProducts'
 import { fetchCatalog } from '@/shared/api/products'
 import { useAppSelector } from '@/redux/hooks'
-import type { CatalogRequest } from '@/shared/filters/productFilters'
+import {
+  serializeFilters,
+  type CatalogRequest,
+} from '@/shared/filters/productFilters'
 
 export const useCatalog = () => {
   const { filters, sort, page } = useProductFilters()
+  const location = useLocation()
+  const navigate = useNavigate()
   const grid = useAppSelector(state => state.catalogView.grid_view)
   const request: CatalogRequest = {
     filters,
@@ -19,6 +26,7 @@ export const useCatalog = () => {
     isPending,
     isPlaceholderData,
     isLoadingError,
+    isError,
     isFetching,
     refetch,
   } = useQuery({
@@ -26,6 +34,42 @@ export const useCatalog = () => {
     placeholderData: keepPreviousData,
     queryFn: ({ signal }) => fetchCatalog(request, signal),
   })
+  useEffect(() => {
+    if (
+      !grid ||
+      !data ||
+      isPlaceholderData ||
+      isFetching ||
+      isError ||
+      data.page >= page
+    )
+      return
+    const params = serializeFilters(
+      { filters, sort, page: data.page },
+      new URLSearchParams(location.search)
+    )
+    navigate(
+      {
+        pathname: location.pathname,
+        search: params.toString(),
+        hash: location.hash,
+      },
+      { replace: true, preventScrollReset: true }
+    )
+  }, [
+    data,
+    filters,
+    grid,
+    isError,
+    isFetching,
+    isPlaceholderData,
+    location.hash,
+    location.pathname,
+    location.search,
+    navigate,
+    page,
+    sort,
+  ])
   return {
     products: isPlaceholderData ? [] : (data?.items ?? []),
     total: isPlaceholderData ? 0 : (data?.total ?? 0),

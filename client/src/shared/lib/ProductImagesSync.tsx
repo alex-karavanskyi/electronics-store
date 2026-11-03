@@ -1,48 +1,36 @@
 ﻿import { useEffect } from 'react'
-import { updateCartProductImages } from '@/redux/features/cartSlice'
-import { updateFavoriteProductImages } from '@/redux/features/favoriteSlice'
+import { removeFromCart, updateCartProduct } from '@/redux/features/cartSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { useProduct } from '@/shared/hooks/useProducts'
-import type { Product } from '@/shared/types/productSchema'
-
-function needsImages(snapshot: Product | undefined, current: Product) {
-  return (
-    snapshot &&
-    (snapshot.image !== current.image ||
-      snapshot.images.length !== current.images.length ||
-      snapshot.images.some((url, index) => url !== current.images[index]))
-  )
-}
+import { ApiError } from '@/shared/api/http'
+import { sameProduct } from '@/shared/utils/sameProduct'
 
 function ProductImageSync({ id }: { id: string }) {
   const dispatch = useAppDispatch()
-  const { data, isSuccess } = useProduct(id)
+  const { data, error, isSuccess, isFetching } = useProduct(id, true)
   const cartProduct = useAppSelector(
     state => state.cart.items.find(item => item.product.id === id)?.product
   )
-  const favoriteProduct = useAppSelector(state =>
-    state.favorite.favorites_products.find(product => product.id === id)
-  )
 
   useEffect(() => {
+    if (!cartProduct || isFetching) return
+    if (
+      (error instanceof ApiError && error.status === 404) ||
+      (isSuccess && data === null)
+    ) {
+      dispatch(removeFromCart(id))
+      return
+    }
     if (!isSuccess || !data || data.id !== id) return
-    const images = { id, image: data.image, images: data.images }
-    if (needsImages(cartProduct, data))
-      dispatch(updateCartProductImages(images))
-    if (needsImages(favoriteProduct, data))
-      dispatch(updateFavoriteProductImages(images))
-  }, [cartProduct, favoriteProduct, data, isSuccess, id, dispatch])
+    if (!sameProduct(cartProduct, data)) dispatch(updateCartProduct(data))
+  }, [cartProduct, data, error, isSuccess, isFetching, id, dispatch])
 
   return null
 }
 
 export default function ProductImagesSync() {
   const { items, isHydrated } = useAppSelector(state => state.cart)
-  const favorites = useAppSelector(state => state.favorite.favorites_products)
-  const ids = new Set([
-    ...(isHydrated ? items.map(item => item.product.id) : []),
-    ...favorites.map(product => product.id),
-  ])
+  const ids = new Set(isHydrated ? items.map(item => item.product.id) : [])
   return (
     <>
       {Array.from(ids, id => (

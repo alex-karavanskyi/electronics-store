@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-
 import type { CatalogRequest } from '@/shared/filters/productFilters'
-
 import { fetchProduct, fetchProducts } from '@/shared/api/products'
+import type { Product } from '@/shared/types/productSchema'
 
 export const productKeys = {
   all: ['products'] as const,
+  scope: () => productKeys.all,
   list: () => [...productKeys.all, 'list'] as const,
   catalog: (request: CatalogRequest) =>
     [...productKeys.all, 'catalog', request] as const,
@@ -18,9 +18,13 @@ export const useProducts = () =>
     queryFn: ({ signal }) => fetchProducts(signal),
   })
 
-export const useProduct = (id: string) =>
+export const useProduct = (id: string, revalidate = false) =>
   useQuery({
     queryKey: productKeys.detail(id),
-    queryFn: ({ signal }) => fetchProduct(id, signal),
+    // null is the local tombstone after a confirmed deletion.
+    queryFn: ({ signal }): Promise<Product | null> => fetchProduct(id, signal),
     enabled: Boolean(id),
+    refetchOnMount: revalidate ? 'always' : true,
+    refetchOnWindowFocus: revalidate ? 'always' : true,
+    refetchOnReconnect: revalidate ? 'always' : true,
   })

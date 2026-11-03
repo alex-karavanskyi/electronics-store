@@ -21,17 +21,31 @@ Starts API on http://127.0.0.1:3001 and Vite on http://localhost:5173. Open the 
 
 ## API
 
+Account favorites are available under `/api/me/favorites`: GET reads the current
+user's list; PUT/DELETE `/items/:productId` add/remove; POST `/merge` imports guest IDs;
+PUT `/order` saves a revision-checked permutation. All require verified Clerk
+session tokens and return `{ ids, revision }` with private/no-store caching.
+Prepare the new collection with `npm run setup:favorites` against the intended
+database. See [setup and full contract](../docs/favorites-setup.md).
+
+Authentication uses `@clerk/express`. Configure `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` together; optional `CLERK_JWT_KEY` enables networkless JWT verification. With no keys, public browsing works and protected requests fail closed with 503. See [Clerk setup](../docs/clerk-setup.md) for admin metadata and the `role` session claim.
+
+`GET /api/me` requires a valid session and returns `{ userId, role }`. `requireUser` and `requireAdmin` in `src/middleware/auth.ts` return JSON 401/403, use only verified session claims, and set private/no-store caching. Product POST requires a signed-in user; PATCH/DELETE atomically require the owner or Admin; see [CRUD contract](../docs/products-crud.md). CORS permits bearer Authorization and GET/POST/PUT/PATCH/DELETE/OPTIONS for configured origins; those origins also define Clerk `authorizedParties`.
+
 | Method | Endpoint              | Response                                       |
 | ------ | --------------------- | ---------------------------------------------- |
 | GET    | /api/health           | Process liveness, not an upstream health check |
 | GET    | /api/products         | Product array                                  |
 | GET    | /api/products/catalog | Filtered and paginated catalog                 |
 | GET    | /api/products/:id     | Product or 404                                 |
+| POST   | /api/products         | Signed-in user: 201 + created Product          |
+| PATCH  | /api/products/:id     | Owner/Admin: updated Product; 403/404 on denial |
+| DELETE | /api/products/:id     | Owner/Admin: 204 without body; 403/404          |
 | POST   | /api/chat             | AI SDK UI message SSE stream                   |
 
 The `/api/health` handler returns `{ status: 'ok' }` without querying MongoDB or OpenAI. The Node server connects to MongoDB before listening. On Vercel, every route, including health, first passes through application initialization: a failed initial database connection returns 503. Once initialized, health does not detect a later database outage. It is not a complete dependency health check.
 
-The list contains documents with catalogOrder >= 0, ordered by catalogOrder and then string ID. Detail can also retrieve products outside the storefront. Stored Cloudinary secureUrl values form the image gallery; an empty gallery returns images=[] and image=''. The catalog endpoint documented below adds filtering and pagination. The list and detail endpoints use explicit /api/products routes; no legacy aliases are registered.
+The list contains documents with catalogOrder >= 0, ordered by catalogOrder and then string ID. Detail can also retrieve products outside the storefront. The gallery uses the optional admin imageUrls override, or imported Cloudinary secureUrl values when no override exists; an empty gallery returns images=[] and image=''. The catalog endpoint documented below adds filtering and pagination. The list and detail endpoints use explicit /api/products routes; no legacy aliases are registered.
 
 Chat accepts a messages array of user/assistant UI messages with id and text/reasoning parts. The final user message must contain metadata.productId. The server loads product facts by ID, retains the o4-mini model, validates input, limits request size, aborts generation on disconnect and returns safe streaming error messages. It does not accept client-supplied system prompts. Contact has no server implementation in the project and remains unchanged.
 
@@ -55,6 +69,25 @@ Set client variables in `client/.env` or the frontend build environment. Vite in
 The environment parser validates values and produces errors containing variable names rather than values. The Node entry point catches startup failures and prints a generic safe message; Vercel returns a safe 503.
 
 CORS permits configured origins and requests without an `Origin` header. It does not enable wildcards or credentials mode, and it is not authentication. The Vercel adapter additionally allows origins from `VERCEL_URL`, `VERCEL_PROJECT_PRODUCTION_URL`, and `VERCEL_BRANCH_URL`. It reads these platform settings, not request headers.
+
+## Product ownership
+
+New products store immutable ownerId from the verified Clerk session. Existing
+products without an owner are not backfilled; only Admin can change them.
+Public Product responses do not expose owner IDs. Authenticated
+GET /api/me/products returns only the session user's products in catalogOrder/_id
+order with private/no-store caching; query parameters cannot select another owner.
+The frontend now provides `/my-products` for signed-in users and owner/Admin
+controls on product pages. `/admin/products` provides the moderation panel.
+GET `/api/admin/products` requires a verified admin claim and returns
+`{ product, ownerId: string | null, createdAt: string | null }[]` with private/no-store
+caching, newest creation dates first and ID as a tiebreaker; missing dates sort
+last. Public DTOs stay unchanged. This read performs no backfill or document writes.
+
+Run npm run setup:products explicitly against the intended environment to create
+the product_owner_catalog_order index. This reads server/.env (process environment
+takes precedence); it neither rewrites documents nor drops indexes. Runtime
+autoIndex stays disabled. The setup was verified only on temporary test MongoDB.
 
 ## Build and run with Node
 
@@ -116,6 +149,18 @@ Unit tests use real local HTTP requests to Express with controlled product servi
 GET /api/products/catalog accepts text, repeated category, price, sort, page and pageSize. Returns { items, total, page, pageSize, min_price, max_price }. It filters/sorts/pages the MongoDB storefront; existing unfiltered list and detail endpoints are preserved. Invalid values use defaults (sort=price-lowest, page=1, pageSize=6; maximum pageSize=100). Bounds describe the unfiltered result. See the [client catalog URL rules](../client/README.md#catalog-url).
 
 ## Recovery
+
+Product creation persists a notification job in the same MongoDB document and
+awaits the first Telegram attempt without rolling back publication on delivery failure.
+The separate secret-protected scheduler route is
+`GET /api/internal/product-notifications`; Admins can retry through
+`POST /api/admin/products/:id/notification/retry`. See
+[notification configuration and activation](../docs/product-notifications.md).
+`setup:products` now also prepares the notification due-job index; it never
+backfills notifications for existing products.
+
+See the [stage 6 report](../docs/implementation/user-products-stage-6.md) for
+isolated MongoDB/HTTP authorization checks and remaining production setup.
 
 For an application regression, restore a verified MongoDB deployment on Vercel, then check `/api/products`, `/api/products/catalog`, product details, images and chat. Confirm that the restored deployment has the intended environment and access settings.
 

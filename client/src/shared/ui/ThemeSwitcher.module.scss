@@ -1,3 +1,5 @@
+@use '../styles' as shared;
+
 .switcher {
   position: relative;
   flex-shrink: 0;
@@ -30,7 +32,7 @@
 .menu {
   position: absolute;
   top: calc(100% + 0.4rem);
-  right: 0;
+  left: 0;
   z-index: 1;
   width: 10rem;
   padding: 0.4rem;
@@ -62,5 +64,12 @@
     &:focus-visible {
       outline-offset: -2px;
     }
+  }
+}
+
+@include shared.from(shared.$mobile) {
+  .menu {
+    right: 0;
+    left: auto;
   }
 }

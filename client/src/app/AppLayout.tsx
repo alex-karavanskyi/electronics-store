@@ -9,25 +9,35 @@ import ProductImagesSync from '@/shared/lib/ProductImagesSync'
 import QueryProvider from '@/shared/lib/QueryProvider'
 import ThemeProvider from '@/shared/lib/ThemeProvider'
 import ScrollToPage from './ScrollToPage'
+import FavoritesStorageSync from '@/components/favorites/FavoritesStorageSync'
+import ProductAccountSync from '@/shared/auth/ProductAccountSync'
 
 export default function AppLayout() {
   return (
     <ThemeProvider>
-      <ReduxProvider>
-        <QueryProvider>
-          <CartHydrator />
-          <ProductImagesSync />
-          <ScrollToPage />
-          <Navbar />
-          <main style={{ flex: 1 }}>
-            <Suspense fallback={<Loading />}>
-              <Outlet />
-            </Suspense>
-          </main>
-          <Footer />
-          <CartDrawer />
-        </QueryProvider>
-      </ReduxProvider>
+      <QueryProvider>
+        <StoreSession />
+      </QueryProvider>
     </ThemeProvider>
+  )
+}
+
+function StoreSession() {
+  return (
+    <ReduxProvider>
+      <ProductAccountSync />
+      <FavoritesStorageSync />
+      <CartHydrator />
+      <ProductImagesSync />
+      <ScrollToPage />
+      <Navbar />
+      <main style={{ flex: 1 }}>
+        <Suspense fallback={<Loading />}>
+          <Outlet />
+        </Suspense>
+      </main>
+      <Footer />
+      <CartDrawer />
+    </ReduxProvider>
   )
 }

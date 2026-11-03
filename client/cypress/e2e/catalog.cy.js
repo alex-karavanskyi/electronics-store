@@ -66,7 +66,22 @@ describe('Standalone Vite storefront', () => {
   it('navigates featured products with the carousel controls', () => {
     cy.visit('/')
     cy.wait('@list')
+    // Test manual controls from a fixed slide, without racing the autoplay timer.
+    cy.get('.swiper')
+      .its('0.swiper')
+      .then(swiper => {
+        swiper.autoplay.stop()
+        swiper.slideToLoop(0, 0)
+        // slideToLoop queues its reset in requestAnimationFrame. Let that reset
+        // finish before clicking Next, otherwise it can undo the tested click.
+        return new Cypress.Promise(resolve => {
+          swiper.el.ownerDocument.defaultView.requestAnimationFrame(() =>
+            resolve()
+          )
+        })
+      })
     cy.get('.swiper-slide-active img').should('have.attr', 'alt', 'Phone 00')
+    cy.get('.swiper').its('0.swiper.animating').should('eq', false)
     cy.get('button[aria-label="Next product"]').click()
     cy.get('.swiper-slide-active img').should('have.attr', 'alt', 'Phone 01')
     cy.get('.swiper').its('0.swiper.animating').should('eq', false)
@@ -307,7 +322,9 @@ describe('Accessible controls and modal interactions', () => {
     cy.viewport(1280, 900)
     cy.visit('/')
     cy.wait('@catalog')
-    cy.get('button[aria-label="Favorite Phone 00"]').focus()
+    cy.get('button[aria-label="Favorite Phone 00"]')
+      .should('be.enabled')
+      .focus()
     cy.press(Cypress.Keyboard.Keys.SPACE)
     cy.get('button[aria-label="Favorite Phone 00"]').should(
       'have.attr',
@@ -315,6 +332,7 @@ describe('Accessible controls and modal interactions', () => {
       'true'
     )
     cy.get('button[aria-label="Favorite Phone 01"]')
+      .should('be.enabled')
       .focus()
       .should('be.focused')
     cy.press(Cypress.Keyboard.Keys.SPACE)
@@ -324,12 +342,14 @@ describe('Accessible controls and modal interactions', () => {
       'true'
     )
     cy.get('a[href="/favorites"]').filter(':visible').first().click()
-    cy.get('button[aria-label="Move Phone 01 up"]').focus()
+    cy.get('button[aria-label="Move Phone 01 up"]').should('be.enabled').focus()
     cy.press(Cypress.Keyboard.Keys.SPACE)
     cy.get('[role="group"][aria-label^="Reorder"]')
       .first()
       .should('have.attr', 'aria-label', 'Reorder Phone 01')
-    cy.get('button[aria-label="Move Phone 01 down"]').focus()
+    cy.get('button[aria-label="Move Phone 01 down"]')
+      .should('be.enabled')
+      .focus()
     cy.press(Cypress.Keyboard.Keys.SPACE)
     cy.get('[role="group"][aria-label^="Reorder"]')
       .first()

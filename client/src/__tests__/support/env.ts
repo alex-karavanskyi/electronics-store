@@ -1,1 +1,1 @@
-export const clientEnv = { dev: false, apiUrl: '' }
+export const clientEnv = { dev: false, apiUrl: '', clerkPublishableKey: '' }

@@ -1,6 +1,7 @@
 import { Middleware } from '@reduxjs/toolkit'
 
 import {
+  updateCartProduct,
   updateCartProductImages,
   addToCart,
   clearCart,
@@ -14,6 +15,7 @@ import {
 } from '@/shared/constants/localStorage'
 
 const persistedActions = new Set([
+  updateCartProduct.type,
   updateCartProductImages.type,
   addToCart.type,
   clearCart.type,

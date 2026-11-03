@@ -6,11 +6,13 @@ import { selectCartQuantity } from '@/redux/features/cartSlice'
 import CheckoutFields from './CheckoutFields'
 import CheckoutOrder from './CheckoutOrder'
 import useCheckoutForm from './useCheckoutForm'
+import useCheckoutCart from './useCheckoutCart'
 import styles from './Checkout.module.scss'
 
 export default function Checkout() {
   const items = useAppSelector(state => state.cart.items)
   const quantity = useAppSelector(selectCartQuantity)
+  const reviewCart = useCheckoutCart()
   const {
     register,
     errors,
@@ -20,7 +22,8 @@ export default function Checkout() {
     formRef,
     onSubmit,
     onChange,
-  } = useCheckoutForm(items.length > 0)
+    reviewMessage,
+  } = useCheckoutForm(JSON.stringify(items), reviewCart)
 
   return (
     <div className={styles.page}>
@@ -32,6 +35,7 @@ export default function Checkout() {
         <h1>Checkout</h1>
         <p>Your next upgrade is almost yours.</p>
       </header>
+      {reviewMessage && <p role="alert">{reviewMessage}</p>}
       {items.length === 0 ? (
         <div className={styles.empty}>
           <EmptyCart />

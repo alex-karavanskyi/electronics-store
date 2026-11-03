@@ -24,6 +24,12 @@ const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
+    updateCartProduct: (state, action: PayloadAction<Product>) => {
+      const item = state.items.find(
+        item => item.product.id === action.payload.id
+      )
+      if (item) item.product = action.payload
+    },
     updateCartProductImages: (
       state,
       action: PayloadAction<Pick<Product, 'id' | 'image' | 'images'>>
@@ -89,6 +95,7 @@ const cartSlice = createSlice({
 })
 
 export const {
+  updateCartProduct,
   updateCartProductImages,
   addToCart,
   clearCart,

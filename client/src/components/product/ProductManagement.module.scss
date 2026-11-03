@@ -1,0 +1,132 @@
+.management {
+  margin-block: 1rem;
+
+  p {
+    margin-top: 0.75rem;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+.catalogManagement {
+  width: min(100% - 2rem, 1280px);
+  margin-inline: auto;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+
+  button {
+    min-height: 44px;
+    padding: 0.65rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 3px;
+  }
+
+  .primary {
+    background: var(--text);
+    color: var(--surface);
+  }
+
+  .danger {
+    background: #b42318;
+    border-color: #b42318;
+    color: #fff;
+  }
+
+  .deleteLink {
+    color: var(--danger);
+  }
+}
+
+.backdrop {
+  position: fixed;
+  z-index: 1100;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(0, 0, 0, 0.55);
+}
+
+.dialog {
+  width: min(100%, 560px);
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: clamp(1rem, 3vw, 1.75rem);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+
+  h2 {
+    margin-bottom: 1rem;
+  }
+}
+
+.fields {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+
+  label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+  }
+
+  input,
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--background);
+    color: var(--text);
+    font: inherit;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  [aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+}
+
+.hint {
+  margin-top: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.error {
+  margin-top: 0.5rem;
+  color: var(--danger);
+  overflow-wrap: anywhere;
+}

@@ -15,3 +15,7 @@ export const productSchema = z.object({
 })
 
 export type Product = z.infer<typeof productSchema>
+export type ProductInput = Pick<
+  Product,
+  'name' | 'price' | 'description' | 'category' | 'images'
+>

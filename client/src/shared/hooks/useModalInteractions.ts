@@ -5,17 +5,21 @@ interface UseModalInteractionsOptions {
   isOpen: boolean
   initialFocusRef: RefObject<HTMLElement>
   onClose: () => void
+  onAfterClose?: () => void
 }
 
 const useModalInteractions = ({
   isOpen,
   initialFocusRef,
   onClose,
+  onAfterClose,
 }: UseModalInteractionsOptions) => {
   const onCloseRef = useRef(onClose)
+  const onAfterCloseRef = useRef(onAfterClose)
   useEffect(() => {
     onCloseRef.current = onClose
-  }, [onClose])
+    onAfterCloseRef.current = onAfterClose
+  }, [onClose, onAfterClose])
 
   useEffect(() => {
     if (!isOpen) return
@@ -80,6 +84,7 @@ const useModalInteractions = ({
       document.body.style.overflow = bodyOverflow
       document.documentElement.style.overflow = htmlOverflow
       if (opener instanceof HTMLElement && opener.isConnected) opener.focus()
+      onAfterCloseRef.current?.()
     }
   }, [initialFocusRef, isOpen])
 }

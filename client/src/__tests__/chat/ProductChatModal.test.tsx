@@ -15,7 +15,6 @@ import '../support/streams'
 
 import SingleProduct from '@/components/product/SingleProduct'
 import cart from '@/redux/features/cartSlice'
-import favorite from '@/redux/features/favoriteSlice'
 import { productKeys } from '@/shared/hooks/useProducts'
 
 const product = {
@@ -47,7 +46,7 @@ it.each(['button', 'Escape', 'overlay'] as const)(
   'closes the product chat via %s, aborts its request and restores focus',
   async method => {
     const user = userEvent.setup()
-    const store = configureStore({ reducer: { cart, favorite } })
+    const store = configureStore({ reducer: { cart } })
     let signal: AbortSignal | null | undefined
     mockFetch.mockImplementation((_url, options) => {
       signal = options?.signal

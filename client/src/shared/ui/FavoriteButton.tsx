@@ -1,8 +1,7 @@
 import styles from './FavoriteButton.module.scss'
 import { MdFavorite, MdFavoriteBorder } from 'react-icons/md'
 
-import { toggleFavorite } from '@/redux/features/favoriteSlice'
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
+import { useFavorites } from '@/components/favorites/useFavorites'
 import { Product } from '@/shared/types/productSchema'
 
 interface FavoriteButtonProps {
@@ -14,13 +13,13 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   product,
   classIcon,
 }) => {
-  const { favorites_products } = useAppSelector(store => store.favorite)
-  const dispatch = useAppDispatch()
+  const { favoriteIds, toggleFavorite, canWrite, isSaving, error } =
+    useFavorites()
 
-  const isFavorite = favorites_products.some(p => p.id === product.id)
+  const isFavorite = favoriteIds.includes(product.id)
 
   const handleClick = () => {
-    dispatch(toggleFavorite(product))
+    toggleFavorite(product)
   }
 
   return (
@@ -29,6 +28,13 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
       className={styles.button}
       aria-label={`Favorite ${product.name}`}
       aria-pressed={isFavorite}
+      disabled={!canWrite}
+      aria-busy={isSaving}
+      title={
+        error
+          ? 'Your wishlist could not be updated. Open Favorites to retry.'
+          : undefined
+      }
       onClick={handleClick}
     >
       {isFavorite ? (

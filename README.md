@@ -9,7 +9,7 @@ npm ci
 npm run install:apps
 ```
 
-Create `server/.env` from `server/.env.example` and set `MONGODB_URI`. MongoDB is the only product source; the optional `OPENAI_API_KEY` enables chat. The Node entry point loads `server/.env`; existing process environment values take precedence. It does not load the root `.env`. Vercel supplies the function's environment through project settings. Never expose secrets as `VITE_*`.
+Create `server/.env` from `server/.env.example` and set `MONGODB_URI`. MongoDB is the only product source. The optional `OPENAI_API_KEY` enables chat. The Node entry point loads `server/.env`; existing process environment values take precedence. It does not load the root `.env`. Vercel supplies the function's environment through project settings. Never expose secrets as `VITE_*`.
 
 ```sh
 npm run dev
@@ -38,7 +38,41 @@ Configure `MONGODB_URI`, optional `OPENAI_API_KEY`, and any custom frontend orig
 
 See the server guide for [environment variables](server/README.md#environment-variables), [startup structure](server/README.md#structure-and-checks), and the limits of `/api/health`.
 
+## Authentication
+
+Clerk provides sign in, sign up, account management and sign out. See [Clerk setup](docs/clerk-setup.md) for local keys, the admin session claim, API verification and deployment configuration. Without Clerk keys the public catalog remains available; protected session requests fail closed.
+
 ## Verification
+
+Account favorites: after configuring Clerk, prepare the MongoDB collection with
+`npm --prefix server run setup:favorites`. See [favorites setup](docs/favorites-setup.md)
+for the authenticated API, guest merge, account isolation and local integration tests.
+
+The Express API lets signed-in users create products and manage their own;
+Admins can manage any product. `GET /api/me/products` lists the caller's products.
+Signed-in users can publish products and manage their own listings at `/my-products`.
+Owner controls also appear on product pages; Admins can manage any product.
+The Admin panel at `/admin/products` lists all publications, with search by
+name/product ID/owner, editing and confirmed deletion. It is available through
+the Products menu after signing in with the admin claim; see [Admin setup](docs/clerk-setup.md).
+See [CRUD contract](docs/products-crud.md) for rights, the explicit
+`npm --prefix server run setup:products` index preparation and isolated tests.
+
+New publications support private Telegram notifications with durable retries and
+an Admin delivery status/retry action. See [Telegram setup](docs/product-notifications.md)
+for bot creation, server settings and scheduler activation. Email delivery has
+been removed; actual Telegram delivery still requires configuring and deploying the app.
+
+Demo Mode has been removed; existing browser demo data is ignored.
+See [removal and compatibility](docs/demo-mode.md).
+
+[Storefront integration](docs/storefront-verification.md) describes cart
+reconciliation, checkout review, account boundaries and the complete
+Guest/User/Admin verification checklist.
+
+The [stage 6 verification report](docs/implementation/user-products-stage-6.md)
+records current local test results separately from live Clerk, database indexes,
+deployment and Telegram scheduler activation.
 
 ```sh
 npm run check:architecture

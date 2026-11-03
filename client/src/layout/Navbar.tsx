@@ -3,12 +3,13 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 
 import { FiHeart } from 'react-icons/fi'
-import { GoPerson } from 'react-icons/go'
 import { SlBasket } from 'react-icons/sl'
 
 import { openCart, selectCartQuantity } from '@/redux/features/cartSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import ThemeSwitcher from '@/shared/ui/ThemeSwitcher'
+import AccountControls from '@/shared/auth/AccountControls'
+import ProductNavigation from './ProductNavigation'
 
 import styles from './Navbar.module.scss'
 
@@ -31,23 +32,20 @@ const Navbar = () => {
         .join(' ')}
     >
       <div className={styles.navbar}>
-        <Link to="/" className={styles.navbar__brand} aria-label="VOLT home">
-          <span>VOLT</span>
-          <small>Technology store</small>
-        </Link>
+        <div className={styles.navbar__links}>
+          <Link to="/" className={styles.navbar__brand} aria-label="VOLT home">
+            <span>VOLT</span>
+            <small>Technology store</small>
+          </Link>
+          <ProductNavigation />
+        </div>
 
         <div className={styles.navbar__icons}>
           <ThemeSwitcher />
           <NavLink to="/favorites" aria-label="Favorites" title="Favorites">
             <FiHeart aria-hidden="true" />
           </NavLink>
-          <button
-            type="button"
-            className={styles.navbar__account}
-            aria-label="Your account"
-          >
-            <GoPerson aria-hidden="true" />
-          </button>
+          <AccountControls className={styles.navbar__account} />
           <button
             type="button"
             className={'navbar__cart'}

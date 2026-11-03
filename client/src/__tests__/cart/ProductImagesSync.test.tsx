@@ -1,6 +1,10 @@
 import { StrictMode } from 'react'
 import { configureStore } from '@reduxjs/toolkit'
-import { QueryClientProvider } from '@tanstack/react-query'
+import {
+  QueryClientProvider,
+  focusManager,
+  onlineManager,
+} from '@tanstack/react-query'
 import { act, cleanup, render, waitFor } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import cartReducer, {
@@ -9,11 +13,12 @@ import cartReducer, {
   incrementQuantity,
   removeFromCart,
 } from '@/redux/features/cartSlice'
-import favoriteReducer, {
-  addFavorite,
-  removeFavorite,
-  reorderFavorite,
-} from '@/redux/features/favoriteSlice'
+import {
+  useFavorites,
+  guestFavoritesKey,
+} from '@/components/favorites/useFavorites'
+import Favorites from '@/components/favorites/Favorites'
+import { MemoryRouter } from 'react-router-dom'
 import { persistCartMiddleware } from '@/redux/middleware/persistCartMiddleware'
 import CartHydrator from '@/shared/lib/CartHydrator'
 import ProductImagesSync from '@/shared/lib/ProductImagesSync'
@@ -42,12 +47,33 @@ const fresh = {
 const clients: ReturnType<typeof createQueryClient>[] = []
 function setup() {
   const store = configureStore({
-    reducer: { cart: cartReducer, favorite: favoriteReducer },
+    reducer: { cart: cartReducer },
     middleware: get => get().concat(persistCartMiddleware),
   })
   const client = createQueryClient()
   client.setDefaultOptions({ queries: { retry: false, staleTime: 60_000 } })
   clients.push(client)
+  let actions!: ReturnType<typeof useFavorites>
+  function FavoriteProbe() {
+    actions = useFavorites()
+    return (
+      <MemoryRouter>
+        <Favorites />
+      </MemoryRouter>
+    )
+  }
+  const seed = (ids: string[]) => {
+    let storageAvailable = true
+    try {
+      localStorage.setItem(
+        'volt_favorites',
+        JSON.stringify({ version: 1, ids })
+      )
+    } catch {
+      storageAvailable = false
+    }
+    client.setQueryData(guestFavoritesKey, { ids, storageAvailable })
+  }
   const mount = () =>
     render(
       <StrictMode>
@@ -55,11 +81,12 @@ function setup() {
           <QueryClientProvider client={client}>
             <CartHydrator />
             <ProductImagesSync />
+            <FavoriteProbe />
           </QueryClientProvider>
         </Provider>
       </StrictMode>
     )
-  return { store, client, mount }
+  return { store, client, mount, seed, favorites: () => actions }
 }
 beforeEach(() => {
   localStorage.clear()
@@ -69,9 +96,11 @@ afterEach(() => {
   cleanup()
   clients.splice(0).forEach(client => client.clear())
   jest.restoreAllMocks()
+  focusManager.setFocused(undefined)
+  onlineManager.setOnline(true)
 })
 
-it('refreshes a v1 cart through detail API and persists only images while preserving a live quantity edit', async () => {
+it('refreshes every product field in a v1 cart while preserving a live quantity edit', async () => {
   localStorage.setItem(
     'volt_cart',
     JSON.stringify({ version: 1, items: [{ product: old, quantity: 3 }] })
@@ -93,7 +122,7 @@ it('refreshes a v1 cart through detail API and persists only images while preser
   await act(async () => resolve(jsonResponse(fresh)))
   const expected = [
     {
-      product: { ...old, image: 'new', images: ['new', 'second'] },
+      product: fresh,
       quantity: 4,
     },
   ]
@@ -114,35 +143,30 @@ it('shares detail data, preserves reordered favorites and does not restore a rem
         resolve = done
       })
   )
-  const { store, client, mount } = setup()
+  const { store, client, mount, seed, favorites } = setup()
   client.setQueryData(productKeys.detail('two'), { ...old, id: 'two' })
   store.dispatch(hydrateCart([{ product: old, quantity: 2 }]))
-  store.dispatch(addFavorite(old))
-  store.dispatch(addFavorite({ ...old, id: 'two' }))
+  seed([old.id, 'two'])
   mount()
   await waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2))
   expect(mockFetch.mock.calls[0][1]?.signal?.aborted).toBe(true)
   expect(mockFetch.mock.calls[1][1]?.signal?.aborted).toBe(false)
   act(() => {
     store.dispatch(removeFromCart(old.id))
-    store.dispatch(reorderFavorite({ from: 0, to: 1 }))
+    favorites().setFavoriteOrder(['two', old.id])
   })
   await act(async () => resolve(jsonResponse(fresh)))
-  await waitFor(() =>
-    expect(store.getState().favorite.favorites_products).toEqual([
-      { ...old, id: 'two' },
-      { ...old, image: 'new', images: ['new', 'second'] },
-    ])
-  )
+  await waitFor(() => expect(favorites().favoriteIds).toEqual(['two', old.id]))
   expect(store.getState().cart.items).toEqual([])
+  mockFetch.mockResolvedValue(jsonResponse(fresh))
   act(() => store.dispatch(addToCart(old)))
   await waitFor(() =>
     expect(store.getState().cart.items[0].product.image).toBe('new')
   )
-  expect(mockFetch).toHaveBeenCalledTimes(2)
+  expect(store.getState().cart.items[0].product).toEqual(fresh)
 })
 
-it.each([404, 503, 'offline', 'invalid', 'wrong-id'] as const)(
+it.each([503, 'offline', 'invalid', 'wrong-id'] as const)(
   'keeps snapshots on %s responses',
   async failure => {
     if (failure === 'offline') mockFetch.mockRejectedValue(new Error('offline'))
@@ -157,9 +181,9 @@ it.each([404, 503, 'offline', 'invalid', 'wrong-id'] as const)(
           typeof failure === 'number' ? failure : 200
         )
       )
-    const { store, client, mount } = setup()
+    const { store, client, mount, seed, favorites } = setup()
     store.dispatch(hydrateCart([{ product: old, quantity: 2 }]))
-    store.dispatch(addFavorite(old))
+    seed([old.id])
     mount()
     await waitFor(() =>
       expect(
@@ -167,7 +191,7 @@ it.each([404, 503, 'offline', 'invalid', 'wrong-id'] as const)(
       ).toBe('idle')
     )
     expect(store.getState().cart.items).toEqual([{ product: old, quantity: 2 }])
-    expect(store.getState().favorite.favorites_products).toEqual([old])
+    expect(favorites().favoriteIds).toEqual([old.id])
   }
 )
 
@@ -179,17 +203,17 @@ it('keeps removed favorites absent when a shared request finishes', async () => 
         resolve = done
       })
   )
-  const { store, mount } = setup()
+  const { store, mount, seed, favorites } = setup()
   store.dispatch(hydrateCart([{ product: old, quantity: 2 }]))
-  store.dispatch(addFavorite(old))
+  seed([old.id])
   mount()
   await waitFor(() => expect(mockFetch).toHaveBeenCalled())
-  act(() => store.dispatch(removeFavorite(old.id)))
+  act(() => favorites().removeFavorite(old.id))
   await act(async () => resolve(jsonResponse(fresh)))
   await waitFor(() =>
     expect(store.getState().cart.items[0].product.image).toBe('new')
   )
-  expect(store.getState().favorite.favorites_products).toEqual([])
+  expect(favorites().favoriteIds).toEqual([])
 })
 
 it('updates empty galleries in memory when localStorage fails', async () => {
@@ -200,20 +224,70 @@ it('updates empty galleries in memory when localStorage fails', async () => {
     throw new Error('full')
   })
   mockFetch.mockResolvedValue(jsonResponse({ ...fresh, image: '', images: [] }))
-  const { store, mount } = setup()
+  const { store, client, mount, seed } = setup()
   mount()
   act(() => {
     store.dispatch(addToCart(old))
-    store.dispatch(addFavorite(old))
+    seed([old.id])
   })
   await waitFor(() =>
     expect(store.getState().cart.items[0].product.images).toEqual([])
   )
   expect(store.getState().cart.items[0]).toEqual({
-    product: { ...old, image: '', images: [] },
+    product: { ...fresh, image: '', images: [] },
     quantity: 1,
   })
-  expect(store.getState().favorite.favorites_products).toEqual([
-    { ...old, image: '', images: [] },
-  ])
+  expect(client.getQueryData(productKeys.detail(old.id))).toEqual({
+    ...fresh,
+    image: '',
+    images: [],
+  })
 })
+
+it('removes a product after a confirmed 404 even when the query retains cached data', async () => {
+  const { store, client, mount } = setup()
+  store.dispatch(hydrateCart([{ product: old, quantity: 2 }]))
+  client.setQueryData(productKeys.detail(old.id), old)
+  mockFetch.mockResolvedValue(jsonResponse({ error: 'Product not found' }, 404))
+  mount()
+  await waitFor(() => expect(store.getState().cart.items).toEqual([]))
+  expect(JSON.parse(localStorage.getItem('volt_cart')!).items).toEqual([])
+})
+
+it.each(['focus', 'reconnect'] as const)(
+  'refreshes a recently cached cart on %s and preserves snapshots during an outage',
+  async event => {
+    const { store, client, mount } = setup()
+    store.dispatch(hydrateCart([{ product: old, quantity: 2 }]))
+    mockFetch.mockResolvedValue(jsonResponse(old))
+    mount()
+    await waitFor(() => expect(mockFetch).toHaveBeenCalled())
+    const resume = () =>
+      act(() => {
+        if (event === 'focus') {
+          focusManager.setFocused(false)
+          focusManager.setFocused(true)
+        } else {
+          onlineManager.setOnline(false)
+          onlineManager.setOnline(true)
+        }
+      })
+    mockFetch.mockResolvedValue(jsonResponse(fresh))
+    resume()
+    await waitFor(() =>
+      expect(store.getState().cart.items).toEqual([
+        { product: fresh, quantity: 2 },
+      ])
+    )
+    mockFetch.mockResolvedValue(jsonResponse({ error: 'Unavailable' }, 503))
+    resume()
+    await waitFor(() =>
+      expect(client.getQueryState(productKeys.detail(old.id))?.status).toBe(
+        'error'
+      )
+    )
+    await waitFor(() =>
+      expect(store.getState().cart.items[0].product).toEqual(fresh)
+    )
+  }
+)

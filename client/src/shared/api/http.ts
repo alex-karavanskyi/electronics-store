@@ -30,9 +30,33 @@ function getErrorMessage(body: unknown, status: number): string {
 export async function fetchJson<T>(
   path: string,
   schema: z.ZodType<T>,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  token?: string,
+  request?: { method: 'POST' | 'PUT' | 'PATCH' | 'DELETE'; body?: unknown }
 ): Promise<T> {
-  const response = await fetch(apiUrl(path), { signal })
+  const response = await fetch(apiUrl(path), {
+    signal,
+    ...(token ? { headers: { Authorization: `Bearer ${token}` } } : {}),
+    ...(request
+      ? {
+          method: request.method,
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          ...(request.body === undefined
+            ? {}
+            : { body: JSON.stringify(request.body) }),
+        }
+      : {}),
+  })
+
+  if (response.status === 204 && response.ok) {
+    const empty = schema.safeParse(undefined)
+    if (!empty.success)
+      throw new ApiError(204, 'Invalid API response', empty.error)
+    return empty.data
+  }
 
   let body: unknown
   try {
@@ -57,4 +81,18 @@ export async function fetchJson<T>(
   }
 
   return result.data
+}
+
+export async function fetchAuthenticatedJson<T>(
+  path: string,
+  schema: z.ZodType<T>,
+  getToken: () => Promise<string | null>,
+  signal?: AbortSignal,
+  request?: { method: 'POST' | 'PUT' | 'PATCH' | 'DELETE'; body?: unknown }
+): Promise<T> {
+  if (signal?.aborted) throw new DOMException('Request aborted', 'AbortError')
+  const token = await getToken()
+  if (signal?.aborted) throw new DOMException('Request aborted', 'AbortError')
+  if (!token) throw new ApiError(401, 'Sign in to continue')
+  return fetchJson(path, schema, signal, token, request)
 }

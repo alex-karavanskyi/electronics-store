@@ -122,6 +122,15 @@ describe('Theme preferences', () => {
     it(`uses the ${mode} palette for the checkout form and product chat`, () => {
       const light = mode === 'light'
       const text = light ? 'rgb(23, 33, 43)' : 'rgb(237, 242, 244)'
+      cy.intercept('GET', '**/api/products/theme-product', {
+        id: 'theme-product',
+        name: 'Theme phone',
+        description: 'A theme test product',
+        category: 'phones',
+        price: 125,
+        image: '/favicon.png',
+        images: ['/favicon.png'],
+      })
       cy.visit('/checkout', {
         onBeforeLoad(win) {
           win.localStorage.setItem(
@@ -157,15 +166,6 @@ describe('Theme preferences', () => {
         )
         .and('have.css', 'color-scheme', mode)
       cy.get('input[autocomplete="name"]').should(readableField)
-      cy.intercept('GET', '**/api/products/theme-product', {
-        id: 'theme-product',
-        name: 'Theme phone',
-        description: 'A theme test product',
-        category: 'phones',
-        price: 125,
-        image: '/favicon.png',
-        images: ['/favicon.png'],
-      })
       cy.visit('/product/theme-product')
       cy.get('button[aria-label="Open chat"]').click()
       cy.get('[role="dialog"][aria-label="Product assistant"]').should(
@@ -246,9 +246,10 @@ describe('Theme preferences', () => {
       switcher().should('be.visible')
       cy.get('nav a[aria-label="Favorites"]').should('be.visible')
       cy.get('nav button[aria-label^="Open cart"]').should('be.visible')
-      cy.get('button[aria-label="Your account"]').should(
-        width < 768 ? 'not.be.visible' : 'be.visible'
-      )
+      // Controlled browser runs disable Clerk; its account control stays visible.
+      cy.get('button[aria-label="Sign in unavailable"]')
+        .should('be.visible')
+        .and('be.disabled')
       cy.get('button[aria-label="Open menu"]').should('not.exist')
       chooseMode('dark')
       switcher().click()

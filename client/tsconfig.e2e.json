@@ -3,11 +3,13 @@
   "compilerOptions": {
     "types": [
       "cypress",
+      "vite/client",
       "node"
     ]
   },
   "include": [
     "cypress.config.ts",
-    "cypress/**/*.ts"
+    "cypress/**/*.ts",
+    "cypress/**/*.tsx"
   ]
 }

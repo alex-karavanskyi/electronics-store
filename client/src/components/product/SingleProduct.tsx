@@ -17,6 +17,7 @@ import { ApiError } from '@/shared/api/http'
 
 import ProductChatModal from './ProductChatModal'
 import ProductImages from './ProductImages'
+import ProductManagement from './ProductManagement'
 import styles from './SingleProduct.module.scss'
 
 const SingleProduct = () => {
@@ -31,11 +32,13 @@ const SingleProduct = () => {
   } = useProduct(id ?? '')
   const dispatch = useAppDispatch()
 
+  const missing =
+    product === null || (error instanceof ApiError && error.status === 404)
   if (loading) return <Loading />
-  if (error && !product) {
+  if (missing || (error && !product)) {
     return (
       <div className={styles.container}>
-        {error instanceof ApiError && error.status === 404 ? (
+        {missing ? (
           <section>
             <h1>Product not found</h1>
             <p>This product is unavailable or no longer exists.</p>
@@ -87,6 +90,7 @@ const SingleProduct = () => {
             <ProductPrice price={product.price} variant="detailed" as="h5" />
           </div>
 
+          <ProductManagement key={product.id} product={product} />
           <button
             type="button"
             className={styles['single__product-buy-button']}

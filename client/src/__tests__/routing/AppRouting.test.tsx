@@ -10,9 +10,8 @@ import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom'
 import { mockFetch, jsonResponse } from '../support/fetch'
 import App from '@/App'
 import { store } from '@/redux/store'
-import { clearCart, closeCart } from '@/redux/features/cartSlice'
+import { clearCart, closeCart, addToCart } from '@/redux/features/cartSlice'
 import { setGridView, setListView } from '@/redux/features/catalogViewSlice'
-import { removeFavorite } from '@/redux/features/favoriteSlice'
 
 // External carousel/AI UI is not part of this routing test. Product UI stays real.
 jest.mock('@/components/home/slider/Slider', () => () => null)
@@ -67,11 +66,10 @@ function setup(url = '/') {
 }
 beforeEach(() => {
   localStorage.clear()
+  sessionStorage.clear()
   window.history.replaceState({}, '', '/')
   store.dispatch(clearCart())
   store.dispatch(closeCart())
-  for (const item of store.getState().favorite.favorites_products)
-    store.dispatch(removeFavorite(item.id))
   mockFetch.mockImplementation(async url => {
     if (String(url).startsWith('/api/products/catalog?')) {
       const params = new URL(String(url), 'http://localhost').searchParams
@@ -291,13 +289,11 @@ it('keeps search draft local, preserves focus on commit and resets only owned UR
 it.each([true, false])(
   'keeps the mobile catalog anchor in grid mode %s, including empty results',
   async grid => {
-    window.matchMedia = jest
-      .fn()
-      .mockReturnValue({
-        matches: true,
-        addEventListener() {},
-        removeEventListener() {},
-      })
+    window.matchMedia = jest.fn().mockReturnValue({
+      matches: true,
+      addEventListener() {},
+      removeEventListener() {},
+    })
     store.dispatch(grid ? setGridView() : setListView())
     const view = setup()
     await screen.findByRole('heading', { name: 'Fixture Phone' })
@@ -314,3 +310,41 @@ it.each([true, false])(
     act(() => store.dispatch(setGridView()))
   }
 )
+
+it('ignores old demo storage and preserves live cart and favorites', async () => {
+  sessionStorage.setItem('volt_demo_mode', 'demo')
+  localStorage.setItem(
+    'volt_demo_v1',
+    JSON.stringify({
+      version: 1,
+      resetId: 'old',
+      products: [],
+      favoriteIds: [],
+    })
+  )
+  localStorage.setItem(
+    'volt_favorites',
+    JSON.stringify({ version: 1, ids: ['phone one'] })
+  )
+  store.dispatch(addToCart(products[0]))
+  store.dispatch(addToCart(products[0]))
+  setup()
+  await screen.findByRole('heading', { name: 'Fixture Phone' })
+  expect(
+    screen.queryByRole('button', { name: /Demo Mode/ })
+  ).not.toBeInTheDocument()
+  expect(
+    screen.getByRole('button', { name: 'Open cart, 2 items' })
+  ).toBeVisible()
+  await waitFor(() =>
+    expect(
+      screen.getByRole('button', { name: 'Favorite Fixture Phone' })
+    ).toHaveAttribute('aria-pressed', 'true')
+  )
+  expect(store.getState().cart.items).toEqual([
+    { product: products[0], quantity: 2 },
+  ])
+  expect(JSON.parse(localStorage.getItem('volt_favorites')!).ids).toEqual([
+    'phone one',
+  ])
+})

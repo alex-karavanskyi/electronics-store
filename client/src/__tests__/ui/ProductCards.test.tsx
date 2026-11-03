@@ -7,7 +7,11 @@ import GridView from '@/components/home/list/GridView'
 import ListView from '@/components/home/list/ListView'
 import Favorites from '@/components/favorites/Favorites'
 import cart from '@/redux/features/cartSlice'
-import favorite, { toggleFavorite } from '@/redux/features/favoriteSlice'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { createQueryClient } from '@/shared/lib/queryClient'
+import { productKeys } from '@/shared/hooks/useProducts'
+
+beforeEach(() => localStorage.clear())
 
 const product = {
   id: 'phone',
@@ -24,13 +28,16 @@ it.each([
   ['list', ListView],
 ] as const)(
   'keeps one title, price and working actions in the %s card',
-  (_name, View) => {
-    const store = configureStore({ reducer: { cart, favorite } })
+  async (_name, View) => {
+    const store = configureStore({ reducer: { cart } })
+    const client = createQueryClient()
     render(
       <Provider store={store}>
-        <MemoryRouter>
-          <View products={[product]} isLoading={false} />
-        </MemoryRouter>
+        <QueryClientProvider client={client}>
+          <MemoryRouter>
+            <View products={[product]} isLoading={false} />
+          </MemoryRouter>
+        </QueryClientProvider>
       </Provider>
     )
 
@@ -42,8 +49,12 @@ it.each([
       name: 'Favorite Fixture Phone',
     })
     fireEvent.click(favoriteButton)
-    expect(favoriteButton).toHaveAttribute('aria-pressed', 'true')
-    expect(store.getState().favorite.favorites_products).toEqual([product])
+    await waitFor(() =>
+      expect(favoriteButton).toHaveAttribute('aria-pressed', 'true')
+    )
+    expect(JSON.parse(localStorage.getItem('volt_favorites')!).ids).toEqual([
+      'phone',
+    ])
     fireEvent.click(
       screen.getByRole('button', { name: 'Add Fixture Phone to cart' })
     )
@@ -52,13 +63,20 @@ it.each([
 )
 
 it('keeps the wishlist title and price with its existing cart and delete actions', async () => {
-  const store = configureStore({ reducer: { cart, favorite } })
-  store.dispatch(toggleFavorite(product))
+  const store = configureStore({ reducer: { cart } })
+  const client = createQueryClient()
+  localStorage.setItem(
+    'volt_favorites',
+    JSON.stringify({ version: 1, ids: ['phone'] })
+  )
+  client.setQueryData(productKeys.detail('phone'), product)
   render(
     <Provider store={store}>
-      <MemoryRouter>
-        <Favorites />
-      </MemoryRouter>
+      <QueryClientProvider client={client}>
+        <MemoryRouter>
+          <Favorites />
+        </MemoryRouter>
+      </QueryClientProvider>
     </Provider>
   )
 
@@ -74,5 +92,7 @@ it('keeps the wishlist title and price with its existing cart and delete actions
   )
   expect(store.getState().cart.items).toEqual([{ product, quantity: 1 }])
   fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
-  expect(screen.getByText('Your wishlist is empty')).toBeVisible()
+  await waitFor(() =>
+    expect(screen.getByText('Your wishlist is empty')).toBeVisible()
+  )
 })

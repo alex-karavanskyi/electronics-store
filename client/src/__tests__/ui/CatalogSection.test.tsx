@@ -8,6 +8,7 @@ import { store } from '@/redux/store'
 import { useCatalog } from '@/components/home/hooks/useCatalog'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useProducts } from '@/shared/hooks/useProducts'
+import QueryProvider from '@/shared/lib/QueryProvider'
 
 jest.mock('@/components/home/hooks/useCatalog')
 jest.mock('@/shared/hooks/useIsMobile')
@@ -60,9 +61,11 @@ beforeEach(() => {
 function setup() {
   return render(
     <Provider store={store}>
-      <MemoryRouter>
-        <CatalogSection />
-      </MemoryRouter>
+      <QueryProvider>
+        <MemoryRouter>
+          <CatalogSection />
+        </MemoryRouter>
+      </QueryProvider>
     </Provider>
   )
 }

@@ -1,4 +1,5 @@
 import { Reorder, useDragControls, useReducedMotion } from 'framer-motion'
+import { useEffect, useState, type ReactNode } from 'react'
 import { HiOutlineArrowDown, HiOutlineArrowUp } from 'react-icons/hi2'
 import { TbGripVertical } from 'react-icons/tb'
 
@@ -18,6 +19,9 @@ type FavoriteItemProps = {
   onMoveDown: () => void
   onRemove: () => void
   onPrepareDrag: () => void
+  onFinishDrag: () => void
+  notice?: ReactNode
+  disabled?: boolean
 }
 
 const FavoriteItem = ({
@@ -28,17 +32,26 @@ const FavoriteItem = ({
   onMoveDown,
   onRemove,
   onPrepareDrag,
+  onFinishDrag,
+  notice,
+  disabled = false,
 }: FavoriteItemProps) => {
   const reduceMotion = useReducedMotion()
   const dragControls = useDragControls()
+  const [dragReady, setDragReady] = useState(false)
+  // Motion subscribes its drag controls in a passive effect. Keep the handle
+  // disabled until child effects mount, including on a direct/lazy page visit.
+  useEffect(() => setDragReady(true), [])
 
   return (
     <Reorder.Item
       value={product.id}
       className={styles.item}
       dragListener={false}
+      drag={disabled ? false : 'y'}
       dragControls={dragControls}
       dragMomentum={false}
+      onDragEnd={onFinishDrag}
       initial={false}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -59,6 +72,7 @@ const FavoriteItem = ({
         <button
           type="button"
           className={styles.dragHandle}
+          disabled={disabled || !dragReady}
           draggable={false}
           aria-label={`Drag to reorder ${product.name}`}
           aria-keyshortcuts="ArrowUp ArrowDown"
@@ -92,6 +106,7 @@ const FavoriteItem = ({
 
         <div className={styles.favorites__info}>
           <ProductHeader name={product.name} />
+          {notice}
           <div className={styles['favorites__price-cart']}>
             <p className={styles['product__info-price']}>
               {formatPrice(product.price)}
@@ -101,6 +116,7 @@ const FavoriteItem = ({
           <button
             type="button"
             onClick={onRemove}
+            disabled={disabled}
             className={styles['favorites__btn-delete']}
           >
             Delete

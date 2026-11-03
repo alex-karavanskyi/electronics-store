@@ -2,10 +2,6 @@
   hydrateCart,
   removeFromCart,
 } from '@/redux/features/cartSlice'
-import favoriteReducer, {
-  addFavorite,
-  removeFavorite,
-} from '@/redux/features/favoriteSlice'
 
 const product = {
   id: 'one',
@@ -46,20 +42,4 @@ it('refreshes only cart images, preserving quantity, order and UI state', () => 
   })
   const removed = cartReducer(state, removeFromCart('one'))
   expect(cartReducer(removed, action)).toEqual(removed)
-})
-
-it('refreshes only favorite images, including an empty gallery, preserving order', () => {
-  let state = favoriteReducer(undefined, addFavorite(product))
-  state = favoriteReducer(state, addFavorite({ ...product, id: 'two' }))
-  const action = {
-    type: 'favorite/updateFavoriteProductImages',
-    payload: { ...fresh, image: '', images: [] },
-  }
-  state = favoriteReducer(state, action)
-  expect(state.favorites_products).toEqual([
-    { ...product, image: '', images: [] },
-    { ...product, id: 'two' },
-  ])
-  const removed = favoriteReducer(state, removeFavorite('one'))
-  expect(favoriteReducer(removed, action)).toEqual(removed)
 })

@@ -7,6 +7,8 @@ import NotFoundPage from '@/pages/NotFoundPage'
 const ProductPage = lazy(() => import('@/pages/ProductPage'))
 const CheckoutPage = lazy(() => import('@/pages/CheckoutPage'))
 const FavoritesPage = lazy(() => import('@/pages/FavoritesPage'))
+const MyProductsPage = lazy(() => import('@/pages/MyProductsPage'))
+const AdminProductsPage = lazy(() => import('@/pages/AdminProductsPage'))
 
 export default function App() {
   return (
@@ -17,6 +19,8 @@ export default function App() {
         <Route path="checkout" element={<CheckoutPage />} />
         <Route path="contact" element={<Navigate to="/checkout" replace />} />
         <Route path="favorites" element={<FavoritesPage />} />
+        <Route path="my-products" element={<MyProductsPage />} />
+        <Route path="admin/products" element={<AdminProductsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

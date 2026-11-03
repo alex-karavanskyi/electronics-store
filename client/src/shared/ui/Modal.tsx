@@ -9,6 +9,7 @@ interface ModalProps {
   labelledBy?: string
   describedBy?: string
   onClose: () => void
+  onAfterClose?: () => void
 }
 
 const Modal = ({
@@ -18,9 +19,15 @@ const Modal = ({
   labelledBy,
   describedBy,
   onClose,
+  onAfterClose,
 }: ModalProps) => {
   const dialogRef = useRef<HTMLDivElement>(null)
-  useModalInteractions({ isOpen: true, initialFocusRef: dialogRef, onClose })
+  useModalInteractions({
+    isOpen: true,
+    initialFocusRef: dialogRef,
+    onClose,
+    onAfterClose,
+  })
   return createPortal(
     <div
       ref={dialogRef}

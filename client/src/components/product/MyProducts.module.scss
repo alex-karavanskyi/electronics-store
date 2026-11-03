@@ -1,0 +1,71 @@
+@use '../../shared/styles' as shared;
+
+.container {
+  @include shared.container;
+  padding-block: 1rem 2rem;
+  padding-inline: 1rem;
+  color: var(--ink);
+
+  h1 {
+    margin-block: 1rem;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.2;
+  }
+}
+
+.notice {
+  display: grid;
+  justify-items: start;
+  gap: 1rem;
+
+  button {
+    min-height: 44px;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper);
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+  }
+}
+
+.list {
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+  margin-top: 1rem;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+
+  img {
+    width: 5rem;
+    height: 5rem;
+    object-fit: contain;
+  }
+
+  h2 {
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
+.content {
+  flex: 1 1 12rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

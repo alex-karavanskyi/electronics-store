@@ -1,5 +1,6 @@
 /node_modules/
 /coverage/
+/docs/
 .DS_Store
 *.pem
 npm-debug.log*
@@ -9,7 +10,5 @@ yarn-error.log*
 .env*.local
 *.tsbuildinfo
 /.agents/
-
 /.vercel/
-
 .env*
