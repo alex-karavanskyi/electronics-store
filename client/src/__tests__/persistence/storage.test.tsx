@@ -38,6 +38,19 @@ const mount = (store: ReturnType<typeof setup>) =>
   )
 beforeEach(() => localStorage.clear())
 afterEach(() => jest.restoreAllMocks())
+it('keeps uploaded images in memory without exhausting cart storage', () => {
+  const image = 'data:image/png;base64,' + 'A'.repeat(2800000)
+  const uploaded = { ...product, image, images: [image] }
+  const store = setup()
+  store.dispatch(addToCart(uploaded))
+  expect(JSON.parse(localStorage.getItem('volt_cart')!).items).toEqual([
+    { product, quantity: 1 },
+  ])
+  expect(store.getState().cart.items[0].product).toEqual(uploaded)
+  const restored = setup()
+  mount(restored)
+  expect(restored.getState().cart.items[0].product.id).toBe(product.id)
+})
 it('restores validated items once, persists edits and keeps UI flags out of storage', () => {
   localStorage.setItem(
     'volt_cart',

@@ -24,6 +24,7 @@ const Price: React.FC<PriceProps> = ({
     name: FilterName
     value: string
   } | null>(null)
+
   const percent = (value: number) =>
     max_price > min_price
       ? ((value - min_price) / (max_price - min_price)) * 100
@@ -38,6 +39,7 @@ const Price: React.FC<PriceProps> = ({
     }
     setDraft(null)
   }
+
   const bounds = [
     {
       name: FilterName.MinPrice,

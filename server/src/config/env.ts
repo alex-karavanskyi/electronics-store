@@ -59,15 +59,18 @@ const schema = z
       })
     }
   })
+export class EnvironmentError extends Error {
+  constructor(public readonly invalidVariables: string[]) {
+    super('Invalid environment variables: ' + invalidVariables.join(', '))
+  }
+}
+
 export function parseEnv(env: NodeJS.ProcessEnv) {
   const result = schema.safeParse(env)
   if (!result.success)
-    throw new Error(
-      'Invalid environment variables: ' +
-        [
-          ...new Set(result.error.issues.map(issue => issue.path.join('.'))),
-        ].join(', ')
-    )
+    throw new EnvironmentError([
+      ...new Set(result.error.issues.map(issue => issue.path.join('.'))),
+    ])
   return result.data
 }
 export type Config = ReturnType<typeof parseEnv>

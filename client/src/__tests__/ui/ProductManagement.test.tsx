@@ -72,15 +72,15 @@ function setup(edit = false, access = admin) {
     </MemoryRouter>
   )
 }
-it.each([
-  unavailableAccess,
-  { ...admin, status: 'loading' as const },
-])('does not expose product management without authentication', access => {
-  setup(true, access)
-  expect(
-    screen.queryByRole('button', { name: /product/i })
-  ).not.toBeInTheDocument()
-})
+it.each([unavailableAccess, { ...admin, status: 'loading' as const }])(
+  'does not expose product management without authentication',
+  access => {
+    setup(true, access)
+    expect(
+      screen.queryByRole('button', { name: /product/i })
+    ).not.toBeInTheDocument()
+  }
+)
 it('offers creation to an ordinary registered user', () => {
   setup(false, { ...admin, isAdmin: false })
   expect(screen.getByRole('button', { name: 'Add Product' })).toBeVisible()
@@ -147,9 +147,7 @@ it('keeps the draft on server failure and submits only changed fields including 
   expect(JSON.parse(mockFetch.mock.calls[0][1]!.body as string)).toEqual({
     price: 25,
   })
-  fireEvent.change(screen.getByLabelText('Image URLs'), {
-    target: { value: '' },
-  })
+  fireEvent.click(screen.getByRole('button', { name: 'Remove image 1' }))
   mockFetch.mockResolvedValue(
     jsonResponse({ ...product, price: 25, images: [], image: '' })
   )
@@ -161,6 +159,32 @@ it('keeps the draft on server failure and submits only changed fields including 
     price: 25,
     images: [],
   })
+})
+it('uploads a local image and sends it with the product', async () => {
+  mockFetch.mockResolvedValue(jsonResponse(product, 201))
+  setup()
+  fireEvent.click(screen.getByRole('button', { name: 'Add Product' }))
+  fireEvent.change(screen.getByLabelText('Name'), {
+    target: { value: 'Phone' },
+  })
+  fireEvent.change(screen.getByLabelText('Price'), { target: { value: '10' } })
+  const file = new File(
+    [new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])],
+    'phone.png',
+    { type: 'image/png' }
+  )
+  fireEvent.change(screen.getByLabelText('Images'), {
+    target: { files: [file] },
+  })
+  expect(await screen.findByAltText('Product image 1')).toHaveAttribute(
+    'src',
+    'data:image/png;base64,iVBORw0KGgo='
+  )
+  fireEvent.click(screen.getByRole('button', { name: 'Create product' }))
+  await waitFor(() => expect(mockFetch).toHaveBeenCalled())
+  expect(JSON.parse(mockFetch.mock.calls[0][1]!.body as string).images).toEqual(
+    ['data:image/png;base64,iVBORw0KGgo=']
+  )
 })
 it('validates fields before sending and closes an unchanged edit without a PATCH', async () => {
   setup(true)

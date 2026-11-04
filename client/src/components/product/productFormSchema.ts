@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { Product, ProductInput } from '@/shared/types/productSchema'
+import { maxImageCharacters, rasterDataUrl } from './imageUpload'
 
 const parseImages = (text: string) =>
   text
@@ -31,8 +32,11 @@ export function createProductFormSchema(original?: Product) {
       if (original && sameImages(images, original.images)) return
       const valid =
         images.length <= 20 &&
+        images.reduce((sum, image) => sum + image.length, 0) <=
+          maxImageCharacters &&
         new Set(images).size === images.length &&
         images.every(value => {
+          if (rasterDataUrl.test(value) && !value.endsWith(',')) return true
           try {
             const url = new URL(value)
             return (
@@ -48,8 +52,7 @@ export function createProductFormSchema(original?: Product) {
       if (!valid)
         context.addIssue({
           code: 'custom',
-          message:
-            'Use up to 20 unique HTTPS image URLs without credentials (one per line, up to 2048 characters each).',
+          message: 'Choose up to 20 images, no larger than 2 MB in total.',
         })
     }),
   })

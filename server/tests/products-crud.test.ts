@@ -80,6 +80,23 @@ async function fixture(config = authConfig) {
   }
 }
 
+test('persists uploaded image data larger than the default JSON limit', async () => {
+  const app = await fixture()
+  try {
+    const image =
+      'data:image/png;base64,' + Buffer.alloc(300000).toString('base64')
+    const response = await app.request('', 'POST', {
+      name: 'Photo',
+      price: 1,
+      images: [image],
+    })
+    assert.equal(response.status, 201)
+    assert.deepEqual((app.calls[0][1] as { images: string[] }).images, [image])
+  } finally {
+    await app.close()
+  }
+})
+
 test('product mutations require a verified session while product reads remain public', async () => {
   const app = await fixture()
   try {

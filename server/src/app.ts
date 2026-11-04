@@ -56,6 +56,7 @@ export function createApp({
       exposedHeaders: ['x-vercel-ai-ui-message-stream'],
     })
   )
+  app.use('/api/products', express.json({ limit: '3mb' }))
   app.use(express.json({ limit: '256kb' }))
   // Scheduler bearer tokens are independent of Clerk sessions.
   app.use(

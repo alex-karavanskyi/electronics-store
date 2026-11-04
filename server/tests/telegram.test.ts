@@ -48,11 +48,11 @@ test('Telegram sends plain text to the configured private chat with trusted mode
     inline_keyboard: [
       [
         {
-          text: 'Открыть товар',
+          text: 'View product',
           url: 'https://shop.example.test/product/prod_one',
         },
         {
-          text: 'Админ-панель',
+          text: 'Admin panel',
           url: 'https://shop.example.test/admin/products',
         },
       ],

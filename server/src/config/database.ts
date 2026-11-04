@@ -46,6 +46,27 @@ export function connectDatabase(uri: string): Promise<void> {
       })
       .then(() => undefined)
       .catch(async error => {
+        // Driver messages/stacks can contain credentials and private hostnames.
+        const category =
+          error?.code === 18
+            ? 'authentication'
+            : ['ENOTFOUND', 'EAI_AGAIN', 'ESERVFAIL'].includes(error?.code)
+              ? 'dns'
+              : ['MongoParseError', 'MongoInvalidArgumentError'].includes(
+                    error?.name
+                  )
+                ? 'configuration'
+                : [
+                      'MongoServerSelectionError',
+                      'MongooseServerSelectionError',
+                    ].includes(error?.name)
+                  ? 'server-selection'
+                  : ['MongoNetworkError', 'MongoNetworkTimeoutError'].includes(
+                        error?.name
+                      )
+                    ? 'network'
+                    : 'unknown'
+        console.error('MongoDB connection failed', { category })
         await database.close().catch(() => undefined)
         connectionPromise = undefined
         throw databaseError(error)

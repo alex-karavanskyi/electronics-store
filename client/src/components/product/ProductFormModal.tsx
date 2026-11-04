@@ -1,4 +1,4 @@
-import { useId, useRef } from 'react'
+import { useId, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Product } from '@/shared/types/productSchema'
@@ -14,6 +14,7 @@ import {
   type ProductFormValues,
 } from './productFormSchema'
 import styles from './ProductManagement.module.scss'
+import { readProductImages } from './imageUpload'
 
 type Props = {
   product?: Product
@@ -24,10 +25,15 @@ type Props = {
 export default function ProductFormModal({ product, onClose, onSaved }: Props) {
   const id = useId()
   const busy = useRef(false)
+  const reading = useRef(false)
+  const [isReading, setIsReading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
   const mutation = useProductMutation()
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormValues>({
     resolver: zodResolver(createProductFormSchema(product)),
@@ -39,12 +45,13 @@ export default function ProductFormModal({ product, onClose, onSaved }: Props) {
       imagesText: product?.images.join('\n') ?? '',
     },
   })
-  const pending = isSubmitting || mutation.isSaving
+  const images = watch('imagesText').split('\n').filter(Boolean)
+  const pending = isSubmitting || mutation.isSaving || isReading
   const close = () => {
-    if (!busy.current && !pending) onClose()
+    if (!busy.current && !reading.current && !pending) onClose()
   }
   const submit = handleSubmit(async values => {
-    if (busy.current || mutation.isSaving) return
+    if (busy.current || reading.current || mutation.isSaving) return
     busy.current = true
     try {
       const input = product
@@ -124,17 +131,68 @@ export default function ProductFormModal({ product, onClose, onSaved }: Props) {
               {fieldError('description')}
             </div>
             <div>
-              <label htmlFor={`${id}-imagesText`}>Image URLs</label>
-              <textarea
+              <label htmlFor={`${id}-imagesText`}>Images</label>
+              <input
                 {...fieldProps('imagesText')}
-                {...register('imagesText')}
-                rows={3}
-                spellCheck={false}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                multiple
+                onChange={async event => {
+                  const files = Array.from(event.target.files ?? [])
+                  event.target.value = ''
+                  if (!files.length || reading.current) return
+                  reading.current = true
+                  setIsReading(true)
+                  setUploadError('')
+                  try {
+                    const next = await readProductImages(files, images)
+                    setValue('imagesText', next.join('\n'), {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    })
+                  } catch (error) {
+                    setUploadError(
+                      error instanceof Error
+                        ? error.message
+                        : 'Could not read images.'
+                    )
+                  } finally {
+                    reading.current = false
+                    setIsReading(false)
+                  }
+                }}
               />
               <p className={styles.hint}>
-                One HTTPS URL per line, up to 20 images. Leave empty for no
-                images.
+                PNG, JPEG, WebP or GIF. Up to 20 images, 2 MB in total.
               </p>
+              {isReading && <p role="status">Reading images...</p>}
+              {uploadError && (
+                <p role="alert" className={styles.error}>
+                  {uploadError}
+                </p>
+              )}
+              <div className={styles.imagePreviews}>
+                {images.map((image, index) => (
+                  <div key={image}>
+                    <img src={image} alt={`Product image ${index + 1}`} />
+                    <button
+                      type="button"
+                      className={styles.removeImage}
+                      aria-label={`Remove image ${index + 1}`}
+                      onClick={() => {
+                        setValue(
+                          'imagesText',
+                          images.filter((_, i) => i !== index).join('\n'),
+                          { shouldValidate: true, shouldDirty: true }
+                        )
+                        setUploadError('')
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
               {fieldError('imagesText')}
             </div>
           </fieldset>

@@ -1,4 +1,5 @@
 import { Middleware } from '@reduxjs/toolkit'
+import type { CartItem } from '@/redux/features/cartSlice'
 
 import {
   updateCartProduct,
@@ -33,7 +34,20 @@ export const persistCartMiddleware: Middleware = store => next => action => {
         CART_STORAGE_KEY,
         JSON.stringify({
           version: CART_STORAGE_VERSION,
-          items: store.getState().cart.items,
+          // Inline uploads can exceed localStorage quota. ProductImagesSync
+          // restores current images from the API after hydration.
+          items: (store.getState().cart.items as CartItem[]).map(item => ({
+            ...item,
+            product: {
+              ...item.product,
+              image: item.product.image.startsWith('data:')
+                ? ''
+                : item.product.image,
+              images: item.product.images.filter(
+                image => !image.startsWith('data:')
+              ),
+            },
+          })),
         })
       )
     } catch {

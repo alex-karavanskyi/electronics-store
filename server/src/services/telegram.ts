@@ -76,12 +76,12 @@ export function createTelegramSender(
       return {
         chatId: config.TELEGRAM_ADMIN_CHAT_ID,
         text: [
-          'Новый товар опубликован',
+          'New product published',
           shorten(event.name, 1000),
-          `Цена: $${event.price.toFixed(2)}`,
-          `Автор: ${shorten(event.ownerId, 200)}`,
-          `Дата: ${shorten(event.createdAt, 80)}`,
-          `ID товара: ${shorten(event.id, 200)}`,
+          `Price: $${event.price.toFixed(2)}`,
+          `Author: ${shorten(event.ownerId, 200)}`,
+          `Date: ${shorten(event.createdAt, 80)}`,
+          `Product ID: ${shorten(event.id, 200)}`,
         ].join('\n'),
         productUrl: new URL(
           '/product/' + encodeURIComponent(event.id),
@@ -106,8 +106,8 @@ export function createTelegramSender(
               reply_markup: {
                 inline_keyboard: [
                   [
-                    { text: 'Открыть товар', url: message.productUrl },
-                    { text: 'Админ-панель', url: message.adminUrl },
+                    { text: 'View product', url: message.productUrl },
+                    { text: 'Admin panel', url: message.adminUrl },
                   ],
                 ],
               },

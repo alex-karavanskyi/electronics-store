@@ -7,6 +7,8 @@ export const productWriteIdSchema = z
   .max(200)
   .refine(id => Boolean(id.trim()) && !/^demo[_:]/.test(id))
 
+// 2 MiB of image bytes encoded as base64, plus data URL headers for 20 files.
+const maxImageCharacters = Math.ceil((2 * 1024 * 1024) / 3) * 4 + 20 * 40
 const imageUrl = z
   .string()
   .max(2048)
@@ -20,8 +22,23 @@ const imageUrl = z
     }
   })
 export const productImagesSchema = z
-  .array(imageUrl)
+  .array(
+    z.union([
+      imageUrl,
+      z
+        .string()
+        .max(maxImageCharacters)
+        .regex(
+          /^data:image\/(?:png|jpeg|webp|gif);base64,[A-Za-z0-9+/]+={0,2}$/
+        )
+        .refine(value => value.slice(value.indexOf(',') + 1).length % 4 === 0),
+    ])
+  )
   .max(20)
+  .refine(
+    values =>
+      values.reduce((sum, value) => sum + value.length, 0) <= maxImageCharacters
+  )
   .refine(values => new Set(values).size === values.length)
 
 const fields = z
