@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 import {
   useIsMutating,
   useMutation,
@@ -172,12 +173,30 @@ export function useAccountFavorites() {
       }
     },
     onSuccess: (data, pending) => {
-      if (pending.active() && !pending.controller.signal.aborted)
+      if (pending.active() && !pending.controller.signal.aborted) {
         client.setQueryData<AccountFavorites>(pending.key, data)
+        if (pending.input.kind === 'add' && data.ids.includes(pending.input.id))
+          toast.success('Product added to favorites', {
+            id: `favorite-${pending.input.id}`,
+          })
+      }
     },
     onSettled: (_data, _error, pending) => {
       if (pending.active() && !pending.controller.signal.aborted)
         void client.invalidateQueries({ queryKey: pending.key, exact: true })
+    },
+    onError: (error, pending) => {
+      if (
+        pending.active() &&
+        !pending.controller.signal.aborted &&
+        !(error instanceof Error && error.name === 'AbortError')
+      )
+        toast.error(
+          'Your wishlist could not be updated. Open Favorites to retry.',
+          {
+            id: 'favorites-write-error',
+          }
+        )
     },
   })
 

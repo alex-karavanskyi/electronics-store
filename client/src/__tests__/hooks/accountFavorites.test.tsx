@@ -13,6 +13,7 @@ import FavoritesStorageSync from '@/components/favorites/FavoritesStorageSync'
 import { mockFetch, jsonResponse } from '../support/fetch'
 import { saveFavoriteIds } from '@/shared/lib/favoritesStorage'
 import { installStorageLocks } from '../support/locks'
+import { toast } from 'sonner'
 
 Object.defineProperty(crypto, 'randomUUID', {
   value: randomUUID,
@@ -80,10 +81,42 @@ beforeEach(() => {
   installStorageLocks()
 })
 afterEach(() => {
+  toast.dismiss()
   cleanup()
   clients.splice(0).forEach(client => client.clear())
   jest.restoreAllMocks()
   focusManager.setFocused(undefined)
+})
+
+it('waits for a successful server response before confirming a favorite addition', async () => {
+  const response = deferred<Response>()
+  mockFetch.mockResolvedValue(jsonResponse({ ids: [], revision: 0 }))
+  const app = setup(account('user_a'))
+  await waitFor(() => expect(app.result.current.first.canWrite).toBe(true))
+  mockFetch.mockImplementation((_url, options) =>
+    options?.method === 'PUT'
+      ? response.promise
+      : Promise.resolve(jsonResponse({ ids: ['one'], revision: 1 }))
+  )
+  act(() => app.result.current.first.addFavorite(product))
+  await waitFor(() =>
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/favorites/items/one'),
+      expect.objectContaining({ method: 'PUT' })
+    )
+  )
+  expect(toast.getToasts()).toEqual([])
+  await act(async () => {
+    response.resolve(jsonResponse({ ids: ['one'], revision: 1 }))
+  })
+  await waitFor(() =>
+    expect(toast.getToasts()).toEqual([
+      expect.objectContaining({
+        id: 'favorite-one',
+        title: 'Product added to favorites',
+      }),
+    ])
+  )
 })
 
 it('merges guest IDs once and displays the server result in all consumers without persisting server data', async () => {

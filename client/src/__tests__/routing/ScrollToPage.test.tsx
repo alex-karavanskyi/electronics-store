@@ -53,7 +53,7 @@ it.each([
 
 it.each([-1, 1])('does not scroll to an anchor on history step %s', step => {
   const entries =
-    step === -1 ? ['/#collection', '/contact'] : ['/contact', '/#collection']
+    step === -1 ? ['/#collection', '/checkout'] : ['/checkout', '/#collection']
   const { result } = setup(entries, step === -1 ? 1 : 0)
 
   act(() => result.current(step))
@@ -83,7 +83,7 @@ it.each([false, true])(
   replace => {
     const { result } = setup()
 
-    act(() => result.current('/contact', { replace }))
+    act(() => result.current('/checkout', { replace }))
 
     expect(window.scrollTo).toHaveBeenCalledTimes(1)
     expect(window.scrollTo).toHaveBeenCalledWith({ top: 0 })
@@ -92,7 +92,7 @@ it.each([false, true])(
 )
 
 it('scrolls on a new anchor navigation after returning through history', () => {
-  const { result } = setup(['/contact'])
+  const { result } = setup(['/checkout'])
   act(() => result.current('/#collection'))
   expect(scrollIntoView).toHaveBeenCalledTimes(1)
 

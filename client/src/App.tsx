@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import AppLayout from '@/app/AppLayout'
 import HomePage from '@/pages/HomePage'
 import NotFoundPage from '@/pages/NotFoundPage'
@@ -17,7 +17,6 @@ export default function App() {
         <Route index element={<HomePage />} />
         <Route path="product/:id" element={<ProductPage />} />
         <Route path="checkout" element={<CheckoutPage />} />
-        <Route path="contact" element={<Navigate to="/checkout" replace />} />
         <Route path="favorites" element={<FavoritesPage />} />
         <Route path="my-products" element={<MyProductsPage />} />
         <Route path="admin/products" element={<AdminProductsPage />} />

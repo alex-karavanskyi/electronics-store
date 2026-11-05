@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { Link, useParams } from 'react-router-dom'
 
@@ -97,6 +98,9 @@ const SingleProduct = () => {
             aria-label={`Buy ${product.name}`}
             onClick={() => {
               dispatch(addToCart(product))
+              toast.success(`${product.name} added to cart`, {
+                id: `cart-${product.id}`,
+              })
             }}
           >
             <HiOutlineShoppingCart />

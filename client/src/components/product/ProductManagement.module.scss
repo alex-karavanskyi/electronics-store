@@ -10,11 +10,6 @@
   }
 }
 
-.catalogManagement {
-  width: min(100% - 2rem, 1280px);
-  margin-inline: auto;
-}
-
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -60,7 +55,7 @@
 
 .backdrop {
   position: fixed;
-  z-index: 1100;
+  z-index: 5000;
   inset: 0;
   display: flex;
   align-items: center;
@@ -82,6 +77,8 @@
 
   h2 {
     margin-bottom: 1rem;
+    font-size: 1.5rem;
+    line-height: 1.25;
   }
 }
 

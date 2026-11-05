@@ -6,6 +6,7 @@ import { productKeys } from '@/shared/hooks/useProducts'
 import { useFavorites } from '@/components/favorites/useFavorites'
 import FavoritesStorageSync from '@/components/favorites/FavoritesStorageSync'
 import { ApiError } from '@/shared/api/http'
+import { toast } from 'sonner'
 
 const product = {
   id: 'one',
@@ -39,9 +40,28 @@ const persistedIds = () =>
   JSON.parse(localStorage.getItem('volt_favorites')!).ids
 beforeEach(() => localStorage.clear())
 afterEach(() => {
+  toast.dismiss()
   cleanup()
   clients.splice(0).forEach(client => client.clear())
   jest.restoreAllMocks()
+})
+
+it('notifies once for a guest addition, without notifying on duplicate adds or removal', async () => {
+  const { result } = setup()
+  act(() => result.current.first.toggleFavorite(product))
+  await waitFor(() =>
+    expect(toast.getToasts()).toEqual([
+      expect.objectContaining({
+        id: 'favorite-one',
+        title: 'Product added to favorites',
+      }),
+    ])
+  )
+  toast.dismiss()
+  act(() => result.current.first.addFavorite(product))
+  expect(toast.getToasts()).toEqual([])
+  act(() => result.current.first.toggleFavorite(product))
+  expect(toast.getToasts()).toEqual([])
 })
 
 it('deduplicates additions from multiple consumers and restores order in a fresh app', async () => {

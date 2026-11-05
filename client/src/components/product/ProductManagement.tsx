@@ -40,11 +40,7 @@ function ManagementSession({ product, onDeleted, returnFocusRef }: Props) {
   } | null>(null)
   const [saved, setSaved] = useState<Product | null>(null)
   return (
-    <div
-      className={[styles.management, !product ? styles.catalogManagement : '']
-        .filter(Boolean)
-        .join(' ')}
-    >
+    <div className={styles.management}>
       <div className={styles.actions}>
         <button
           type="button"

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 import {
   useIsMutating,
   useMutation,
@@ -84,6 +85,15 @@ export function useProductMutation() {
       return undefined
     },
     onSuccess: async (product, write, session) => {
+      if (isCurrent()) {
+        toast.success(
+          write.kind === 'delete'
+            ? 'Product deleted'
+            : write.kind === 'create'
+              ? 'Product created'
+              : 'Changes saved'
+        )
+      }
       // A read started before the write must not overwrite its result.
       const scope = productKeys.scope()
       await client.cancelQueries({ queryKey: scope })
@@ -109,6 +119,13 @@ export function useProductMutation() {
         await client.cancelQueries({ queryKey: adminKey, exact: true })
         void client.invalidateQueries({ queryKey: adminKey, exact: true })
       }
+    },
+    onError: error => {
+      if (
+        isCurrent() &&
+        !(error instanceof Error && error.name === 'AbortError')
+      )
+        toast.error(productWriteError(error), { id: 'product-write-error' })
     },
   })
   return { ...mutation, isSaving: saving, isCurrent }

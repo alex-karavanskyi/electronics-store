@@ -80,7 +80,6 @@
     display: flex;
     align-items: center;
     min-height: 44px;
-    font-size: 0.75rem;
     white-space: nowrap;
     color: inherit;
 
@@ -152,6 +151,25 @@
 
     > a[aria-current='page'] {
       background: var(--theme-switcher-hover);
+    }
+  }
+
+  &__navigation {
+    display: flex;
+    align-items: center;
+    margin-right: 0.5rem;
+
+    &::after {
+      content: '';
+      width: 1px;
+      height: 1.25rem;
+      margin-left: 0.75rem;
+      background: currentcolor;
+      opacity: 0.25;
+    }
+
+    &:empty {
+      display: none;
     }
   }
 

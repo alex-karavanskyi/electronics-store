@@ -1,4 +1,5 @@
 import { HiOutlineShoppingCart } from 'react-icons/hi2'
+import { toast } from 'sonner'
 
 import { addToCart } from '@/redux/features/cartSlice'
 import { useAppDispatch } from '@/redux/hooks'
@@ -15,6 +16,7 @@ const CartButton = ({ product }: CartButtonProps) => {
 
   const handleAddToCart = () => {
     dispatch(addToCart(product))
+    toast.success(`${product.name} added to cart`, { id: `cart-${product.id}` })
   }
 
   return (

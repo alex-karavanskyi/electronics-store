@@ -37,10 +37,12 @@ const Navbar = () => {
             <span>VOLT</span>
             <small>Technology store</small>
           </Link>
-          <ProductNavigation />
         </div>
 
         <div className={styles.navbar__icons}>
+          <div className={styles.navbar__navigation}>
+            <ProductNavigation />
+          </div>
           <ThemeSwitcher />
           <NavLink to="/favorites" aria-label="Favorites" title="Favorites">
             <FiHeart aria-hidden="true" />

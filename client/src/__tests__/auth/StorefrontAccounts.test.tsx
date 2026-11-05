@@ -144,7 +144,9 @@ it('merges a guest favorite, applies Admin edits to the cart, and isolates the n
   )
   switchAccount('user_a')
   await waitFor(() => expect(accountIds.user_a).toEqual(['real_phone']))
-  expect(screen.getByRole('button', { name: 'Add Product' })).toBeVisible()
+  expect(
+    screen.queryByRole('button', { name: 'Add Product' })
+  ).not.toBeInTheDocument()
   fireEvent.click(screen.getByRole('link', { name: 'View Real Phone' }))
   fireEvent.click(await screen.findByRole('button', { name: 'Buy Real Phone' }))
   switchAccount('user_a', true)

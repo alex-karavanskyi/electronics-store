@@ -2,7 +2,6 @@ const companyInformation = [
   { id: 1, title: 'About us' },
   { id: 2, title: 'Terms of use' },
   { id: 3, title: 'Careers' },
-  { id: 4, title: 'Contacts' },
   { id: 5, title: 'All categories' },
 ]
 

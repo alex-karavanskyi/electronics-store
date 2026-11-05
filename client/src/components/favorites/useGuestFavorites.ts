@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { productKeys } from '@/shared/hooks/useProducts'
 import { productSchema, type Product } from '@/shared/types/productSchema'
 import {
@@ -25,9 +26,17 @@ export function useGuestFavorites() {
   const current = () =>
     client.getQueryData<GuestFavorites>(guestFavoritesKey) ?? data
   const commit = (update: (ids: string[]) => string[]) => {
-    const result = updateGuestFavorites(update, current())
-    const publish = (value: GuestFavorites) =>
+    let addedIds: string[] = []
+    const result = updateGuestFavorites(ids => {
+      const next = update(ids)
+      addedIds = next.filter(id => !ids.includes(id))
+      return next
+    }, current())
+    const publish = (value: GuestFavorites) => {
       client.setQueryData(guestFavoritesKey, value)
+      for (const id of addedIds)
+        toast.success('Product added to favorites', { id: `favorite-${id}` })
+    }
     if (result instanceof Promise) void result.then(publish)
     else publish(result)
   }

@@ -8,9 +8,14 @@ import styles from './Chat.module.scss'
 type ChatMessagesProps = {
   messages: UIMessage[]
   isResponding: boolean
+  onSuggestion?: (question: string) => void
 }
 
-const ChatMessages = ({ messages, isResponding }: ChatMessagesProps) => {
+const ChatMessages = ({
+  messages,
+  isResponding,
+  onSuggestion,
+}: ChatMessagesProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const lastMessage = messages[messages.length - 1]
   const isLastMessageStreaming =
@@ -32,8 +37,29 @@ const ChatMessages = ({ messages, isResponding }: ChatMessagesProps) => {
     <div className={styles.messagesContainer}>
       {messages.length === 0 ? (
         <div className={styles.emptyState}>
-          <HiOutlineChatBubbleLeftRight size={56} />
-          <p>Hi! 👋 Ask a question about the product</p>
+          <HiOutlineChatBubbleLeftRight aria-hidden="true" />
+          <strong>Get to know this product</strong>
+          <p>Explore the details and find out if it fits your needs.</p>
+          {onSuggestion && (
+            <div className={styles.suggestions} aria-label="Suggested questions">
+              {[
+                ['Key features', 'What are the key features of this product?'],
+                ['Best for', 'Who is this product best suited for?'],
+                [
+                  'Compare options',
+                  'What should I compare when choosing this product?',
+                ],
+              ].map(([label, question]) => (
+                <button
+                  type="button"
+                  key={label}
+                  onClick={() => onSuggestion(question)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         <>

@@ -1,4 +1,5 @@
-import type { FormEvent } from 'react'
+import { useRef, type FormEvent } from 'react'
+import { HiOutlineSparkles } from 'react-icons/hi2'
 import { IoSend } from 'react-icons/io5'
 
 import { useProductChat } from './useProductChat'
@@ -12,6 +13,7 @@ type ChatProps = {
 }
 
 const Chat = ({ productId }: ChatProps) => {
+  const inputRef = useRef<HTMLInputElement>(null)
   const {
     input,
     setInput,
@@ -30,22 +32,36 @@ const Chat = ({ productId }: ChatProps) => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <span>🤖</span>
+        <span className={styles.assistantIcon}>
+          <HiOutlineSparkles aria-hidden="true" />
+        </span>
         <div>
           <strong>Product Assistant</strong>
           <small>Ask anything about this product</small>
         </div>
       </div>
 
-      <ChatMessages messages={messages} isResponding={isResponding} />
+      <ChatMessages
+        messages={messages}
+        isResponding={isResponding}
+        onSuggestion={
+          productId === null
+            ? undefined
+            : question => {
+                setInput(question)
+                inputRef.current?.focus()
+              }
+        }
+      />
 
       {error && (
-        <p role="alert">
+        <p role="alert" className={styles.error}>
           Unable to reach the product assistant. Please try again.
         </p>
       )}
       <form className={styles.formContainer} onSubmit={handleSubmit}>
         <input
+          ref={inputRef}
           className={styles.input}
           value={input}
           aria-label="Your question"

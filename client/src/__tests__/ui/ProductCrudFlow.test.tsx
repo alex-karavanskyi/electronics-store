@@ -89,7 +89,7 @@ function respond(raw: RequestInfo | URL) {
   return jsonResponse(phone)
 }
 it.each([false, true])(
-  'offers creation above empty catalog for mobile=%s',
+  'keeps product creation out of the empty catalog for mobile=%s',
   async mobile => {
     jest.mocked(useIsMobile).mockReturnValue(mobile)
     mockFetch.mockImplementation(async raw =>
@@ -106,8 +106,9 @@ it.each([false, true])(
     )
     setup('/')
     expect(await screen.findByText(/no products matched/i)).toBeVisible()
-    fireEvent.click(screen.getByRole('button', { name: 'Add Product' }))
-    expect(screen.getByRole('dialog', { name: 'Add Product' })).toBeVisible()
+    expect(
+      screen.queryByRole('button', { name: 'Add Product' })
+    ).not.toBeInTheDocument()
   }
 )
 it('normalizes the URL to the server-clamped page and keeps filters and unrelated parameters', async () => {

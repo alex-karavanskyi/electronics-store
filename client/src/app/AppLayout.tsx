@@ -8,6 +8,7 @@ import CartHydrator from '@/shared/lib/CartHydrator'
 import ProductImagesSync from '@/shared/lib/ProductImagesSync'
 import QueryProvider from '@/shared/lib/QueryProvider'
 import ThemeProvider from '@/shared/lib/ThemeProvider'
+import AppToaster from '@/shared/ui/AppToaster'
 import ScrollToPage from './ScrollToPage'
 import FavoritesStorageSync from '@/components/favorites/FavoritesStorageSync'
 import ProductAccountSync from '@/shared/auth/ProductAccountSync'
@@ -15,6 +16,7 @@ import ProductAccountSync from '@/shared/auth/ProductAccountSync'
 export default function AppLayout() {
   return (
     <ThemeProvider>
+      <AppToaster />
       <QueryProvider>
         <StoreSession />
       </QueryProvider>

@@ -47,7 +47,7 @@ See [removal notes](../docs/demo-mode.md).
 
 From client/: npm ci, npm run dev. The API must be available on port 3001, or set VITE_API_URL in a local env file to its public origin. All VITE_* values are public. Production hosting needs index.html fallback for frontend routes and /api forwarding (or a configured separate API origin with CORS).
 
-Routes: /, /product/:id, /my-products, /admin/products, /favorites, /checkout, /contact, *. Shared providers and Navbar/Footer/Sidebar/CartDrawer wrap Outlet. A native Image component in shared/ui handles loading/fill layout; no image optimizer or generated srcset is supplied. PageTitle sets document titles. Typography uses system fonts.
+Routes: /, /product/:id, /my-products, /admin/products, /favorites, /checkout, *. Shared providers and Navbar/Footer/Sidebar/CartDrawer wrap Outlet. A native Image component in shared/ui handles loading/fill layout; no image optimizer or generated srcset is supplied. PageTitle sets document titles. Typography uses system fonts.
 
 URL owns applied filters/sort/page; local state owns search drafts; TanStack Query owns API data and favorite ID caches; Redux owns cart and catalog view preference. Cart, guest favorites and grid/list persist safely to localStorage. Authenticated favorites are stored only in MongoDB. See [Catalog URL](#catalog-url).
 
@@ -57,7 +57,7 @@ Authenticated favorites use `/api/me/favorites` and user-scoped Query caches. Gu
 
 Commands: npm run typecheck, npm run lint, npm run lint:styles, npm test, npm run build, npm run preview. npm run test:e2e runs Cypress against a running Vite server. Jest uses SWC and jsdom; Cypress has no component-test framework dependency.
 
-The /api/products/catalog request and query key use identical normalized criteria. The unfiltered list remains a separate Query for carousel/categories. Contacts currently validate, alert and reset; no message-delivery endpoint exists. The product assistant uses /api/chat UI-message streaming.
+The /api/products/catalog request and query key use identical normalized criteria. The unfiltered list remains a separate Query for carousel/categories. The product assistant uses /api/chat UI-message streaming.
 
 ## Catalog URL
 

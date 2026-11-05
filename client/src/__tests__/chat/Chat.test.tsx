@@ -99,7 +99,7 @@ it('disables the form without a product and rejects blank questions', () => {
   const button = screen.getByRole('button', { name: 'Send question' })
 
   expect(
-    screen.getByText('Hi! 👋 Ask a question about the product')
+    screen.getByText('Get to know this product')
   ).toBeVisible()
   expect(input).toBeDisabled()
   expect(button).toBeDisabled()
@@ -206,5 +206,14 @@ it('shows a request error and allows another question', async () => {
     'Unable to reach the product assistant. Please try again.'
   )
   fireEvent.change(input, { target: { value: 'Try again' } })
+  expect(screen.getByRole('button', { name: 'Send question' })).toBeEnabled()
+})
+it('fills a suggested question and focuses the composer without sending', () => {
+  render(<Chat productId={product.id} />)
+  fireEvent.click(screen.getByRole('button', { name: 'Key features' }))
+  const input = screen.getByRole('textbox', { name: 'Your question' })
+  expect(input).toHaveValue('What are the key features of this product?')
+  expect(input).toHaveFocus()
+  expect(mockFetch).not.toHaveBeenCalled()
   expect(screen.getByRole('button', { name: 'Send question' })).toBeEnabled()
 })

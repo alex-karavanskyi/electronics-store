@@ -7,7 +7,6 @@ import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useReservedProductsHeight } from '@/components/home/hooks/useReservedProductsHeight'
 
 import RequestError from '@/shared/ui/RequestError'
-import ProductManagement from '@/components/product/ProductManagement'
 
 import CatalogFiltersPanel from './filters/CatalogFiltersPanel'
 import Sort from './filters/Sort'
@@ -105,7 +104,6 @@ const CatalogSection = () => {
       aria-label="Product catalog"
       tabIndex={-1}
     >
-      <ProductManagement />
       {content}
     </section>
   )
