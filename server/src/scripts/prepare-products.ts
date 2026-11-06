@@ -8,7 +8,10 @@ import {
 } from '../config/database.js'
 import { prepareProductIndexes } from '../models/product.js'
 
-loadEnv({ path: fileURLToPath(new URL('../../.env', import.meta.url)) })
+loadEnv({
+  path: fileURLToPath(new URL('../../.env', import.meta.url)),
+  quiet: true,
+})
 try {
   const config = parseEnv(process.env)
   await connectDatabase(config.MONGODB_URI)

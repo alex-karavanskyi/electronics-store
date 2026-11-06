@@ -32,7 +32,7 @@ jest.mock('@clerk/react', () => ({
     </>
   ),
   useAuth: () => ({ ...mockSession, getToken: mockGetToken }),
-  SignInButton: ({ children }: { children: ReactElement }) =>
+  SignInButton: ({ children }: { children: ReactElement<{ onClick?: () => void }> }) =>
     cloneElement(children, { onClick: mockOpenSignIn }),
   UserButton: () => (
     <button aria-label="Open account menu">Profile and sign out</button>

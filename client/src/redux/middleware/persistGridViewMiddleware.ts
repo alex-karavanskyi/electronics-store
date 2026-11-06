@@ -10,10 +10,10 @@ export const persistGridViewMiddleware: Middleware =
 
     try {
       if (typeof window !== 'undefined') {
-        if (action.type === setGridView.type) {
+        if (setGridView.match(action)) {
           localStorage.setItem(GRID_VIEW_STORAGE_KEY, 'true')
         }
-        if (action.type === setListView.type) {
+        if (setListView.match(action)) {
           localStorage.setItem(GRID_VIEW_STORAGE_KEY, 'false')
         }
       }

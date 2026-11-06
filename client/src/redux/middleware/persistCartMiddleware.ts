@@ -1,4 +1,4 @@
-import { Middleware } from '@reduxjs/toolkit'
+import { isAction, type Middleware } from '@reduxjs/toolkit'
 import type { CartItem } from '@/redux/features/cartSlice'
 
 import {
@@ -15,7 +15,7 @@ import {
   CART_STORAGE_VERSION,
 } from '@/shared/constants/localStorage'
 
-const persistedActions = new Set([
+const persistedActions = new Set<string>([
   updateCartProduct.type,
   updateCartProductImages.type,
   addToCart.type,
@@ -28,7 +28,7 @@ const persistedActions = new Set([
 export const persistCartMiddleware: Middleware = store => next => action => {
   const result = next(action)
 
-  if (typeof window !== 'undefined' && persistedActions.has(action.type)) {
+  if (typeof window !== 'undefined' && isAction(action) && persistedActions.has(action.type)) {
     try {
       localStorage.setItem(
         CART_STORAGE_KEY,

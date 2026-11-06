@@ -1,6 +1,6 @@
 # VOLT storefront
 
-React + TypeScript + Vite frontend in [client/](client/README.md), Express + TypeScript REST API in [server/](server/README.md). Each application has its own package and lockfile; the root only orchestrates commands. Use Node.js 22.12 or later within the 22.x release line, as specified by the root package.
+React + TypeScript + Vite frontend in [client/](client/README.md), Express + TypeScript REST API in [server/](server/README.md). Each application has its own package and lockfile; the root only orchestrates commands. Use Node.js 26.13.0 LTS and npm 12.2.2, as recorded in `.nvmrc`, `.node-version` and the package manifests. Select this toolchain per project; a global Node.js upgrade is not required.
 
 ## Setup and development
 
@@ -32,7 +32,7 @@ Build outputs: `client/dist` and `server/dist`. `npm start` runs the compiled Ex
 
 ## Run on Vercel
 
-The root `vercel.json` installs dependencies and runs `npm run build`. Vercel serves `client/dist` and sends `/api` requests to `api/index.mjs`, which exports the compiled Express adapter. The adapter does not call `listen()` or serve frontend files.
+The root `vercel.json` installs dependencies and runs `npm run build`. Vercel serves `client/dist` and sends `/api` requests to `api/index.mjs`, which exports the compiled Express adapter. The adapter does not call `listen()` or serve frontend files. The root `engines.node` selects Node.js 26.x. `packageManager` documents the npm version but does not install it; verify that the build environment uses npm 12.2.2 before deployment.
 
 Configure `MONGODB_URI`, optional `OPENAI_API_KEY`, and any custom frontend origins in `CORS_ORIGINS` in the Vercel project environment. Keep `VITE_API_URL` unset for the current same-origin deployment. The function reads `process.env` and does not load `server/.env`; local env files and verification artifacts are excluded from upload.
 

@@ -16,7 +16,7 @@ export default function DeleteProductDialog({
   product: Product
   onClose: () => void
   onDeleted: () => void
-  returnFocusRef?: RefObject<HTMLElement>
+  returnFocusRef?: RefObject<HTMLElement | null>
 }) {
   const id = useId()
   const busy = useRef(false)

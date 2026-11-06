@@ -16,6 +16,23 @@ export default defineConfig(({ mode }) => {
   }
   return {
     plugins: [react()],
+    build: {
+      target: ['chrome107', 'edge107', 'firefox104', 'safari16'],
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            // Cache the React runtime separately from application code.
+            includeDependenciesRecursively: false,
+            groups: [
+              {
+                name: 'react-vendor',
+                test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+              },
+            ],
+          },
+        },
+      },
+    },
     resolve: {
       alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
     },

@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "22.x"
+    "node": "26.x",
+    "npm": "12.x"
   },
   "scripts": {
     "dev": "concurrently --kill-others --names server,client \"npm run dev:server\" \"npm run dev:client\"",
@@ -22,7 +23,8 @@
     "check:architecture": "node scripts/check-architecture.mjs"
   },
   "devDependencies": {
-    "concurrently": "9.2.4",
-    "prettier": "3.7.4"
-  }
+    "concurrently": "10.0.6",
+    "prettier": "3.9.10"
+  },
+  "packageManager": "npm@12.2.2"
 }

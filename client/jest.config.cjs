@@ -3,6 +3,9 @@ module.exports = {
   roots: ['<rootDir>/src'],
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.cjs'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!(?:ai|@ai-sdk/[^/]+|@standard-schema/spec|@workflow/serde)/)',
+  ],
   transform: {
     '^.+\\.[tj]sx?$': [
       '@swc/jest',

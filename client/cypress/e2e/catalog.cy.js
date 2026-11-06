@@ -306,6 +306,10 @@ describe('Accessible controls and modal interactions', () => {
     cy.get('button[aria-label="Open chat"]').click()
     cy.focused().should('have.attr', 'aria-label', 'Close chat')
     cy.get('input[aria-label="Your question"]').should('be.visible')
+    for (const suggestion of ['Key features', 'Best for', 'Compare options']) {
+      cy.press(Cypress.Keyboard.Keys.TAB)
+      cy.focused().should('have.text', suggestion)
+    }
     cy.press(Cypress.Keyboard.Keys.TAB)
     cy.focused()
       .should('have.attr', 'aria-label', 'Your question')

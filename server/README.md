@@ -1,6 +1,6 @@
 # Express API
 
-Node.js 22.12+, Express 5, TypeScript. Use Node.js 22.x when running the whole repository. The API does not import frontend source code; the Node entry point also serves the built frontend when `client/dist` is present.
+Node.js 26.13.0 LTS, npm 12.2.2, Express 5, TypeScript. Use the same project toolchain for the client and server. The API does not import frontend source code; the Node entry point also serves the built frontend when `client/dist` is present.
 
 ## Local setup
 

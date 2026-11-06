@@ -11,7 +11,7 @@ interface ClearButtonProps {
 const ClearButton: React.FC<ClearButtonProps> = ({ handleClearButton }) => {
   const [clicked, setClicked] = useState(false)
 
-  const animationTimer = useRef<ReturnType<typeof setTimeout>>()
+  const animationTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
     return () => clearTimeout(animationTimer.current)

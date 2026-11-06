@@ -3,7 +3,7 @@ import { getFocusableElements } from '@/shared/lib/focusableElements'
 
 interface UseModalInteractionsOptions {
   isOpen: boolean
-  initialFocusRef: RefObject<HTMLElement>
+  initialFocusRef: RefObject<HTMLElement | null>
   onClose: () => void
   onAfterClose?: () => void
 }

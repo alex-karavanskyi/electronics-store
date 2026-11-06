@@ -1,6 +1,10 @@
 # React frontend
 
-Standalone React 18 + TypeScript + Vite + React Router app. No dependency on the root application package or server implementation.
+Standalone React 19 + TypeScript + Vite + React Router app. Use Node.js 26.13.0 LTS and npm 12.2.2, matching the root and server packages. No dependency on the root application package or server implementation.
+
+Vite retains the previous build targets (Chrome/Edge 107, Firefox 104, Safari 16).
+The upgraded Swiper carousel itself requires Chrome/Edge/Firefox 110+ and Safari/iOS 16.4+;
+the build target does not polyfill those library requirements. Browser verification uses Chrome.
 
 Clerk account controls are provided by `shared/auth/AuthProvider.tsx` and `AccountControls.tsx`. Set `VITE_CLERK_PUBLISHABLE_KEY` to enable them; see [Clerk setup](../docs/clerk-setup.md). `useAccess` exposes loading/guest/authenticated/unavailable states and UI admin access; only the backend authorizes operations. Private HTTP requests use `fetchAuthenticatedJson` with Clerk's current `getToken` callback.
 

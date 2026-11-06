@@ -10,7 +10,7 @@ import styles from './ProductManagement.module.scss'
 type Props = {
   product?: Product
   onDeleted?: () => void
-  returnFocusRef?: RefObject<HTMLElement>
+  returnFocusRef?: RefObject<HTMLElement | null>
 }
 export default function ProductManagement(props: Props) {
   const access = useAccess()

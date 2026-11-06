@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { EventEmitter, once } from 'node:events'
 import express, { type ErrorRequestHandler } from 'express'
-import { MockLanguageModelV3 } from 'ai/test'
+import { MockLanguageModelV4 } from 'ai/test'
 import { simulateReadableStream } from 'ai'
 import { createApp } from '../src/app.js'
 import { parseEnv } from '../src/config/env.js'
@@ -30,7 +30,7 @@ const body = {
 }
 
 function createModel(fails = false) {
-  return new MockLanguageModelV3({
+  return new MockLanguageModelV4({
     doStream: async options => {
       const prompt = JSON.stringify(options.prompt)
       assert.ok(prompt.includes('125'))

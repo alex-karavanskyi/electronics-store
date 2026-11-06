@@ -45,7 +45,10 @@ if (
   process.argv[1] &&
   resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 ) {
-  loadEnv({ path: fileURLToPath(new URL('../.env', import.meta.url)) })
+  loadEnv({
+    path: fileURLToPath(new URL('../.env', import.meta.url)),
+    quiet: true,
+  })
   try {
     const config = parseEnv(process.env)
     const running = await startServer(config)
