@@ -1,4 +1,5 @@
 // Browser coverage of the real app with external Clerk/API boundaries replaced.
+import { homeData } from '../fixtures/home'
 // The test entry exists only in Cypress's intercepted response, never in the app.
 const entry = `<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><div id="root"></div>
 <script type="module">
@@ -44,6 +45,7 @@ for (const width of [1280, 390, 320]) {
       }
       if (path === '/api/me/products')
         return req.reply(req.headers.authorization === 'Bearer A' ? items : [])
+      if (path === '/api/products/home') return req.reply(homeData(items))
       if (path === '/api/products') return req.reply(items)
       return req.reply(items[0] ?? {})
     })

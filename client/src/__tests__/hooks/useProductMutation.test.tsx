@@ -13,6 +13,7 @@ import { productKeys } from '@/shared/hooks/useProducts'
 import cart, { hydrateCart } from '@/redux/features/cartSlice'
 import { persistCartMiddleware } from '@/redux/middleware/persistCartMiddleware'
 import { mockFetch, jsonResponse } from '../support/fetch'
+import { fetchHome } from '@/shared/api/products'
 
 const original = {
   id: 'one',
@@ -48,6 +49,10 @@ function setup() {
   store.dispatch(hydrateCart([{ product: original, quantity: 3 }]))
   client.setQueryData(productKeys.detail('one'), original)
   client.setQueryData(productKeys.list(), [original])
+  client.setQueryData(productKeys.home(), {
+    categories: [''],
+    featured: [{ id: original.id, name: original.name, image: original.image }],
+  })
   client.setQueryData(['favorites', 'user', 'A'], { ids: ['one'], revision: 1 })
   const hook = renderHook(() => useProductMutation(), {
     wrapper: ({ children }) => (
@@ -68,6 +73,55 @@ function setup() {
     },
   }
 }
+
+it('cancels an older home read before invalidating it after a successful write', async () => {
+  const view = setup()
+  let finishRead!: (response: Response) => void
+  let oldSignal: AbortSignal | null | undefined
+  mockFetch.mockImplementation(async (url, options) => {
+    if (url === '/api/products/home') {
+      oldSignal = options?.signal
+      return new Promise<Response>(resolve => {
+        finishRead = resolve
+      })
+    }
+    return jsonResponse({ ...original, name: 'Updated' })
+  })
+  const pendingRead = view.client
+    .fetchQuery({
+      queryKey: productKeys.home(),
+      staleTime: 0,
+      queryFn: ({ signal }) => fetchHome(signal),
+    })
+    .catch(() => undefined)
+  await act(async () => {
+    await view.result.current.mutateAsync({
+      kind: 'update',
+      id: 'one',
+      input: { name: 'Updated' },
+    })
+    finishRead(jsonResponse({ categories: ['stale'], featured: [] }))
+    await pendingRead
+  })
+  expect(oldSignal?.aborted).toBe(true)
+  expect(view.client.getQueryData(productKeys.home())).toMatchObject({
+    categories: [''],
+  })
+  expect(view.client.getQueryState(productKeys.home())?.isInvalidated).toBe(
+    true
+  )
+  const latest = {
+    categories: ['new'],
+    featured: [{ id: original.id, name: 'Updated', image: '' }],
+  }
+  mockFetch.mockResolvedValue(jsonResponse(latest))
+  await expect(
+    view.client.fetchQuery({
+      queryKey: productKeys.home(),
+      queryFn: ({ signal }) => fetchHome(signal),
+    })
+  ).resolves.toEqual(latest)
+})
 it('updates detail and persisted cart without changing quantity; invalidates all catalog variants', async () => {
   const view = setup()
   mockFetch.mockResolvedValue(
@@ -87,6 +141,9 @@ it('updates detail and persisted cart without changing quantity; invalidates all
   expect(view.client.getQueryState(productKeys.list())?.isInvalidated).toBe(
     true
   )
+  expect(view.client.getQueryState(productKeys.home())?.isInvalidated).toBe(
+    true
+  )
   expect(view.store.getState().cart.items[0]).toMatchObject({
     quantity: 3,
     product: { name: 'Updated', price: 20 },
@@ -102,6 +159,9 @@ it('removes deleted detail and cart data and refreshes server favorites', async 
     await view.result.current.mutateAsync({ kind: 'delete', id: 'one' })
   })
   expect(view.client.getQueryData(productKeys.detail('one'))).toBeNull()
+  expect(view.client.getQueryState(productKeys.home())?.isInvalidated).toBe(
+    true
+  )
   expect(view.store.getState().cart.items).toEqual([])
   expect(
     view.client.getQueryState(['favorites', 'user', 'A'])?.isInvalidated
@@ -171,6 +231,9 @@ it('allows ordinary users and invalidates their personal list after a write', as
   expect(view.client.getQueryState(['my-products', 'A'])?.isInvalidated).toBe(
     true
   )
+  expect(view.client.getQueryState(productKeys.home())?.isInvalidated).toBe(
+    true
+  )
 })
 it('refreshes the originating personal cache when the form unmounts before a successful write', async () => {
   const view = setup()
@@ -191,6 +254,9 @@ it('refreshes the originating personal cache when the form unmounts before a suc
     finish({ ok: true, status: 204 } as Response)
     await pending
   })
+  expect(view.client.getQueryState(productKeys.home())?.isInvalidated).toBe(
+    true
+  )
   expect(view.client.getQueryState(['my-products', 'A'])?.isInvalidated).toBe(
     true
   )

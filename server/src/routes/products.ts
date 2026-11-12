@@ -1,6 +1,10 @@
 import { Router } from 'express'
-import { selectCatalog } from '../services/catalog.js'
-import type { ProductsService, ProductWrites } from '../services/products.js'
+import type {
+  ProductsService,
+  ProductWrites,
+  CatalogProductsService,
+  HomeProductsService,
+} from '../services/products.js'
 import { getSession, requireUser } from '../middleware/auth.js'
 import { HttpError } from '../middleware/errors.js'
 import type { ProductNotifications } from '../services/product-notifications.js'
@@ -13,7 +17,8 @@ import {
 } from '../validation/productInput.js'
 
 export function productsRouter(
-  products: ProductsService,
+  products: ProductsService &
+    Partial<CatalogProductsService & HomeProductsService>,
   writes?: ProductWrites,
   notifications?: ProductNotifications
 ) {
@@ -26,12 +31,18 @@ export function productsRouter(
     res.json(await products.list())
   })
   router.get('/catalog', async (req, res) => {
+    if (!products.catalog)
+      throw new HttpError(503, 'Product service temporarily unavailable')
     res.json(
-      selectCatalog(
-        await products.list(),
+      await products.catalog(
         new URL(req.originalUrl, 'http://localhost').searchParams
       )
     )
+  })
+  router.get('/home', async (_req, res) => {
+    if (!products.home)
+      throw new HttpError(503, 'Product service temporarily unavailable')
+    res.json(await products.home())
   })
   router.get('/:id', async (req, res) => {
     res.json(await products.get(req.params.id))

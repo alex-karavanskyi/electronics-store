@@ -4,13 +4,13 @@ import type { Swiper as SwiperInstance } from 'swiper'
 import { Autoplay, EffectFade, Pagination } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-import type { Product } from '@/shared/types/productSchema'
+import type { FeaturedProduct } from '@/shared/types/productSchema'
 import Image from '@/shared/ui/Image'
 
 import styles from './Slider.module.scss'
 
 type ProductCarouselProps = {
-  slides: Product[]
+  slides: FeaturedProduct[]
   isLoading: boolean
 }
 

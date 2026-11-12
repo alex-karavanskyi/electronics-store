@@ -1,5 +1,5 @@
 import { isAction, type Middleware } from '@reduxjs/toolkit'
-import type { CartItem } from '@/redux/features/cartSlice'
+import type { RootState } from '@/redux/store'
 
 import {
   updateCartProduct,
@@ -25,10 +25,17 @@ const persistedActions = new Set<string>([
   removeFromCart.type,
 ])
 
-export const persistCartMiddleware: Middleware = store => next => action => {
+export const persistCartMiddleware: Middleware<
+  object,
+  Pick<RootState, 'cart'>
+> = store => next => action => {
   const result = next(action)
 
-  if (typeof window !== 'undefined' && isAction(action) && persistedActions.has(action.type)) {
+  if (
+    typeof window !== 'undefined' &&
+    isAction(action) &&
+    persistedActions.has(action.type)
+  ) {
     try {
       localStorage.setItem(
         CART_STORAGE_KEY,
@@ -36,7 +43,7 @@ export const persistCartMiddleware: Middleware = store => next => action => {
           version: CART_STORAGE_VERSION,
           // Inline uploads can exceed localStorage quota. ProductImagesSync
           // restores current images from the API after hydration.
-          items: (store.getState().cart.items as CartItem[]).map(item => ({
+          items: store.getState().cart.items.map(item => ({
             ...item,
             product: {
               ...item.product,

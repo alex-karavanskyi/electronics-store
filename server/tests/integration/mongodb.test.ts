@@ -16,7 +16,9 @@ let db: typeof import('../../src/config/database.js')
 let Product: ReturnType<
   typeof import('../../src/models/product.js').getProductModel
 >
-let products: import('../../src/services/products.js').ProductsService
+let products: ReturnType<
+  typeof import('../../src/services/mongodb-products.js').createMongoProductsService
+>
 
 before(
   async () => {
@@ -96,6 +98,15 @@ const image = (suffix: string) => ({
 
 test('real MongoDB preserves DTO, gallery and storefront order, hidden detail and unique string IDs', async () => {
   assert.deepEqual(await products.list(), [])
+  assert.deepEqual(await products.home(), { categories: [], featured: [] })
+  assert.deepEqual(await products.catalog(new URLSearchParams()), {
+    items: [],
+    total: 0,
+    page: 1,
+    pageSize: 6,
+    min_price: 0,
+    max_price: 0,
+  })
   await Product.create([
     {
       _id: 'recLater',
@@ -1507,12 +1518,307 @@ test('historical jobs are not sent, retried, exhausted or allowed to starve Tele
   assert.equal(dto.notification?.channel, null)
 })
 
+test('MongoDB chat admission atomically shares concurrency and rate quotas between instances', async () => {
+  const { createMongoChatAdmission } =
+    await import('../../src/services/mongodb-chat-admission.js')
+  const limits = { requestsPerMinute: 3, maxConcurrent: 2 }
+  const first = createMongoChatAdmission(limits, db.database)
+  const second = createMongoChatAdmission(limits, db.database)
+  const results = await Promise.all([
+    first.acquire(),
+    second.acquire(),
+    first.acquire(),
+    second.acquire(),
+  ])
+  const leases = results.filter(result => result !== null)
+  assert.equal(leases.length, 2)
+  await Promise.all(leases.map(lease => lease!.release()))
+  const last = await second.acquire()
+  assert.ok(last)
+  await last.release()
+  assert.equal(await first.acquire(), null)
+})
+
+test('MongoDB catalog matches existing filters, global bounds, stable sorts and page correction', async () => {
+  const { selectCatalog } = await import('../../src/services/catalog.js')
+  const fixtures = Array.from({ length: 125 }, (_, i) => ({
+    _id: `catalog-fixture-${String(i).padStart(3, '0')}`,
+    name: [
+      'Phone [x]',
+      'phone.*',
+      'Écran',
+      'écran',
+      'Alpha',
+      'Alpha',
+      'x\0end',
+    ][i % 7],
+    price: i % 7,
+    category: ['Phones', 'phones', '', 'a.b', 'Cat\0end'][i % 5],
+    catalogOrder: 10_000 + Math.floor(i / 2),
+    imageUrls: ['https://example.com/photo.png'],
+  }))
+  await Product.create([
+    ...fixtures,
+    {
+      _id: 'catalog-fixture-hidden',
+      name: 'Phone [x]',
+      price: 999999,
+      catalogOrder: null,
+    },
+  ])
+  try {
+    const all = await products.list()
+    for (const sort of ['price-lowest', 'price-highest', 'name-a', 'name-z']) {
+      for (const query of [
+        '',
+        'text=phONe',
+        'text=Phone%20%5Bx%5D',
+        'text=phone.*',
+        'text=%00',
+        'text=x%00',
+        'category=Cat%00end',
+        'text=%C3%89c',
+        'category=Phones&category=a.b',
+        'category=unknown',
+        'minPrice=2&price=4',
+        'minPrice=8&price=2',
+      ]) {
+        for (const page of [1, 2, 999]) {
+          const params = new URLSearchParams(
+            `${query}&sort=${sort}&page=${page}&pageSize=6`
+          )
+          assert.deepEqual(
+            await products.catalog(params),
+            selectCatalog(all, params),
+            params.toString()
+          )
+        }
+      }
+    }
+    const params = new URLSearchParams('text=phone&page=2&pageSize=6')
+    await Product.deleteMany({
+      _id: {
+        $in: fixtures.filter(p => p.name.startsWith('Phone')).map(p => p._id),
+      },
+    })
+    assert.deepEqual(
+      await products.catalog(params),
+      selectCatalog(await products.list(), params)
+    )
+  } finally {
+    await Product.deleteMany({ _id: /^catalog-fixture-/ })
+  }
+})
+
+test('catalog recounts after deletion between count and page read, with bounded retries', async t => {
+  const fixtures = Array.from({ length: 12 }, (_, i) => ({
+    _id: `catalog-race-${i}`,
+    name: 'Catalog race fixture',
+    price: i,
+    catalogOrder: 20_000 + i,
+  }))
+  const originalFind = Product.find.bind(Product)
+  let reads = 0
+  const intercepted = t.mock.method(
+    Product,
+    'find',
+    (...args: Parameters<typeof Product.find>) => {
+      const query = originalFind(...args)
+      const execute = query.exec.bind(query)
+      t.mock.method(query, 'exec', async () => {
+        reads++
+        if (reads === 1)
+          await Product.deleteMany({
+            _id: { $in: fixtures.slice(5).map(p => p._id) },
+          })
+        return execute()
+      })
+      return query
+    }
+  )
+  await Product.create(fixtures)
+  try {
+    const result = await products.catalog(
+      new URLSearchParams('text=Catalog%20race%20fixture&page=2&pageSize=6')
+    )
+    assert.equal(result.page, 1)
+    assert.equal(result.total, 5)
+    assert.equal(result.items.length, 5)
+    assert.equal(reads, 2)
+  } finally {
+    intercepted.mock.restore()
+    await Product.deleteMany({ _id: /^catalog-race-/ })
+  }
+})
+
+test('catalog can return an image-heavy page larger than a single BSON document', async () => {
+  const imageUrl = 'data:image/png;base64,' + 'AAAA'.repeat(400_000)
+  const fixtures = Array.from({ length: 12 }, (_, i) => ({
+    _id: `catalog-large-${i}`,
+    name: 'Large catalog fixture',
+    price: 1,
+    catalogOrder: 20_000 + i,
+    imageUrls: [imageUrl],
+  }))
+  await Product.create(fixtures)
+  try {
+    const result = await products.catalog(
+      new URLSearchParams('text=Large%20catalog%20fixture&pageSize=100')
+    )
+    assert.equal(result.total, 12)
+    assert.equal(result.items.length, 12)
+    assert.equal(result.items[11].image, imageUrl)
+  } finally {
+    await Product.deleteMany({ _id: /^catalog-large-/ })
+  }
+})
+
+test('catalog explicit setup supports the default page sort without scanning full product documents', async () => {
+  const fixtures = Array.from({ length: 2000 }, (_, i) => ({
+    _id: `catalog-explain-${i}`,
+    name: 'Explain fixture',
+    price: i % 100,
+    catalogOrder: 30_000 + i,
+    description: 'x'.repeat(1000),
+  }))
+  await Product.insertMany(fixtures)
+  try {
+    const query = () =>
+      Product.collection
+        .find(
+          { catalogOrder: { $gte: 0 } },
+          {
+            sort: { price: 1, catalogOrder: 1, _id: 1 },
+            projection: {
+              _id: 1,
+              name: 1,
+              price: 1,
+              description: 1,
+              category: 1,
+              imageUrls: 1,
+              'images.secureUrl': 1,
+            },
+            collation: { locale: 'simple' },
+          }
+        )
+        .limit(6)
+    const before = await query().hint({ $natural: 1 }).explain('executionStats')
+    const { prepareProductIndexes } =
+      await import('../../src/models/product.js')
+    await prepareProductIndexes(db.database)
+    const indexes = await Product.collection.listIndexes().toArray()
+    assert.ok(indexes.some(index => index.name === 'product_catalog_price'))
+    const after = await query().explain('executionStats')
+    assert.equal(after.executionStats.nReturned, 6)
+    assert.ok(after.executionStats.totalDocsExamined <= 6)
+    assert.ok(
+      !JSON.stringify(after.queryPlanner.winningPlan).includes('"stage":"SORT"')
+    )
+    console.info(
+      'Catalog explain fixture:',
+      JSON.stringify({
+        before: {
+          returned: before.executionStats.nReturned,
+          documents: before.executionStats.totalDocsExamined,
+          keys: before.executionStats.totalKeysExamined,
+        },
+        after: {
+          returned: after.executionStats.nReturned,
+          documents: after.executionStats.totalDocsExamined,
+          keys: after.executionStats.totalKeysExamined,
+        },
+      })
+    )
+  } finally {
+    await Product.deleteMany({ _id: /^catalog-explain-/ })
+  }
+})
+
+test('home preserves category and slide order with compact images and reflects product writes', async () => {
+  const fixtureIds = Array.from({ length: 8 }, (_, i) => `home-fixture-${i}`)
+  await Product.create(
+    fixtureIds.map((_id, i) => ({
+      _id,
+      name: `Home ${i}`,
+      price: 10,
+      description: 'unused'.repeat(1000),
+      category: [
+        'Phones',
+        '',
+        'phones',
+        'Phones',
+        'laptops',
+        '',
+        'late',
+        'hidden',
+      ][i],
+      catalogOrder: i === 7 ? null : Math.floor(i / 2),
+      images: [image(`home-${i}`), image('unused-gallery')],
+      ...(i === 1
+        ? { imageUrls: [] }
+        : i === 2
+          ? {
+              imageUrls: [
+                'https://example.com/override.png',
+                'https://example.com/unused.png',
+              ],
+            }
+          : {}),
+    }))
+  )
+  const expected = async () => {
+    const all = await products.list()
+    return {
+      categories: [...new Set(all.map(p => p.category))],
+      featured: all
+        .slice(0, 5)
+        .map(({ id, name, image }) => ({ id, name, image })),
+    }
+  }
+  try {
+    assert.deepEqual(await products.home(), await expected())
+    await products.update(
+      fixtureIds[0],
+      { name: 'Edited slide', category: 'new-category', images: [] },
+      { userId: 'admin', role: 'admin' }
+    )
+    assert.deepEqual(await products.home(), await expected())
+    await products.remove(fixtureIds[0], { userId: 'admin', role: 'admin' })
+    assert.deepEqual(await products.home(), await expected())
+    const created = await products.create(
+      {
+        name: 'New',
+        price: 1,
+        category: 'created-category',
+        description: '',
+        images: [],
+      },
+      { userId: 'admin', role: 'admin' }
+    )
+    fixtureIds.push(created.id)
+    assert.deepEqual(await products.home(), await expected())
+  } finally {
+    await Product.deleteMany({ _id: { $in: fixtureIds } })
+  }
+})
+
 test('a real database outage is unavailable, never an empty storefront or missing product', async () => {
   await db.connectDatabase(uri)
   const exited = once(mongod, 'exit')
   mongod.kill()
   await exited
   await assert.rejects(products.list(), { status: 503 })
+  await assert.rejects(products.home(), { status: 503 })
+  await assert.rejects(products.catalog(new URLSearchParams()), { status: 503 })
+  const { createMongoChatAdmission } =
+    await import('../../src/services/mongodb-chat-admission.js')
+  await assert.rejects(
+    createMongoChatAdmission(
+      { requestsPerMinute: 30, maxConcurrent: 4 },
+      db.database
+    ).acquire(),
+    { status: 503 }
+  )
   await assert.rejects(products.get('hidden'), { status: 503 })
   const writes = (
     await import('../../src/services/mongodb-products.js')

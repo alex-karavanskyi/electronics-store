@@ -1,4 +1,5 @@
 // The real app is loaded with test-only Clerk and HTTP boundaries; no live data.
+import { homeData } from '../fixtures/home'
 const entry = `<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><div id="root"></div>
 <script type="module">
 import RefreshRuntime from '/@react-refresh';
@@ -76,6 +77,8 @@ for (const width of [1280, 390, 320]) {
       }
       if (path === '/api/admin/products') return req.reply(rows)
       if (path === '/api/me/products') return req.reply([])
+      if (path === '/api/products/home')
+        return req.reply(homeData(rows.map(row => row.product)))
       if (path === '/api/products')
         return req.reply(rows.map(row => row.product))
       return req.reply(rows[0]?.product ?? {})

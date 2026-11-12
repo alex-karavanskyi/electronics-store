@@ -7,7 +7,7 @@ import { setGridView, setListView } from '@/redux/features/catalogViewSlice'
 import { store } from '@/redux/store'
 import { useCatalog } from '@/components/home/hooks/useCatalog'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
-import { useProducts } from '@/shared/hooks/useProducts'
+import { useHomeProducts } from '@/shared/hooks/useProducts'
 import QueryProvider from '@/shared/lib/QueryProvider'
 
 jest.mock('@/components/home/hooks/useCatalog')
@@ -49,13 +49,13 @@ beforeEach(() => {
   store.dispatch(setGridView())
   mockIsMobile.mockReturnValue(false)
   mockCatalog.mockReturnValue(catalog)
-  jest.mocked(useProducts).mockReturnValue({
-    data: [product],
+  jest.mocked(useHomeProducts).mockReturnValue({
+    data: { categories: ['phones'], featured: [] },
     isPending: false,
     error: null,
     isFetching: false,
     refetch: jest.fn(),
-  } as unknown as ReturnType<typeof useProducts>)
+  } as unknown as ReturnType<typeof useHomeProducts>)
 })
 
 function setup() {
@@ -94,7 +94,10 @@ it.each([false, true])(
       store.dispatch(setListView())
     })
     expect(screen.getByRole('link', { name: 'Details' })).toBeVisible()
-    expect(screen.queryByRole('link', { name: '2' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '2' })).toHaveAttribute(
+      'href',
+      '/?page=2'
+    )
   }
 )
 

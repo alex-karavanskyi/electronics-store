@@ -2,7 +2,10 @@ import { z } from 'zod'
 
 export const checkoutSchema = z.object({
   name: z.string().trim().min(3, 'Name must be at least 3 characters'),
-  email: z.string().trim().email('Email must be valid'),
+  email: z
+    .string()
+    .trim()
+    .pipe(z.email({ error: 'Email must be valid' })),
   phone: z
     .string()
     .trim()

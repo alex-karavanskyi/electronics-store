@@ -4,7 +4,7 @@ import { BsFillGridFill, BsList } from 'react-icons/bs'
 
 import { setGridView, setListView } from '@/redux/features/catalogViewSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import type { Sorting } from '@/shared/filters/productFilters'
+import { sortSchema, type Sorting } from '@/shared/filters/productFilters'
 import { FilterName, HandleFiltersFn } from './filterTypes'
 
 import styles from './Sort.module.scss'
@@ -67,7 +67,9 @@ const Sort: React.FC<SortProps> = ({
             id={sortId}
             className={styles.sort__select}
             value={sort}
-            onChange={e => handleFilters(FilterName.Sort, e.target.value)}
+            onChange={e =>
+              handleFilters(FilterName.Sort, sortSchema.parse(e.target.value))
+            }
           >
             <option value="price-lowest">price (lowest)</option>
             <option value="price-highest">price (highest)</option>

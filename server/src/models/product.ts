@@ -147,6 +147,14 @@ Object.assign(productSchema.path('name'), {
 })
 productSchema.index({ catalogOrder: 1 })
 productSchema.index(
+  { price: 1, catalogOrder: 1, _id: 1 },
+  {
+    name: 'product_catalog_price',
+    partialFilterExpression: { catalogOrder: { $gte: 0 } },
+    collation: { locale: 'simple' },
+  }
+)
+productSchema.index(
   { 'notification.status': 1, 'notification.nextAttemptAt': 1, _id: 1 },
   { name: 'product_notification_due' }
 )
@@ -166,6 +174,15 @@ export function getProductModel(connection: Connection) {
 export async function prepareProductIndexes(
   connection: Connection
 ): Promise<void> {
+  await getProductModel(connection).collection.createIndex({ catalogOrder: 1 })
+  await getProductModel(connection).collection.createIndex(
+    { price: 1, catalogOrder: 1, _id: 1 },
+    {
+      name: 'product_catalog_price',
+      partialFilterExpression: { catalogOrder: { $gte: 0 } },
+      collation: { locale: 'simple' },
+    }
+  )
   await getProductModel(connection).collection.createIndex(
     { ownerId: 1, catalogOrder: 1, _id: 1 },
     { name: 'product_owner_catalog_order' }

@@ -21,7 +21,7 @@ const Price: React.FC<PriceProps> = ({
   const upper = Math.max(min_price, Math.min(max_price, price))
   const lower = Math.max(min_price, Math.min(upper, minPrice ?? min_price))
   const [draft, setDraft] = useState<{
-    name: FilterName
+    name: FilterName.Price | FilterName.MinPrice
     value: string
   } | null>(null)
 
@@ -29,7 +29,10 @@ const Price: React.FC<PriceProps> = ({
     max_price > min_price
       ? ((value - min_price) / (max_price - min_price)) * 100
       : 0
-  const commit = (name: FilterName, raw: string) => {
+  const commit = (
+    name: FilterName.Price | FilterName.MinPrice,
+    raw: string
+  ) => {
     if (raw.trim() && Number.isFinite(Number(raw))) {
       const value =
         name === FilterName.MinPrice
@@ -55,7 +58,7 @@ const Price: React.FC<PriceProps> = ({
       min: lower,
       max: max_price,
     },
-  ]
+  ] as const
 
   return (
     <div className={styles.container} role="group" aria-label="Price range">

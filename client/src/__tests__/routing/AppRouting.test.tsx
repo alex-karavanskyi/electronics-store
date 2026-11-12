@@ -87,6 +87,13 @@ beforeEach(() => {
         max_price: 500,
       })
     }
+    if (url === '/api/products/home')
+      return jsonResponse({
+        categories: [...new Set(products.map(p => p.category))],
+        featured: products
+          .slice(0, 5)
+          .map(({ id, name, image }) => ({ id, name, image })),
+      })
     if (url === '/api/products') return jsonResponse(products)
     const product = products.find(
       p => '/api/products/' + encodeURIComponent(p.id) === url

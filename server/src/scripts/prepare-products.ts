@@ -15,9 +15,9 @@ loadEnv({
 try {
   const config = parseEnv(process.env)
   await connectDatabase(config.MONGODB_URI)
-  // Creates only the ownership index. No document writes or destructive syncIndexes.
+  // Explicit additive setup only. No document writes or destructive syncIndexes.
   await prepareProductIndexes(database)
-  console.log('Product ownership index is ready')
+  console.log('Product catalog, ownership and notification indexes are ready')
 } catch {
   console.error(
     'Product setup failed; check database configuration and permissions'

@@ -98,9 +98,7 @@ it('disables the form without a product and rejects blank questions', () => {
   const input = screen.getByRole('textbox', { name: 'Your question' })
   const button = screen.getByRole('button', { name: 'Send question' })
 
-  expect(
-    screen.getByText('Get to know this product')
-  ).toBeVisible()
+  expect(screen.getByText('Get to know this product')).toBeVisible()
   expect(input).toBeDisabled()
   expect(button).toBeDisabled()
   fireEvent.submit(input.closest('form')!)
@@ -217,3 +215,29 @@ it('fills a suggested question and focuses the composer without sending', () => 
   expect(mockFetch).not.toHaveBeenCalled()
   expect(screen.getByRole('button', { name: 'Send question' })).toBeEnabled()
 })
+
+it.each([429, 413])(
+  'explains chat limit %s without displaying the raw response',
+  async status => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status,
+      text: async () => 'private upstream detail',
+    } as Response)
+    render(<Chat productId={product.id} />)
+    const input = screen.getByRole('textbox', { name: 'Your question' })
+    fireEvent.change(input, { target: { value: 'Price?' } })
+    fireEvent.submit(input.closest('form')!)
+    const alert = await screen.findByRole('alert')
+    expect(alert).not.toHaveTextContent('private upstream detail')
+    if (status === 429) {
+      expect(alert).toHaveTextContent('Please wait a minute')
+    } else {
+      expect(alert).toHaveTextContent('Start a new chat')
+      fireEvent.click(screen.getByRole('button', { name: 'Start a new chat' }))
+      expect(screen.getByText('Get to know this product')).toBeVisible()
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+    }
+  }
+)

@@ -1,5 +1,21 @@
 # React frontend
 
+The homepage category filter and slider share `/api/products/home` through the
+`['products', 'home']` Query key. The response has category names and at most five
+compact slides (`id`, `name`, `image`); it is never placed in full product detail
+or cart caches. Both components retain their loading/error/retry behavior.
+Successful product creates, edits and deletions cancel old product reads and
+invalidate the shared home key through the existing products-prefix policy,
+including successful writes that finish after navigation. Homepage rendering
+does not request the legacy full product list.
+
+Page render/lazy failures are contained inside the app shell, so navigation and
+the footer remain available. A navigation resets the page error boundary without
+remounting healthy content. Product chat has its own boundary inside the modal;
+close/Escape remain available after a failed import. Both offer a full page reload
+because React caches rejected lazy imports. Network/API errors continue to use
+their existing query/chat handling. See [React error boundaries](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary).
+
 Standalone React 19 + TypeScript + Vite + React Router app. Use Node.js 26.13.0 LTS and npm 12.2.2, matching the root and server packages. No dependency on the root application package or server implementation.
 
 Vite retains the previous build targets (Chrome/Edge 107, Firefox 104, Safari 16).
@@ -59,9 +75,31 @@ Favorites use `components/favorites/useFavorites.ts`. Guest favorites persist or
 
 Authenticated favorites use `/api/me/favorites` and user-scoped Query caches. Guest IDs move into an account-bound pending import before the first request; retry uses the same batch ID. Server snapshots and tokens never enter storage. Logout/account changes remove private caches and ignore late responses. Account lists refresh on focus/reconnect. Reorder uses the server revision and reports 409 conflicts rather than overwriting concurrent changes. See [stage-3 setup and API](../docs/favorites-setup.md).
 
-Commands: npm run typecheck, npm run lint, npm run lint:styles, npm test, npm run build, npm run preview. npm run test:e2e runs Cypress against a running Vite server. Jest uses SWC and jsdom; Cypress has no component-test framework dependency.
+Commands: npm run typecheck, npm run lint, npm run lint:styles, npm test, npm run build, npm run preview. From the repository root, run `npm --prefix client run test:e2e -- --browser chrome` against a running local Vite server to use Chrome explicitly. The E2E fixtures intercept API responses; these browser tests complement the separate real MongoDB integration suite. Jest uses SWC and jsdom; Cypress has no component-test framework dependency.
 
-The /api/products/catalog request and query key use identical normalized criteria. The unfiltered list remains a separate Query for carousel/categories. The product assistant uses /api/chat UI-message streaming.
+The controlled E2E suite expects Clerk to be disabled. In Windows PowerShell,
+assigning an empty environment variable may remove it and let `.env` supply its
+value again. Start an isolated fixture server from the repository root with:
+
+```powershell
+@'
+process.env.VITE_CLERK_PUBLISHABLE_KEY = '';
+process.env.VITE_API_URL = 'http://127.0.0.1:3001';
+const { createServer } = await import('./client/node_modules/vite/dist/node/index.js');
+const server = await createServer({
+  root: 'client', envDir: false,
+  define: { 'import.meta.env.VITE_CLERK_PUBLISHABLE_KEY': JSON.stringify('') },
+  server: { host: '127.0.0.1', port: 5173, strictPort: true },
+});
+await server.listen();
+server.printUrls();
+'@ | node --input-type=module -
+```
+
+Run Cypress in another terminal and stop this server afterwards. This does not
+modify env files or the normal development configuration.
+
+The /api/products/catalog request and query key use identical normalized criteria. Carousel/categories share the compact /api/products/home query. The product assistant uses /api/chat UI-message streaming.
 
 ## Catalog URL
 
@@ -73,7 +111,22 @@ The browser URL stores `text`, repeated `category`, `price`, `sort` and `page`. 
 - `page` is a positive integer and defaults to 1. Changing filters or sorting resets it to 1.
 - Serialization omits default values and preserves unrelated query parameters. Navigation preserves the pathname and hash. Back/forward navigation restores applied criteria and the search draft.
 
-The view preference is stored separately in Redux and localStorage. Grid view requests 6 products per page; list view requests page 1 with up to 100 products and reveals them locally in batches of 7. `pageSize` is an API parameter, not a browser URL setting.
+The view preference is stored separately in Redux and localStorage. Grid view requests 6 products per page; list view requests up to 100 products per page and reveals each page locally in batches of 7. Both views support server pagination. `pageSize` is an API parameter, not a browser URL setting.
+
+## Frontend conventions
+
+Route screens own the document title through React's `<title>` element in
+`PageTitle`; `index.html` has no second static title. Initial lazy loading and
+route render errors currently have no fallback title.
+
+Modal effects use `useEffectEvent` for current close callbacks without restarting
+focus trapping, inert background handling or scroll locking. Filter callbacks
+pair each field with its value type; DOM sort values use the same schema as URL
+parsing. Cart persistence requires only the typed `cart` state slice, and Redux
+hooks use `.withTypes()`.
+
+Keeping old catalog cards visible during page loading remains a separate UX
+decision; this refactor preserves the existing loading behavior.
 
 URL parsing and serialization live in [productFilters.ts](src/shared/filters/productFilters.ts); navigation updates live in [useProductFilters.ts](src/components/home/hooks/useProductFilters.ts). See the [catalog API contract](../server/README.md#parameterized-catalog) for response fields and server defaults.
 

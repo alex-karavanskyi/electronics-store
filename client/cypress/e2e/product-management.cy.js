@@ -1,4 +1,5 @@
 // Real app, controlled auth and HTTP boundaries. Server authorization is tested
+import { homeData } from '../fixtures/home'
 // separately with signed JWTs and temporary MongoDB; this is not an auth bypass.
 const entry = `<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><div id="root"></div>
 <script type="module">
@@ -85,6 +86,8 @@ for (const width of [1280, 390, 320]) {
           min_price: 0,
           max_price: product?.price ?? 0,
         })
+      if (path === '/api/products/home')
+        return req.reply(homeData(product ? [product] : []))
       if (path === '/api/products') return req.reply(product ? [product] : [])
       if (path === '/api/products/community-phone')
         return req.reply(

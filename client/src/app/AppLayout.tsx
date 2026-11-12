@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import Loading from '@/layout/Loading'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
+import ErrorBoundary from '@/shared/ui/ErrorBoundary'
 import { CartDrawer } from '@/components/cart'
 import { Footer, Navbar } from '@/layout'
 import { ReduxProvider } from '@/redux/provider'
@@ -25,6 +26,7 @@ export default function AppLayout() {
 }
 
 function StoreSession() {
+  const location = useLocation()
   return (
     <ReduxProvider>
       <ProductAccountSync />
@@ -34,9 +36,14 @@ function StoreSession() {
       <ScrollToPage />
       <Navbar />
       <main style={{ flex: 1 }}>
-        <Suspense fallback={<Loading />}>
-          <Outlet />
-        </Suspense>
+        <ErrorBoundary
+          resetKey={location.key}
+          message="This page could not be displayed. Please reload or visit another page."
+        >
+          <Suspense fallback={<Loading />}>
+            <Outlet />
+          </Suspense>
+        </ErrorBoundary>
       </main>
       <Footer />
       <CartDrawer />

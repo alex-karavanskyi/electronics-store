@@ -1,8 +1,60 @@
 import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import useModalInteractions from '@/shared/hooks/useModalInteractions'
+
+it('uses current callbacks without restarting focus and scroll management', () => {
+  function Modal({
+    open,
+    close,
+    after,
+  }: {
+    open: boolean
+    close: () => void
+    after: () => void
+  }) {
+    const ref = useRef<HTMLButtonElement>(null)
+    useModalInteractions({
+      isOpen: open,
+      initialFocusRef: ref,
+      onClose: close,
+      onAfterClose: after,
+    })
+    return open
+      ? createPortal(
+          <div role="dialog">
+            <button ref={ref}>Close</button>
+            <input aria-label="Draft" />
+          </div>,
+          document.body
+        )
+      : null
+  }
+  const oldClose = jest.fn()
+  const oldAfter = jest.fn()
+  const close = jest.fn()
+  const after = jest.fn()
+  const { rerender, container } = render(
+    <Modal open close={oldClose} after={oldAfter} />
+  )
+  const draft = screen.getByRole('textbox')
+  draft.focus()
+  rerender(<Modal open close={close} after={after} />)
+  expect(draft).toHaveFocus()
+  expect(container).toHaveAttribute('inert')
+  expect(document.body.style.overflow).toBe('hidden')
+  expect(oldAfter).not.toHaveBeenCalled()
+  expect(after).not.toHaveBeenCalled()
+  fireEvent.keyDown(document, { key: 'Escape' })
+  expect(close).toHaveBeenCalledTimes(1)
+  expect(oldClose).not.toHaveBeenCalled()
+  rerender(<Modal open={false} close={close} after={after} />)
+  expect(after).toHaveBeenCalledTimes(1)
+  expect(oldAfter).not.toHaveBeenCalled()
+  expect(container).not.toHaveAttribute('inert')
+  expect(document.body.style.overflow).toBe('')
+})
 
 function Example() {
   const [open, setOpen] = useState(false)
@@ -114,12 +166,16 @@ it('skips disabled controls and controls inside hidden or inert ancestors', asyn
   const user = userEvent.setup()
   render(<FocusableExample />)
   await user.click(screen.getByRole('button', { name: 'Open focus example' }))
-  expect(screen.getByRole('button', { name: 'Close focus example' })).toHaveFocus()
+  expect(
+    screen.getByRole('button', { name: 'Close focus example' })
+  ).toHaveFocus()
 
   await user.tab({ shift: true })
   expect(screen.getByRole('button', { name: 'Last action' })).toHaveFocus()
   await user.tab()
-  expect(screen.getByRole('button', { name: 'Close focus example' })).toHaveFocus()
+  expect(
+    screen.getByRole('button', { name: 'Close focus example' })
+  ).toHaveFocus()
 })
 
 it('updates the focus loop as controls are added and removed', async () => {

@@ -144,9 +144,93 @@ npm --prefix client run build
 
 Unit tests use real local HTTP requests to Express with controlled product services/model responses. Integration tests use a separate local mongod selected by MONGODB_TEST_BINARY: npm --prefix server run test:mongodb. Streaming tests verify the UI protocol and safe provider errors without paid model requests.
 
+### Public chat limits
+
+Chat admission uses a shared MongoDB document in `chat_admission` (`_id: global`),
+with revision-based atomic updates. The database user needs read/write access
+to that collection. MongoDB's built-in `_id` index is sufficient; no setup script
+or new dependency is required. Missing/unavailable admission storage fails closed
+with 503 before contacting the model.
+
+- `CHAT_REQUESTS_PER_MINUTE`: default 30, range 1–1000, rolling 60-second window.
+- `CHAT_MAX_CONCURRENT`: default 4, range 1–100.
+- `CHAT_MAX_HISTORY_CHARACTERS`: default 12000, range 100–50000 (UTF-16 characters).
+- `CHAT_MAX_OUTPUT_TOKENS`: default 2048, range 128–8192; reasoning may consume this budget.
+
+Use identical settings and synchronized clocks on instances sharing a database.
+These are global limits across guests and signed-in users, not per-user fairness
+or a monetary account budget. Infrastructure abuse controls may supplement them.
+No client-provided identity/IP header controls the quota. Exhaustion returns
+429 with `Retry-After: 60`; overlong text/reasoning history returns 413 and the
+client offers a new conversation. Accepted failures consume rate quota too.
+
+Streaming slots are released on completion/error/disconnect. Generation aborts
+after 120 seconds including admission/product lookup; crashed-worker leases
+expire after 150 seconds. A failed release safely leaves the lease to expire.
+External providers must honor cancellation; this cannot stop work inside a
+provider that ignores cancellation. Automatic provider retries are disabled.
+Instructions include only bounded product text and price, never image payloads.
+
+The normal test suite covers quotas with a shared CAS store and local HTTP/model
+fixtures. Real MongoDB race/outage coverage is part of `test:mongodb`, using a
+temporary local database rather than the configured application database.
+
 ## Parameterized catalog
 
+`GET /api/products/home` supplies the compact initial storefront data:
+`{ categories: string[], featured: { id, name, image }[] }`. Only visible products
+participate. Categories retain first-occurrence order from catalogOrder/ID,
+including blank labels and distinct casing. Featured contains the first five
+products in that same order, with only their first effective image; an explicit
+empty gallery override remains empty. Descriptions, prices, complete galleries,
+ownership and notification fields are excluded.
+
+MongoDB groups categories and projects the five slides before returning data;
+the endpoint never calls the legacy list service. Category grouping still scans
+catalog metadata and grows with the number of unique categories. The two reads
+are not a transactional snapshot. Errors fail closed (503/504, or 502 for an
+invalid projected response), rather than falling back to the full catalog.
+Existing index preparation covers the storefront ordering; stage 7 adds no new
+indexes or migrations. The legacy list and detail endpoints remain available.
+
 GET /api/products/catalog accepts text, repeated category, price, sort, page and pageSize. Returns { items, total, page, pageSize, min_price, max_price }. It filters/sorts/pages the MongoDB storefront; existing unfiltered list and detail endpoints are preserved. Invalid values use defaults (sort=price-lowest, page=1, pageSize=6; maximum pageSize=100). Bounds describe the unfiltered result. See the [client catalog URL rules](../client/README.md#catalog-url).
+
+The catalog delegates to `CatalogProductsService.catalog`; it never loads the
+legacy full product list. MongoDB filters visible records (`catalogOrder >= 0`),
+counts matches, sorts and selects only the requested page's public DTO fields.
+Global min/max price use two one-record reads. Images remain separate documents
+in the cursor, so an image-heavy page is not constrained by a single BSON
+aggregation document's 16 MiB limit.
+
+Text search is an escaped, case-insensitive literal prefix (MongoDB PCRE2), and
+category matching is exact, including case and punctuation. Name sorting uses
+explicit English ICU collation at strength 3 rather than the Node host's default
+locale. Equal values sort by ascending catalogOrder then ID. Unusual Unicode
+case folding/ordering can differ from JavaScript toLowerCase/localeCompare and
+between ICU versions; ASCII and accented-name contract fixtures are covered.
+Generated IDs are ASCII. Externally imported Unicode IDs that are canonically
+equivalent can still compare equal in a name-sort tie with the same catalogOrder;
+such imports need distinct catalogOrder values for deterministic ordering.
+
+Count, bounds and page reads are not a transactional snapshot. A concurrent
+deletion that shortens a page triggers one recount/retry; continuous changes
+return a safe 503. Concurrent inserts or price edits can appear on the next
+request. Each DB operation retains the existing 15-second timeout.
+
+Run `npm --prefix server run setup:products` against the intended database during
+deployment preparation to add `product_catalog_price` (price, catalogOrder, ID;
+visible records only) and ensure the existing catalogOrder index. Runtime still
+uses `autoIndex: false`; it does not create indexes. Setup is additive and retains
+ownership/notification indexes and documents. The price index supports the
+default ascending page and global bounds. Other sort/filter combinations and
+deep offsets may still scan/sort: add further indexes only after representative
+`explain('executionStats')` measurements. The integration suite measures a
+2,000-record fixture against a forced collection scan; this is not a production
+latency benchmark.
+
+References: [MongoDB collation](https://www.mongodb.com/docs/manual/reference/collation/),
+[partial indexes](https://www.mongodb.com/docs/manual/core/index-partial/),
+[regex semantics](https://www.mongodb.com/docs/manual/reference/operator/query/regex/).
 
 ## Recovery
 

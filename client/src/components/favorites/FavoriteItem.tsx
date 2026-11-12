@@ -39,8 +39,6 @@ const FavoriteItem = ({
   const reduceMotion = useReducedMotion()
   const dragControls = useDragControls()
   const [dragReady, setDragReady] = useState(false)
-  // Motion subscribes its drag controls in a passive effect. Keep the handle
-  // disabled until child effects mount, including on a direct/lazy page visit.
   useEffect(() => setDragReady(true), [])
 
   return (

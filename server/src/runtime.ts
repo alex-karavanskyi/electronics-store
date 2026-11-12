@@ -6,6 +6,7 @@ import { createMongoProductsService } from './services/mongodb-products.js'
 import { createMongoFavoritesService } from './services/mongodb-favorites.js'
 import { createTelegramSender } from './services/telegram.js'
 import { createMongoProductNotifications } from './services/mongodb-product-notifications.js'
+import { createMongoChatAdmission } from './services/mongodb-chat-admission.js'
 
 export async function createRuntimeApp(
   config: Config,
@@ -24,6 +25,10 @@ export async function createRuntimeApp(
     adminProducts: products,
     notifications: createMongoProductNotifications(sender),
     favorites: createMongoFavoritesService(),
+    chatAdmission: createMongoChatAdmission({
+      requestsPerMinute: config.CHAT_REQUESTS_PER_MINUTE,
+      maxConcurrent: config.CHAT_MAX_CONCURRENT,
+    }),
     model: config.OPENAI_API_KEY
       ? createOpenAI({ apiKey: config.OPENAI_API_KEY })('o4-mini')
       : undefined,

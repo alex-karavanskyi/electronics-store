@@ -18,6 +18,27 @@ export interface ProductsService {
   get(id: string, signal?: AbortSignal): Promise<Product>
 }
 
+export interface HomeProductsService {
+  home(signal?: AbortSignal): Promise<{
+    categories: string[]
+    featured: Pick<Product, 'id' | 'name' | 'image'>[]
+  }>
+}
+
+export interface CatalogProductsService {
+  catalog(
+    params: URLSearchParams,
+    signal?: AbortSignal
+  ): Promise<{
+    items: Product[]
+    total: number
+    page: number
+    pageSize: number
+    min_price: number
+    max_price: number
+  }>
+}
+
 export interface ProductWrites {
   create(input: CreateProductInput, actor: ProductActor): Promise<Product>
   update(

@@ -27,8 +27,6 @@ export function createProductFormSchema(original?: Product) {
     category: z.string(),
     imagesText: z.string().superRefine((text, context) => {
       const images = parseImages(text)
-      // Existing imports can contain legacy URLs. An unrelated edit must not
-      // replace or revalidate a gallery that is not being submitted in PATCH.
       if (original && sameImages(images, original.images)) return
       const valid =
         images.length <= 20 &&
@@ -56,8 +54,6 @@ export function createProductFormSchema(original?: Product) {
         })
     }),
   })
-  // Preserve untouched legacy values before normalization; PATCH will not
-  // submit these fields. Keep validation issues on their individual inputs.
   return fields
     .superRefine((values, context) => {
       for (const name of [

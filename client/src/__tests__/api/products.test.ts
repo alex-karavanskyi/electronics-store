@@ -3,10 +3,30 @@ import {
   fetchCatalog,
   fetchProduct,
   fetchProducts,
+  fetchHome,
 } from '@/shared/api/products'
 import { ApiError } from '@/shared/api/http'
 import { createQueryClient } from '@/shared/lib/queryClient'
 beforeEach(() => mockFetch.mockReset())
+it('validates compact home data, limits featured slides and forwards cancellation', async () => {
+  const signal = new AbortController().signal
+  const home = {
+    categories: ['phones', ''],
+    featured: [{ id: 'one', name: 'Phone', image: '' }],
+  }
+  mockFetch.mockResolvedValue(jsonResponse(home))
+  await expect(fetchHome(signal)).resolves.toEqual(home)
+  expect(mockFetch).toHaveBeenCalledWith('/api/products/home', { signal })
+  for (const invalid of [
+    [],
+    { ...home, categories: [null] },
+    { ...home, featured: [{ id: '', name: 'Phone', image: '' }] },
+    { ...home, featured: Array(6).fill(home.featured[0]) },
+  ]) {
+    mockFetch.mockResolvedValue(jsonResponse(invalid))
+    await expect(fetchHome()).rejects.toBeInstanceOf(ApiError)
+  }
+})
 it('uses the products REST path and forwards cancellation', async () => {
   const controller = new AbortController()
   mockFetch.mockResolvedValue(jsonResponse(product))

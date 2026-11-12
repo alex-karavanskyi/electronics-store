@@ -4,6 +4,7 @@ import { once } from 'node:events'
 import { createApp } from '../src/app.js'
 import { parseEnv } from '../src/config/env.js'
 import { selectCatalog } from '../src/services/catalog.js'
+import { createMongoProductsService } from '../src/services/mongodb-products.js'
 const products = Array.from({ length: 14 }, (_, i) => ({
   id: String(i),
   name: 'Phone ' + String(i).padStart(2, '0'),
@@ -13,9 +14,22 @@ const products = Array.from({ length: 14 }, (_, i) => ({
   image: '',
   images: [],
 }))
+
+test('MongoDB catalog fails closed when disconnected', async () => {
+  await assert.rejects(
+    createMongoProductsService().catalog(new URLSearchParams()),
+    { status: 503 }
+  )
+})
 test('price range includes both endpoints and excludes cheaper products', () => {
-  const result = selectCatalog(products, new URLSearchParams('minPrice=30&price=50'))
-  assert.deepEqual(result.items.map(product => product.price), [30, 40, 50])
+  const result = selectCatalog(
+    products,
+    new URLSearchParams('minPrice=30&price=50')
+  )
+  assert.deepEqual(
+    result.items.map(product => product.price),
+    [30, 40, 50]
+  )
   assert.equal(result.total, 3)
 })
 test('catalog endpoint applies filters, sorting and pagination without changing legacy list', async () => {
@@ -24,7 +38,11 @@ test('catalog endpoint applies filters, sorting and pagination without changing 
   })
   const server = createApp({
     config,
-    products: { list: async () => products, get: async () => products[0] },
+    products: {
+      list: async () => products,
+      get: async () => products[0],
+      catalog: async params => selectCatalog(products, params),
+    },
   }).listen(0, '127.0.0.1')
   await once(server, 'listening')
   const url =
@@ -48,6 +66,37 @@ test('catalog endpoint applies filters, sorting and pagination without changing 
       await fetch(url + '/api/products').then(r => r.json()),
       products
     )
+  } finally {
+    server.closeAllConnections()
+    await new Promise<void>(resolve => server.close(() => resolve()))
+  }
+})
+
+test('catalog delegates to the database capability without reading the legacy list', async () => {
+  const expected = selectCatalog(products, new URLSearchParams('page=2'))
+  let listReads = 0
+  const server = createApp({
+    config: parseEnv({ MONGODB_URI: 'mongodb://127.0.0.1:27017/test' }),
+    products: {
+      list: async () => {
+        listReads++
+        return products
+      },
+      get: async () => products[0],
+      catalog: async params => {
+        assert.equal(params.get('page'), '2')
+        return expected
+      },
+    },
+  }).listen(0, '127.0.0.1')
+  await once(server, 'listening')
+  try {
+    const port = (server.address() as import('node:net').AddressInfo).port
+    const response = await fetch(
+      `http://127.0.0.1:${port}/api/products/catalog?page=2`
+    )
+    assert.deepEqual(await response.json(), expected)
+    assert.equal(listReads, 0)
   } finally {
     server.closeAllConnections()
     await new Promise<void>(resolve => server.close(() => resolve()))

@@ -2,15 +2,13 @@ import 'swiper/css'
 import 'swiper/css/effect-fade'
 import 'swiper/css/pagination'
 
-import { useProducts } from '@/shared/hooks/useProducts'
+import { useHomeProducts } from '@/shared/hooks/useProducts'
 import RequestError from '@/shared/ui/RequestError'
 
 import HeroCopy from './HeroCopy'
 import HighlightsBar from './HighlightsBar'
 import ProductCarousel from './ProductCarousel'
 import styles from './Slider.module.scss'
-
-const MAX_SLIDES = 5
 
 const Slider = () => {
   const {
@@ -19,8 +17,8 @@ const Slider = () => {
     error,
     isFetching,
     refetch,
-  } = useProducts()
-  const slides = (data ?? []).slice(0, MAX_SLIDES)
+  } = useHomeProducts()
+  const slides = data?.featured ?? []
   const hasProductData = data !== undefined
 
   return (

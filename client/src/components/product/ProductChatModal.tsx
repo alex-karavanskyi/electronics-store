@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 
 import type { Product } from '@/shared/types/productSchema'
 import Modal from '@/shared/ui/Modal'
+import ErrorBoundary from '@/shared/ui/ErrorBoundary'
 
 import styles from './ProductChatModal.module.scss'
 
@@ -31,9 +32,14 @@ const ProductChatModal = ({ productId, onClose }: ProductChatModalProps) => (
         </button>
       </div>
       <div className={styles.chatWrapper}>
-        <Suspense fallback={<p role="status">Loading assistant...</p>}>
-          <Chat productId={productId} />
-        </Suspense>
+        <ErrorBoundary
+          resetKey={productId}
+          message="The assistant could not be displayed. Please reload the page to try again."
+        >
+          <Suspense fallback={<p role="status">Loading assistant...</p>}>
+            <Chat productId={productId} />
+          </Suspense>
+        </ErrorBoundary>
       </div>
     </div>
   </Modal>

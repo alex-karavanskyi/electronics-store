@@ -19,10 +19,19 @@ const Chat = ({ productId }: ChatProps) => {
     setInput,
     messages,
     error,
+    resetChat,
     isResponding,
     isSubmitDisabled,
     submitQuestion,
   } = useProductChat(productId)
+  const statusCode =
+    error && 'statusCode' in error ? error.statusCode : undefined
+  const errorMessage =
+    statusCode === 429
+      ? 'The product assistant is busy. Please wait a minute and try again.'
+      : statusCode === 413
+        ? 'This conversation is too long. Start a new chat with a shorter question.'
+        : 'Unable to reach the product assistant. Please try again.'
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -56,8 +65,13 @@ const Chat = ({ productId }: ChatProps) => {
 
       {error && (
         <p role="alert" className={styles.error}>
-          Unable to reach the product assistant. Please try again.
+          {errorMessage}
         </p>
+      )}
+      {statusCode === 413 && (
+        <button type="button" onClick={resetChat} disabled={isResponding}>
+          Start a new chat
+        </button>
       )}
       <form className={styles.formContainer} onSubmit={handleSubmit}>
         <input

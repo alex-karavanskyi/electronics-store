@@ -85,6 +85,11 @@ function respond(raw: RequestInfo | URL) {
       min_price: 10,
       max_price: 10,
     })
+  if (url === '/api/products/home')
+    return jsonResponse({
+      categories: [phone.category],
+      featured: [{ id: phone.id, name: phone.name, image: phone.image }],
+    })
   if (url === '/api/products') return jsonResponse([phone])
   return jsonResponse(phone)
 }
@@ -102,7 +107,7 @@ it.each([false, true])(
             min_price: 0,
             max_price: 0,
           })
-        : jsonResponse([])
+        : jsonResponse({ categories: [], featured: [] })
     )
     setup('/')
     expect(await screen.findByText(/no products matched/i)).toBeVisible()

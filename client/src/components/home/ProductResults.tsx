@@ -28,13 +28,13 @@ const ProductResults = ({
     )
   }
 
-  if (!isGridView) {
-    return <ListView products={products} isLoading={isLoading} />
-  }
-
   return (
     <>
-      <GridView products={products} isLoading={isLoading} />
+      {isGridView ? (
+        <GridView products={products} isLoading={isLoading} />
+      ) : (
+        <ListView products={products} isLoading={isLoading} />
+      )}
       <Pagination pageSize={pageSize} totalItems={total} />
     </>
   )

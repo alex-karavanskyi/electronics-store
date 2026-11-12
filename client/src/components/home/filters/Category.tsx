@@ -1,9 +1,8 @@
 import { motion } from 'framer-motion'
 
-import { useProducts } from '@/shared/hooks/useProducts'
+import { useHomeProducts } from '@/shared/hooks/useProducts'
 import { FilterName, HandleFiltersFn } from './filterTypes'
 import CategorySkeleton from './CategorySkeleton'
-import { getProductCategories } from './getProductCategories'
 
 import styles from './Category.module.scss'
 import RequestError from '@/shared/ui/RequestError'
@@ -17,8 +16,8 @@ const Category: React.FC<CategoryProps> = ({
   selectedCategories,
   handleFilters,
 }) => {
-  const { data, isPending, error, isFetching, refetch } = useProducts()
-  const categories = getProductCategories(data ?? [])
+  const { data, isPending, error, isFetching, refetch } = useHomeProducts()
+  const categories = data?.categories ?? []
 
   return (
     <nav className={styles.container}>

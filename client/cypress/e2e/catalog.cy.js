@@ -1,3 +1,5 @@
+import { homeData } from '../fixtures/home'
+
 const image =
   'data:image/svg+xml,' +
   encodeURIComponent(
@@ -23,7 +25,10 @@ function installApi() {
         : { statusCode: 404, body: { error: 'Product not found' } }
     )
   }).as('detail')
-  cy.intercept('GET', '**/api/products', products).as('list')
+  cy.intercept('GET', '**/api/products', () => {
+    throw new Error('The storefront must not load the legacy full catalog')
+  })
+  cy.intercept('GET', '**/api/products/home', homeData(products)).as('home')
   cy.intercept('GET', '**/api/products/catalog*', req => {
     const q = new URL(req.url).searchParams
     const list = products.filter(
@@ -63,9 +68,22 @@ describe('Standalone Vite storefront', () => {
     cy.viewport(1280, 900)
     installApi()
   })
+  it('keeps one page title across client navigation and browser history', () => {
+    cy.visit('/')
+    cy.wait('@home')
+    cy.title().should('eq', 'E-Commerce | React App')
+    cy.get('head title').should('have.length', 1)
+    cy.get('a[href="/product/item%201"]').first().click()
+    cy.wait('@detail')
+    cy.title().should('eq', 'Product | React App')
+    cy.get('head title').should('have.length', 1)
+    cy.go('back')
+    cy.title().should('eq', 'E-Commerce | React App')
+    cy.get('head title').should('have.length', 1)
+  })
   it('navigates featured products with the carousel controls', () => {
     cy.visit('/')
-    cy.wait('@list')
+    cy.wait('@home')
     // Test manual controls from a fixed slide, without racing the autoplay timer.
     cy.get('.swiper')
       .its('0.swiper')

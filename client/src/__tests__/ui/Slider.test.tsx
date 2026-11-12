@@ -79,7 +79,14 @@ it('keeps the hero copy and catalogue links visible while showing the loading sk
 })
 
 it('shows the first five products, prioritizes the first image and connects both controls', async () => {
-  mockFetch.mockResolvedValue(jsonResponse(products))
+  mockFetch.mockResolvedValue(
+    jsonResponse({
+      categories: ['phones'],
+      featured: products
+        .slice(0, 5)
+        .map(({ id, name, image }) => ({ id, name, image })),
+    })
+  )
   setup()
   await screen.findByAltText('Phone 0')
   const images = screen.getAllByRole('img')
@@ -108,7 +115,18 @@ it('shows the first five products, prioritizes the first image and connects both
 })
 
 it('disables automatic cycling, pagination and arrows when there is only one product', async () => {
-  mockFetch.mockResolvedValue(jsonResponse(products.slice(0, 1)))
+  mockFetch.mockResolvedValue(
+    jsonResponse({
+      categories: ['phones'],
+      featured: [
+        {
+          id: products[0].id,
+          name: products[0].name,
+          image: products[0].image,
+        },
+      ],
+    })
+  )
   setup()
   expect(await screen.findByAltText('Phone 0')).toBeVisible()
   expect(

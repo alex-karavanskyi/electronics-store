@@ -37,6 +37,10 @@ const product = {
   image: '/phone.png',
   images: ['/phone.png'],
 }
+const home = {
+  categories: ['phones'],
+  featured: [{ id: product.id, name: product.name, image: product.image }],
+}
 let client: QueryClient
 beforeEach(() => {
   client = new QueryClient({
@@ -126,7 +130,7 @@ it.each(['categories', 'featured products'] as const)(
     expect(
       screen.queryByText('Featured products will appear here soon.')
     ).not.toBeInTheDocument()
-    mockFetch.mockResolvedValue(jsonResponse([product]))
+    mockFetch.mockResolvedValue(jsonResponse(home))
     fireEvent.click(screen.getByRole('button', { name: /try again/i }))
     if (kind === 'categories')
       expect(
@@ -140,8 +144,8 @@ it.each(['categories', 'featured products', 'product'] as const)(
   'retains cached %s on a background failure and clears the warning after retry',
   async kind => {
     const detail = kind === 'product'
-    const key = detail ? productKeys.detail('phone') : productKeys.list()
-    client.setQueryData(key, detail ? product : [product])
+    const key = detail ? productKeys.detail('phone') : ['products', 'home']
+    client.setQueryData(key, detail ? product : home)
     mockFetch.mockResolvedValue(jsonResponse({ error: 'Unavailable' }, 503))
     setup(
       detail ? (
@@ -166,7 +170,7 @@ it.each(['categories', 'featured products', 'product'] as const)(
           ? screen.getByRole('checkbox', { name: 'phones' })
           : screen.getByAltText('Fixture Phone')
     expect(content()).toBeVisible()
-    mockFetch.mockResolvedValue(jsonResponse(detail ? product : [product]))
+    mockFetch.mockResolvedValue(jsonResponse(detail ? product : home))
     fireEvent.click(screen.getByRole('button', { name: /try again/i }))
     await waitFor(() =>
       expect(screen.queryByText(/could not refresh/i)).not.toBeInTheDocument()
@@ -178,7 +182,7 @@ it.each(['categories', 'featured products', 'product'] as const)(
 it.each(['categories', 'featured products'] as const)(
   'distinguishes an empty successful %s response from failure',
   async kind => {
-    mockFetch.mockResolvedValue(jsonResponse([]))
+    mockFetch.mockResolvedValue(jsonResponse({ categories: [], featured: [] }))
     setup(
       kind === 'categories' ? (
         <Category selectedCategories={[]} handleFilters={() => {}} />
@@ -199,3 +203,20 @@ it.each(['categories', 'featured products'] as const)(
     ).not.toBeInTheDocument()
   }
 )
+
+it('shares one compact home request between categories and slider without seeding detail cache', async () => {
+  mockFetch.mockImplementation(async url => {
+    expect(url).toBe('/api/products/home')
+    return jsonResponse(home)
+  })
+  setup(
+    <>
+      <Category selectedCategories={[]} handleFilters={() => {}} />
+      <Slider />
+    </>
+  )
+  expect(await screen.findByRole('checkbox', { name: 'phones' })).toBeVisible()
+  expect(await screen.findByAltText(product.name)).toBeVisible()
+  expect(mockFetch).toHaveBeenCalledTimes(1)
+  expect(client.getQueryData(productKeys.detail(product.id))).toBeUndefined()
+})

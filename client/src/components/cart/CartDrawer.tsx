@@ -14,7 +14,7 @@ const CartDrawer = () => {
 
   useEffect(() => {
     if (!isOpen) return
-    // The open cart confirms additions itself; keep its checkout button clear.
+
     for (const notification of toast.getToasts()) {
       if (
         typeof notification.id === 'string' &&

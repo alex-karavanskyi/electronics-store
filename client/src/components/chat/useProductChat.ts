@@ -9,7 +9,15 @@ const transport = new DefaultChatTransport({ api: apiUrl('/chat') })
 
 export const useProductChat = (productId: Product['id'] | null) => {
   const [input, setInput] = useState('')
-  const { messages, sendMessage, status, error, stop } = useChat({ transport })
+  const {
+    messages,
+    sendMessage,
+    status,
+    error,
+    stop,
+    setMessages,
+    clearError,
+  } = useChat({ transport })
   const isResponding = status === 'submitted' || status === 'streaming'
   const isSubmitDisabled = productId === null || !input.trim() || isResponding
 
@@ -34,6 +42,12 @@ export const useProductChat = (productId: Product['id'] | null) => {
     setInput,
     messages,
     error,
+    resetChat: () => {
+      if (isResponding) return
+      setMessages([])
+      clearError()
+      setInput('')
+    },
     isResponding,
     isSubmitDisabled,
     submitQuestion,

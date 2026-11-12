@@ -139,6 +139,23 @@ test('JSON errors, missing endpoints, oversized bodies and unavailable chat', as
 })
 
 test('environment validates ports, origins and required credentials without logging values', () => {
+  for (const setting of [
+    'CHAT_REQUESTS_PER_MINUTE',
+    'CHAT_MAX_CONCURRENT',
+    'CHAT_MAX_HISTORY_CHARACTERS',
+    'CHAT_MAX_OUTPUT_TOKENS',
+  ]) {
+    for (const value of ['0', '-1', 'no-limit', '9999999']) {
+      assert.throws(
+        () =>
+          parseEnv({
+            MONGODB_URI: 'mongodb://127.0.0.1/test',
+            [setting]: value,
+          }),
+        new RegExp(setting)
+      )
+    }
+  }
   assert.throws(() => parseEnv({}), /MONGODB_URI/)
   assert.throws(
     () =>

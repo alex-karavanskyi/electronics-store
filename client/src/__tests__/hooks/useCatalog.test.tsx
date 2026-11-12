@@ -1,10 +1,16 @@
-import { MemoryRouter, useSearchParams } from 'react-router-dom'
+import {
+  MemoryRouter,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom'
 import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { mockFetch, jsonResponse } from '../support/fetch'
 import catalogView from '@/redux/features/catalogViewSlice'
+import { setListView, setGridView } from '@/redux/features/catalogViewSlice'
 import { useCatalog } from '@/components/home/hooks/useCatalog'
 import { productKeys } from '@/shared/hooks/useProducts'
 import { parseFilters } from '@/shared/filters/productFilters'
@@ -40,11 +46,14 @@ function setup(url = '/?text=Phone&price=100') {
   )
   return {
     client,
+    store,
     ...renderHook(
       () => ({
         first: useCatalog(),
         second: useCatalog(),
         set: useSearchParams()[1],
+        navigate: useNavigate(),
+        location: useLocation(),
       }),
       { wrapper }
     ),
@@ -53,6 +62,75 @@ function setup(url = '/?text=Phone&price=100') {
 beforeEach(() => {
   mockFetch.mockReset()
   mockFetch.mockResolvedValue(jsonResponse(response))
+})
+
+it('loads results beyond 100 in list mode and preserves URL history and view switches', async () => {
+  mockFetch.mockImplementation(async input => {
+    const params = new URL(String(input), 'http://localhost').searchParams
+    const page = Number(params.get('page') ?? 1)
+    const pageSize = Number(params.get('pageSize'))
+    return jsonResponse({
+      ...response,
+      items: [
+        { ...response.items[0], id: page === 2 ? 'product-101' : 'product-1' },
+      ],
+      page,
+      pageSize,
+      total: 101,
+    })
+  })
+  const { client, store, result, unmount } = setup(
+    '/?page=2&campaign=sale#collection'
+  )
+  act(() => {
+    store.dispatch(setListView())
+  })
+  await waitFor(() => expect(result.current.first.pageSize).toBe(100))
+  await waitFor(() =>
+    expect(result.current.first.products[0]?.id).toBe('product-101')
+  )
+  expect(
+    mockFetch.mock.calls.some(([url]) =>
+      String(url).includes('page=2&pageSize=100')
+    )
+  ).toBe(true)
+  act(() => result.current.set({ page: '1', campaign: 'sale' }))
+  await waitFor(() =>
+    expect(result.current.first.products[0]?.id).toBe('product-1')
+  )
+  act(() => result.current.navigate(-1))
+  await waitFor(() =>
+    expect(result.current.first.products[0]?.id).toBe('product-101')
+  )
+  expect(result.current.location.hash).toBe('#collection')
+  act(() => {
+    store.dispatch(setGridView())
+  })
+  await waitFor(() => expect(result.current.first.pageSize).toBe(6))
+  expect(result.current.location.search).toContain('page=2')
+  act(() => result.current.navigate(1))
+  await waitFor(() =>
+    expect(result.current.first.products[0]?.id).toBe('product-1')
+  )
+  unmount()
+  client.clear()
+})
+
+it('replaces an out-of-range list page with the returned page without losing URL context', async () => {
+  mockFetch.mockResolvedValue(jsonResponse({ ...response, pageSize: 100 }))
+  const { client, store, result, unmount } = setup(
+    '/?page=99&campaign=sale#collection'
+  )
+  act(() => {
+    store.dispatch(setListView())
+  })
+  await waitFor(() => expect(result.current.first.isPending).toBe(false))
+  await waitFor(() =>
+    expect(result.current.location.search).toBe('?campaign=sale')
+  )
+  expect(result.current.location.hash).toBe('#collection')
+  unmount()
+  client.clear()
 })
 it('shares the exact parameterized request and cache key across catalog consumers', async () => {
   const { client, result, unmount } = setup()

@@ -24,17 +24,7 @@ function CategoryControls() {
 it('shows unique categories in their original order and applies a category to the URL', async () => {
   mockFetch.mockReset()
   mockFetch.mockResolvedValue(
-    jsonResponse(
-      ['laptops', 'phones', 'laptops'].map((category, index) => ({
-        id: String(index),
-        name: 'Product',
-        price: 100,
-        category,
-        description: '',
-        image: '',
-        images: [],
-      }))
-    )
+    jsonResponse({ categories: ['laptops', 'phones'], featured: [] })
   )
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },

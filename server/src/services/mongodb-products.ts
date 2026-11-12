@@ -3,8 +3,12 @@ import { randomUUID } from 'node:crypto'
 import { database, databaseError } from '../config/database.js'
 import { getProductModel } from '../models/product.js'
 import { HttpError } from '../middleware/errors.js'
+import { readMongoCatalog } from './mongodb-catalog.js'
+import { readMongoHome } from './mongodb-home.js'
 import type {
   ProductsService,
+  CatalogProductsService,
+  HomeProductsService,
   ProductWrites,
   ProductActor,
   OwnedProductsService,
@@ -20,6 +24,8 @@ import {
 export function createMongoProductsService({
   notificationsConfigured = false,
 }: { notificationsConfigured?: boolean } = {}): ProductsService &
+  CatalogProductsService &
+  HomeProductsService &
   ProductWrites &
   OwnedProductsService &
   AdminProductsService {
@@ -49,6 +55,15 @@ export function createMongoProductsService({
     throw new HttpError(404, 'Product not found')
   }
   return {
+    home(signal) {
+      return request(() => readMongoHome(ProductModel, signal), signal)
+    },
+    catalog(params, signal) {
+      return request(
+        () => readMongoCatalog(ProductModel, params, signal),
+        signal
+      )
+    },
     async listForAdmin(signal) {
       const records = await request(
         () =>

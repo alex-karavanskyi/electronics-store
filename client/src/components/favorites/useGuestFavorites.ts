@@ -16,8 +16,6 @@ export function useGuestFavorites() {
     queryKey: guestFavoritesKey,
     queryFn: loadGuestFavorites,
     initialData: loadGuestFavorites,
-    // Local writes and storage events own this cache; a refetch must not erase
-    // in-memory edits when persistence is unavailable.
     enabled: false,
     staleTime: Infinity,
     gcTime: Infinity,
@@ -41,7 +39,6 @@ export function useGuestFavorites() {
     else publish(result)
   }
   const seedProduct = (product: Product) => {
-    // An older catalog card must not replace a more recent detail response.
     const detailKey = productKeys.detail(product.id)
     if (client.getQueryData(detailKey) === undefined)
       client.setQueryData(detailKey, product)

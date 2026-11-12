@@ -1,6 +1,6 @@
 import { clientEnv } from '@/shared/config/env'
 
-import { configureStore } from '@reduxjs/toolkit'
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
 
 import cartReducer from '@/redux/features/cartSlice'
 import catalogViewReducer from '@/redux/features/catalogViewSlice'
@@ -8,12 +8,16 @@ import catalogViewReducer from '@/redux/features/catalogViewSlice'
 import { persistCartMiddleware } from './middleware/persistCartMiddleware'
 import { persistGridViewMiddleware } from './middleware/persistGridViewMiddleware'
 
+const rootReducer = combineReducers({
+  cart: cartReducer,
+  catalogView: catalogViewReducer,
+})
+
+export type RootState = ReturnType<typeof rootReducer>
+
 export const createAppStore = () =>
   configureStore({
-    reducer: {
-      cart: cartReducer,
-      catalogView: catalogViewReducer,
-    },
+    reducer: rootReducer,
     middleware: getDefaultMiddleware =>
       getDefaultMiddleware().concat(
         persistCartMiddleware,
@@ -24,5 +28,4 @@ export const createAppStore = () =>
 
 export const store = createAppStore()
 
-export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch

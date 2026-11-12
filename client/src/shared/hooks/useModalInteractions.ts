@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useRef } from 'react'
+import { RefObject, useEffect, useEffectEvent } from 'react'
 import { getFocusableElements } from '@/shared/lib/focusableElements'
 
 interface UseModalInteractionsOptions {
@@ -14,12 +14,8 @@ const useModalInteractions = ({
   onClose,
   onAfterClose,
 }: UseModalInteractionsOptions) => {
-  const onCloseRef = useRef(onClose)
-  const onAfterCloseRef = useRef(onAfterClose)
-  useEffect(() => {
-    onCloseRef.current = onClose
-    onAfterCloseRef.current = onAfterClose
-  }, [onClose, onAfterClose])
+  const close = useEffectEvent(() => onClose())
+  const afterClose = useEffectEvent(() => onAfterClose?.())
 
   useEffect(() => {
     if (!isOpen) return
@@ -51,7 +47,7 @@ const useModalInteractions = ({
       if (event.key === 'Escape') {
         event.preventDefault()
         event.stopPropagation()
-        onCloseRef.current()
+        close()
       }
       if (event.key !== 'Tab') return
       const focusable = getFocusableElements(dialog)
@@ -84,7 +80,7 @@ const useModalInteractions = ({
       document.body.style.overflow = bodyOverflow
       document.documentElement.style.overflow = htmlOverflow
       if (opener instanceof HTMLElement && opener.isConnected) opener.focus()
-      onAfterCloseRef.current?.()
+      afterClose()
     }
   }, [initialFocusRef, isOpen])
 }

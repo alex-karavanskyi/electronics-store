@@ -2,9 +2,12 @@ import express from 'express'
 import cors from 'cors'
 import { fileURLToPath } from 'node:url'
 import type { LanguageModel } from 'ai'
+import type { ChatAdmission } from './services/chat-admission.js'
 import type { Config } from './config/env.js'
 import type {
   ProductsService,
+  CatalogProductsService,
+  HomeProductsService,
   ProductWrites,
   OwnedProductsService,
   AdminProductsService,
@@ -29,16 +32,19 @@ export function createApp({
   favorites,
   notifications,
   model,
+  chatAdmission,
   serveClient = true,
 }: {
   config: Config
-  products: ProductsService
+  products: ProductsService &
+    Partial<CatalogProductsService & HomeProductsService>
   productWrites?: ProductWrites
   ownedProducts?: OwnedProductsService
   adminProducts?: AdminProductsService
   favorites?: FavoritesService
   notifications?: ProductNotifications
   model?: LanguageModel
+  chatAdmission?: ChatAdmission
   serveClient?: boolean
 }) {
   const app = express()
@@ -80,7 +86,13 @@ export function createApp({
     '/api/admin/products',
     adminProductsRouter(adminProducts, notifications)
   )
-  app.use('/api/chat', chatRouter(products, model))
+  app.use(
+    '/api/chat',
+    chatRouter(products, model, chatAdmission, {
+      maxHistoryCharacters: config.CHAT_MAX_HISTORY_CHARACTERS,
+      maxOutputTokens: config.CHAT_MAX_OUTPUT_TOKENS,
+    })
+  )
   app.use('/api', (_req, res) => {
     res.status(404).json({ error: 'Endpoint not found' })
   })

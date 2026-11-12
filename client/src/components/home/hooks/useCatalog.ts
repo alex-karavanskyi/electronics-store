@@ -18,7 +18,7 @@ export const useCatalog = () => {
   const request: CatalogRequest = {
     filters,
     sort,
-    page: grid ? page : 1,
+    page,
     pageSize: grid ? 6 : 100,
   }
   const {
@@ -36,7 +36,6 @@ export const useCatalog = () => {
   })
   useEffect(() => {
     if (
-      !grid ||
       !data ||
       isPlaceholderData ||
       isFetching ||
@@ -54,12 +53,15 @@ export const useCatalog = () => {
         search: params.toString(),
         hash: location.hash,
       },
-      { replace: true, preventScrollReset: true }
+      {
+        replace: true,
+        preventScrollReset: true,
+        state: { catalogPageCorrection: true },
+      }
     )
   }, [
     data,
     filters,
-    grid,
     isError,
     isFetching,
     isPlaceholderData,

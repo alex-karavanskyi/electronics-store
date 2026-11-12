@@ -3,19 +3,18 @@ import {
   FilterName,
   HandleFiltersFn,
 } from '@/components/home/filters/filterTypes'
-import type { Sorting } from '@/shared/filters/productFilters'
 
 export const useFilters = () => {
   const { filters, updateFilter, updateSort, resetFilters } =
     useProductFilters()
 
-  const handleFilters: HandleFiltersFn = (name, value) => {
-    if (name === FilterName.Text) updateFilter('text', String(value))
-    if (name === FilterName.MinPrice) updateFilter('minPrice', Number(value))
-    if (name === FilterName.Price) updateFilter('price', Number(value))
-    if (name === FilterName.Sort) updateSort(String(value) as Sorting)
+  const handleFilters: HandleFiltersFn = (...[name, value]) => {
+    if (name === FilterName.Text) updateFilter('text', value)
+    if (name === FilterName.MinPrice) updateFilter('minPrice', value)
+    if (name === FilterName.Price) updateFilter('price', value)
+    if (name === FilterName.Sort) updateSort(value)
     if (name === FilterName.Category) {
-      const category = String(value)
+      const category = value
       updateFilter(
         'category',
         filters.category.includes(category)

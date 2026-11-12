@@ -11,9 +11,11 @@ const sortSchema = z
   .enum(['price-lowest', 'price-highest', 'name-a', 'name-z'])
   .catch('price-lowest')
 
-function parseCatalogParams(params: URLSearchParams) {
+export function parseCatalogParams(params: URLSearchParams) {
   const minValue = params.get('minPrice')
-  const minResult = minValue?.trim() ? priceSchema.safeParse(Number(minValue)) : null
+  const minResult = minValue?.trim()
+    ? priceSchema.safeParse(Number(minValue))
+    : null
   const priceValue = params.get('price')
   const priceResult = priceValue?.trim()
     ? priceSchema.safeParse(Number(priceValue))
@@ -35,8 +37,15 @@ function parseCatalogParams(params: URLSearchParams) {
 }
 
 export function selectCatalog(products: Product[], params: URLSearchParams) {
-  const { minPrice, maxPrice, requestedPage, pageSize, sort, text, categories } =
-    parseCatalogParams(params)
+  const {
+    minPrice,
+    maxPrice,
+    requestedPage,
+    pageSize,
+    sort,
+    text,
+    categories,
+  } = parseCatalogParams(params)
 
   const filteredProducts = products
     .filter(

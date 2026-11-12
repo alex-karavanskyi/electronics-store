@@ -22,6 +22,7 @@ export default function DeleteProductDialog({
   const busy = useRef(false)
   const deleted = useRef(false)
   const mutation = useProductMutation()
+
   const close = () => {
     if (!busy.current && !mutation.isSaving) onClose()
   }
@@ -38,6 +39,7 @@ export default function DeleteProductDialog({
       busy.current = false
     }
   }
+
   return (
     <Modal
       className={styles.backdrop}
@@ -45,8 +47,6 @@ export default function DeleteProductDialog({
       describedBy={`${id}-description`}
       onClose={close}
       onAfterClose={() => {
-        // A fast list refresh may unmount the row before mutateAsync returns.
-        // Focus the stable list only after the modal has released its trap.
         if (busy.current || deleted.current) returnFocusRef?.current?.focus()
       }}
     >

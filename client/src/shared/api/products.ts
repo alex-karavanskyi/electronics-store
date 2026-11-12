@@ -1,12 +1,23 @@
 import { z } from 'zod'
 import { fetchAuthenticatedJson, fetchJson } from './http'
-import { productSchema, type ProductInput } from '@/shared/types/productSchema'
+import {
+  productSchema,
+  featuredProductSchema,
+  type ProductInput,
+} from '@/shared/types/productSchema'
 import {
   serializeFilters,
   type CatalogRequest,
 } from '@/shared/filters/productFilters'
 
 const productsSchema = z.array(productSchema)
+const homeSchema = z.object({
+  categories: z.array(z.string()),
+  featured: z.array(featuredProductSchema).max(5),
+})
+export type HomeResponse = z.infer<typeof homeSchema>
+export const fetchHome = (signal?: AbortSignal) =>
+  fetchJson('/products/home', homeSchema, signal)
 const adminProductSchema = z.object({
   product: productSchema,
   ownerId: z.string().nullable(),

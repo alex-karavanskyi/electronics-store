@@ -12,6 +12,25 @@ const schema = z
     HOST: z.string().min(1).default('127.0.0.1'),
     MONGODB_URI: z.string().regex(/^mongodb(?:\+srv)?:\/\//),
     OPENAI_API_KEY: z.string().trim().optional(),
+    CHAT_REQUESTS_PER_MINUTE: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(1000)
+      .default(30),
+    CHAT_MAX_CONCURRENT: z.coerce.number().int().min(1).max(100).default(4),
+    CHAT_MAX_HISTORY_CHARACTERS: z.coerce
+      .number()
+      .int()
+      .min(100)
+      .max(50000)
+      .default(12000),
+    CHAT_MAX_OUTPUT_TOKENS: z.coerce
+      .number()
+      .int()
+      .min(128)
+      .max(8192)
+      .default(2048),
     PRODUCT_NOTIFICATIONS_CRON_SECRET: optionalSetting(z.string().min(32)),
     // Invalid/incomplete Telegram configuration disables sending, not publication.
     TELEGRAM_BOT_TOKEN: z.string().trim().optional(),

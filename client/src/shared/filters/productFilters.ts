@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 const priceSchema = z.number().nonnegative()
 const pageSchema = z.number().int().positive()
-const sortSchema = z
+export const sortSchema = z
   .enum(['price-lowest', 'price-highest', 'name-a', 'name-z'])
   .catch('price-lowest')
 

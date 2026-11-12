@@ -27,7 +27,6 @@ export default function useCheckoutCart() {
     const results = await Promise.allSettled(
       items.map(async ({ product }) => {
         const queryKey = productKeys.detail(product.id)
-        // Confirmation needs a read started now, not an older in-flight request.
         await client.cancelQueries({ queryKey, exact: true })
         if (!isCurrent())
           throw new DOMException('Checkout closed', 'AbortError')
@@ -41,7 +40,6 @@ export default function useCheckoutCart() {
           },
           staleTime: 0,
           retry: false,
-          // Report an offline failure immediately instead of pausing confirmation.
           networkMode: 'always',
         })
       })

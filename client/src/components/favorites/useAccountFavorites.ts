@@ -80,7 +80,6 @@ export function useAccountFavorites() {
       assertCurrent()
       let pendingBatchId: string | undefined
       let importError: Error | undefined
-      // One deduplicated query owns migration. A batch is saved before sending.
       try {
         for (;;) {
           let batch
@@ -124,8 +123,6 @@ export function useAccountFavorites() {
             ? error
             : new Error('Unable to import guest favorites.')
       }
-      // An import failure must not prevent viewing/removing existing account
-      // favorites (including freeing space to retry an over-limit import).
       const result = await fetchFavorites(token, signal)
       assertCurrent()
       return { ...result, importError, pendingBatchId }

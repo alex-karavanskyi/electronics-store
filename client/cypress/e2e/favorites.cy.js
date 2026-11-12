@@ -1,3 +1,5 @@
+import { homeData } from '../fixtures/home'
+
 const image =
   'data:image/svg+xml,' +
   encodeURIComponent(
@@ -93,6 +95,7 @@ for (const pointerType of ['mouse', 'touch']) {
   it(`keeps favorites sortable through repeated ${pointerType} drags in both directions`, () => {
     cy.viewport(pointerType === 'touch' ? 375 : 1280, 900)
     cy.intercept('GET', '**/api/products', products)
+    cy.intercept('GET', '**/api/products/home', homeData(products))
     cy.intercept('GET', '**/api/products/catalog*', {
       items: products,
       total: 3,

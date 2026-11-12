@@ -12,7 +12,7 @@ const maxImageCharacters = Math.ceil((2 * 1024 * 1024) / 3) * 4 + 20 * 40
 const imageUrl = z
   .string()
   .max(2048)
-  .url()
+  .pipe(z.url())
   .refine(value => {
     try {
       const url = new URL(value)

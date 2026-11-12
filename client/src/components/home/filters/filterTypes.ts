@@ -1,3 +1,5 @@
+import type { Sorting } from '@/shared/filters/productFilters'
+
 export type FilterFields = {
   category: string[]
   minPrice?: number
@@ -14,9 +16,11 @@ export const enum FilterName {
   Sort = 'sort',
 }
 
-export type HandleFiltersFn = <T extends string | number>(
-  name: FilterName,
-  value: T
+export type HandleFiltersFn = (
+  ...args:
+    | [name: FilterName.Category | FilterName.Text, value: string]
+    | [name: FilterName.Price | FilterName.MinPrice, value: number]
+    | [name: FilterName.Sort, value: Sorting]
 ) => void
 
 export type HandleClearButtonFn = () => void

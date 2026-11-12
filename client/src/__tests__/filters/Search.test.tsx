@@ -23,6 +23,16 @@ function SearchPage() {
       <button onClick={() => navigate('/?text=Tablet&page=2')}>
         Saved search
       </button>
+      <button
+        onClick={() =>
+          navigate('/?text=Phone&campaign=sale', {
+            replace: true,
+            state: { catalogPageCorrection: true },
+          })
+        }
+      >
+        Correct page
+      </button>
       <button onClick={() => navigate(-1)}>Back</button>
       <button onClick={() => setIsVisible(false)}>Hide search</button>
     </>
@@ -114,4 +124,20 @@ it('does not apply pending text after Search unmounts', () => {
   expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
   advance(500)
   expect(screen.getByTestId('url')).toHaveTextContent(initialUrl.slice(1))
+})
+
+it('preserves a pending draft across automatic page correction but resets it on history navigation', () => {
+  const input = setup()
+  fireEvent.change(input, { target: { value: 'Laptop' } })
+  advance(200)
+  fireEvent.click(screen.getByRole('button', { name: 'Correct page' }))
+  expect(input).toHaveValue('Laptop')
+  advance(300)
+  expect(params().get('text')).toBe('Laptop')
+  expect(params().get('campaign')).toBe('sale')
+  fireEvent.change(input, { target: { value: 'pending' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+  expect(input).toHaveValue('Phone')
+  advance(500)
+  expect(params().get('text')).toBe('Phone')
 })
