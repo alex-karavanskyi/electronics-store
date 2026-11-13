@@ -16,7 +16,7 @@ type ProductChatModalProps = {
 const ProductChatModal = ({ productId, onClose }: ProductChatModalProps) => (
   <Modal
     className={styles.chatModal}
-    label="Product assistant"
+    title="Product assistant"
     onClose={onClose}
   >
     <div aria-hidden="true" className={styles.chatOverlay} onClick={onClose} />

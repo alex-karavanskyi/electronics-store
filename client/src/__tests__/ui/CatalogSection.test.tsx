@@ -162,8 +162,19 @@ it('reserves the largest desktop height, resets on view changes and disconnects 
   Object.defineProperty(globalThis, 'ResizeObserver', {
     configurable: true,
     value: jest.fn().mockImplementation((callback: () => void) => {
-      onResize = callback
-      return { observe, disconnect }
+      let observesProducts = false
+      return {
+        observe: (target: HTMLElement) => {
+          if (!target.classList.contains('productsContent')) return
+          observesProducts = true
+          onResize = callback
+          observe(target)
+        },
+        unobserve: jest.fn(),
+        disconnect: () => {
+          if (observesProducts) disconnect()
+        },
+      }
     }),
   })
   try {

@@ -87,6 +87,7 @@ export default function ProductFormModal({ product, onClose, onSaved }: Props) {
 
   return (
     <Modal
+      title={product ? 'Edit Product' : 'Add Product'}
       className={styles.backdrop}
       labelledBy={`${id}-title`}
       onClose={close}

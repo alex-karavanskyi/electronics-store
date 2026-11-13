@@ -62,7 +62,7 @@ const MobileCatalogControls: React.FC<MobileCatalogControlsProps> = ({
 
       {isFiltersOpen && (
         <Modal
-          label="Filters"
+          title="Filters"
           className={styles.sidebarOverlay}
           onClose={() => setIsFiltersOpen(false)}
         >
@@ -99,7 +99,7 @@ const MobileCatalogControls: React.FC<MobileCatalogControlsProps> = ({
 
       {isSortOpen && (
         <Modal
-          label="Sort products"
+          title="Sort products"
           className={styles.sidebarOverlay}
           onClose={() => setIsSortOpen(false)}
         >

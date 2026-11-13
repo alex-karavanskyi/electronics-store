@@ -36,6 +36,7 @@ function installApi() {
         (!q.get('text') ||
           p.name.toLowerCase().startsWith(q.get('text').toLowerCase())) &&
         (!q.has('category') || q.getAll('category').includes(p.category)) &&
+        (!q.has('minPrice') || p.price >= Number(q.get('minPrice'))) &&
         (!q.has('price') || p.price <= Number(q.get('price')))
     )
     const sort = q.get('sort') || 'price-lowest'
@@ -270,12 +271,57 @@ describe('Accessible controls and modal interactions', () => {
     cy.viewport(390, 844)
     installApi()
   })
+  for (const width of [390, 1280]) {
+    it(`selects a theme and tabs out of its menu at width ${width}`, () => {
+      cy.viewport(width, 900)
+      cy.visit('/')
+      cy.wait('@catalog')
+      cy.get('button[aria-label^="Theme:"]').click()
+      cy.get('[role="menu"]')
+        .should('be.visible')
+        .and(menu => {
+          const bounds = menu[0].getBoundingClientRect()
+          expect(bounds.left).to.be.at.least(0)
+          expect(bounds.right).to.be.at.most(width)
+        })
+      cy.contains('[role="menuitemradio"]', 'Dark').click()
+      cy.get('html').should('have.attr', 'data-theme', 'dark')
+      cy.focused().should('have.attr', 'aria-label', 'Theme: dark')
+      cy.get('button[aria-label^="Theme:"]').click()
+      cy.press(Cypress.Keyboard.Keys.TAB)
+      cy.get('[role="menu"]').should('not.exist')
+      cy.focused().should('have.attr', 'aria-label', 'Favorites')
+    })
+  }
+  it('updates prices through slider keys, URL and catalog requests', () => {
+    cy.visit('/?minPrice=30&price=70')
+    cy.wait('@catalog')
+    cy.contains('button', /^Filters$/).click()
+    cy.get('[role="slider"][aria-label="Minimum price"]').focus()
+    cy.press(Cypress.Keyboard.Keys.RIGHT)
+    cy.wait('@catalog').its('request.query.minPrice').should('eq', '31')
+    cy.location('search').should('include', 'minPrice=31')
+    cy.get('[role="slider"][aria-label="Maximum price"]').focus()
+    cy.press(Cypress.Keyboard.Keys.LEFT)
+    cy.wait('@catalog').its('request.query.price').should('eq', '69')
+    cy.get('input[type="number"][aria-label="Minimum price"]').should(
+      'have.value',
+      '31'
+    )
+    cy.get('input[type="number"][aria-label="Maximum price"]').should(
+      'have.value',
+      '69'
+    )
+    cy.get('[role="dialog"]').screenshot('radix-mobile-filters')
+  })
   it('traps focus in mobile filters and sorting and restores the opener', () => {
     cy.visit('/')
     cy.wait('@catalog')
     cy.contains('button', /^Filters$/).click()
     cy.get('[role="dialog"][aria-label="Filters"]').should('be.visible')
-    cy.get('#root').should('have.attr', 'inert')
+    cy.get('nav[aria-label="Main navigation" ]').should(nav => {
+      expect(nav[0].closest('[aria-hidden="true"]')).not.to.equal(null)
+    })
     cy.focused().should('have.text', 'Close filters')
     cy.get('[role="dialog"] input[type="search"]').focus().type('Phone')
     cy.press(Cypress.Keyboard.Keys.TAB)
@@ -293,7 +339,9 @@ describe('Accessible controls and modal interactions', () => {
     cy.focused().should('have.text', 'Close filters')
     cy.press(Cypress.Keyboard.Keys.ESC)
     cy.get('[role="dialog"]').should('not.exist')
-    cy.get('#root').should('not.have.attr', 'inert')
+    cy.get('nav[aria-label="Main navigation" ]').should(nav => {
+      expect(nav[0].closest('[aria-hidden="true"]')).to.equal(null)
+    })
     cy.focused().should('have.text', 'Filters')
     cy.contains('button', /^Sort$/).click()
     cy.focused().should('have.text', 'Close sorting')
@@ -312,9 +360,13 @@ describe('Accessible controls and modal interactions', () => {
       .should('have.length', 1)
       .and('contain', 'Your cart is empty')
     cy.focused().should('have.attr', 'aria-label', 'Close cart')
-    cy.get('#root').should('have.attr', 'inert')
+    cy.get('nav[aria-label="Main navigation" ]').should(nav => {
+      expect(nav[0].closest('[aria-hidden="true"]')).not.to.equal(null)
+    })
     cy.press(Cypress.Keyboard.Keys.ESC)
-    cy.get('#root').should('not.have.attr', 'inert')
+    cy.get('nav[aria-label="Main navigation" ]').should(nav => {
+      expect(nav[0].closest('[aria-hidden="true"]')).to.equal(null)
+    })
     cy.focused().should('have.attr', 'aria-label', 'Open cart, 0 items')
     cy.document().its('body.style.overflow').should('eq', '')
   })
@@ -454,7 +506,9 @@ describe('Deferred feature loading', () => {
     cy.contains('[role="status"]', 'Loading assistant...').should('be.visible')
     cy.get('button[aria-label="Close chat"]').click()
     cy.get('[role="dialog"]').should('not.exist')
-    cy.get('#root').should('not.have.attr', 'inert')
+    cy.get('nav[aria-label="Main navigation" ]').should(nav => {
+      expect(nav[0].closest('[aria-hidden="true"]')).to.equal(null)
+    })
     cy.then(() => releaseAssistantCode())
     cy.wait('@assistantCode')
     cy.get('button[aria-label="Open chat"]').click()

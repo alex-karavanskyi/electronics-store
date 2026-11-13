@@ -5,6 +5,13 @@ global.TextDecoder = TextDecoder
 require('@testing-library/jest-dom')
 window.scrollTo = jest.fn()
 
+// jsdom has no layout engine; actual sizing is covered in browser tests.
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
 class IntersectionObserverMock {
   observe() {}
   unobserve() {}

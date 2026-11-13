@@ -1,5 +1,3 @@
-@use '../styles' as shared;
-
 .switcher {
   position: relative;
   flex-shrink: 0;
@@ -30,10 +28,7 @@
 }
 
 .menu {
-  position: absolute;
-  top: calc(100% + 0.4rem);
-  left: 0;
-  z-index: 1;
+  z-index: 5001;
   width: 10rem;
   padding: 0.4rem;
   border: 1px solid var(--border);
@@ -42,7 +37,7 @@
   color: var(--text);
   box-shadow: 0 4px 8px var(--panel-shadow);
 
-  button {
+  .item {
     width: 100%;
     min-height: 2.5rem;
     display: flex;
@@ -53,10 +48,11 @@
     border-radius: 0.65rem;
     background: transparent;
     color: inherit;
+    font: inherit;
     text-align: left;
     cursor: pointer;
 
-    &:hover,
+    &[data-highlighted],
     &:focus-visible {
       background: var(--surface-hover);
     }
@@ -64,12 +60,5 @@
     &:focus-visible {
       outline-offset: -2px;
     }
-  }
-}
-
-@include shared.from(shared.$mobile) {
-  .menu {
-    right: 0;
-    left: auto;
   }
 }

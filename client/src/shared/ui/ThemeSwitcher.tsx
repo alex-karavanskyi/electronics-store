@@ -1,5 +1,6 @@
+﻿import { useRef, useState } from 'react'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { FiCheck, FiMonitor, FiMoon, FiSun } from 'react-icons/fi'
-import useThemeMenu from '@/shared/hooks/useThemeMenu'
 import { useTheme } from '@/shared/lib/ThemeProvider'
 import styles from './ThemeSwitcher.module.scss'
 
@@ -11,62 +12,87 @@ const options = [
 
 export default function ThemeSwitcher() {
   const { mode, setMode } = useTheme()
-  const selected = options.findIndex(option => option.mode === mode)
-  const Icon = options[selected].Icon
-  const menu = useThemeMenu({
-    selectedIndex: selected,
-    itemCount: options.length,
-  })
+  const selected = options.find(option => option.mode === mode)!
+  const Icon = selected.Icon
+  const [open, setOpen] = useState(false)
+  const trigger = useRef<HTMLButtonElement>(null)
+  const entryMode = useRef(mode)
+  const tabbing = useRef(false)
 
   return (
-    <div
-      ref={menu.containerRef}
-      className={styles.switcher}
-      onKeyDown={menu.handleKeyDown}
-    >
-      <button
-        ref={menu.triggerRef}
-        type="button"
-        className={styles.trigger}
-        aria-label={`Theme: ${mode}`}
-        title={`Theme: ${options[selected].label}`}
-        aria-haspopup="menu"
-        aria-expanded={menu.open}
-        aria-controls={menu.open ? menu.menuId : undefined}
-        onClick={menu.toggleMenu}
-        onKeyDown={menu.handleTriggerKeyDown}
-      >
-        <Icon aria-hidden="true" />
-      </button>
-      {menu.open && (
-        <div
-          id={menu.menuId}
-          role="menu"
-          aria-label="Theme"
-          className={styles.menu}
-        >
-          {options.map((option, index) => (
-            <button
-              key={option.mode}
-              ref={element => {
-                menu.itemRefs.current[index] = element
-              }}
-              type="button"
-              role="menuitemradio"
-              aria-checked={mode === option.mode}
-              tabIndex={-1}
-              onKeyDown={event => menu.handleItemKeyDown(event, index)}
-              onClick={() => {
-                setMode(option.mode)
-                menu.closeMenu()
-              }}
-            >
-              {option.label}
-              {mode === option.mode && <FiCheck aria-hidden="true" />}
-            </button>
-          ))}
-        </div>
-      )}
+    <div className={styles.switcher}>
+      <DropdownMenu.Root open={open} onOpenChange={setOpen} modal={false}>
+        <DropdownMenu.Trigger asChild>
+          <button
+            ref={trigger}
+            type="button"
+            className={styles.trigger}
+            aria-label={`Theme: ${mode}`}
+            title={`Theme: ${selected.label}`}
+            onPointerDown={() => {
+              entryMode.current = mode
+            }}
+            onKeyDown={event => {
+              entryMode.current = event.key === 'ArrowDown' ? 'light' : mode
+              if (event.key === 'ArrowUp') {
+                event.preventDefault()
+                entryMode.current = 'system'
+                setOpen(true)
+              }
+            }}
+          >
+            <Icon aria-hidden="true" />
+          </button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Portal>
+          <DropdownMenu.Content
+            aria-label="Theme"
+            className={styles.menu}
+            align="end"
+            sideOffset={6}
+            collisionPadding={8}
+            loop
+            onFocus={event => {
+              if (event.target !== event.currentTarget) return
+              event.preventDefault()
+              event.currentTarget
+                .querySelector<HTMLElement>(
+                  `[data-mode="${entryMode.current}"]`
+                )
+                ?.focus()
+            }}
+            onKeyDownCapture={event => {
+              if (event.key !== 'Tab') return
+              // Let native Tab traversal continue from the trigger.
+              event.stopPropagation()
+              tabbing.current = true
+              setOpen(false)
+              trigger.current?.focus()
+            }}
+            onCloseAutoFocus={event => {
+              if (tabbing.current) event.preventDefault()
+              tabbing.current = false
+            }}
+          >
+            <DropdownMenu.RadioGroup value={mode}>
+              {options.map(option => (
+                <DropdownMenu.RadioItem
+                  key={option.mode}
+                  value={option.mode}
+                  data-mode={option.mode}
+                  className={styles.item}
+                  onSelect={() => setMode(option.mode)}
+                >
+                  {option.label}
+                  <DropdownMenu.ItemIndicator>
+                    <FiCheck aria-hidden="true" />
+                  </DropdownMenu.ItemIndicator>
+                </DropdownMenu.RadioItem>
+              ))}
+            </DropdownMenu.RadioGroup>
+          </DropdownMenu.Content>
+        </DropdownMenu.Portal>
+      </DropdownMenu.Root>
     </div>
   )
 }

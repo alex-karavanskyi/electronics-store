@@ -33,6 +33,7 @@ const CartDrawer = () => {
 
   return (
     <Modal
+      title="Cart"
       className={styles.backdrop}
       labelledBy="cart-title"
       describedBy={items.length === 0 ? 'cart-empty' : undefined}

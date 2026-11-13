@@ -6,9 +6,9 @@ import ThemeProvider, { useTheme } from '@/shared/lib/ThemeProvider'
 import ThemeSwitcher from '@/shared/ui/ThemeSwitcher'
 
 const themeButton = () => screen.getByRole('button', { name: /^Theme:/ })
-function chooseMode(mode: string) {
-  fireEvent.click(themeButton())
-  fireEvent.click(
+async function chooseMode(mode: string) {
+  await userEvent.click(themeButton())
+  await userEvent.click(
     screen.getByRole('menuitemradio', {
       name: new RegExp('^' + mode + '$', 'i'),
     })
@@ -164,32 +164,35 @@ it('closes on outside interaction and Tab', async () => {
 it.each([
   [false, 'After theme'],
   [true, 'Before theme'],
-])('moves focus outside the menu with Shift=%s and Tab', async (shift, name) => {
-  const user = userEvent.setup()
-  render(
-    <ThemeProvider>
-      <button>Before theme</button>
-      <ThemeSwitcher />
-      <button>After theme</button>
-    </ThemeProvider>
-  )
+])(
+  'moves focus outside the menu with Shift=%s and Tab',
+  async (shift, name) => {
+    const user = userEvent.setup()
+    render(
+      <ThemeProvider>
+        <button>Before theme</button>
+        <ThemeSwitcher />
+        <button>After theme</button>
+      </ThemeProvider>
+    )
 
-  await user.click(themeButton())
-  // user-event 14 computes Tab's destination from the removed menu item.
-  // Verify the handoff first, then simulate traversal from the trigger.
-  expect(
-    fireEvent.keyDown(screen.getByRole('menuitemradio', { name: 'System' }), {
-      key: 'Tab',
-      shiftKey: shift,
-    })
-  ).toBe(true)
-  expect(screen.queryByRole('menu')).not.toBeInTheDocument()
-  expect(themeButton()).toHaveFocus()
-  await user.tab({ shift })
+    await user.click(themeButton())
+    // user-event 14 computes Tab's destination from the removed menu item.
+    // Verify the handoff first, then simulate traversal from the trigger.
+    expect(
+      fireEvent.keyDown(screen.getByRole('menuitemradio', { name: 'System' }), {
+        key: 'Tab',
+        shiftKey: shift,
+      })
+    ).toBe(true)
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    expect(themeButton()).toHaveFocus()
+    await user.tab({ shift })
 
-  expect(screen.getByRole('button', { name })).toHaveFocus()
-  expect(themeButton()).toHaveAccessibleName('Theme: system')
-})
+    expect(screen.getByRole('button', { name })).toHaveFocus()
+    expect(themeButton()).toHaveAccessibleName('Theme: system')
+  }
+)
 
 it.each([
   ['{ArrowDown}', 'Light', '{ArrowUp}', 'System', '{ArrowDown}'],
@@ -254,9 +257,9 @@ it('follows live OS changes in system mode and cleans up its listener', () => {
 
 it.each(['light', 'dark'])(
   'persists %s, overrides OS changes and restores after remount',
-  mode => {
+  async mode => {
     const { unmount } = renderTheme()
-    chooseMode(mode)
+    await chooseMode(mode)
     expect(localStorage.getItem('volt_theme')).toBe(mode)
     changeSystem(true)
     changeSystem(false)
@@ -268,16 +271,16 @@ it.each(['light', 'dark'])(
   }
 )
 
-it('resumes following the current OS preference when switching back to system', () => {
+it('resumes following the current OS preference when switching back to system', async () => {
   renderTheme()
-  chooseMode('light')
+  await chooseMode('light')
   changeSystem(true)
-  chooseMode('system')
+  await chooseMode('system')
   expect(document.documentElement).toHaveAttribute('data-theme', 'dark')
   expect(localStorage.getItem('volt_theme')).toBe('system')
 })
 
-it('continues working when storage reads and writes throw', () => {
+it('continues working when storage reads and writes throw', async () => {
   jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
     throw new Error('blocked')
   })
@@ -286,17 +289,17 @@ it('continues working when storage reads and writes throw', () => {
   })
   renderTheme()
   expect(themeButton()).toHaveAccessibleName('Theme: system')
-  chooseMode('dark')
+  await chooseMode('dark')
   expect(document.documentElement).toHaveAttribute('data-theme', 'dark')
 })
 
-it('continues working when access to localStorage itself is blocked', () => {
+it('continues working when access to localStorage itself is blocked', async () => {
   jest.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
     throw new DOMException('Storage is blocked', 'SecurityError')
   })
   renderTheme()
   expect(themeButton()).toHaveAccessibleName('Theme: system')
-  chooseMode('dark')
+  await chooseMode('dark')
   expect(document.documentElement).toHaveAttribute('data-theme', 'dark')
 })
 

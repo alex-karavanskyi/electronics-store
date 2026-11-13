@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react'
-import type { CSSProperties } from 'react'
+import * as Slider from '@radix-ui/react-slider'
 import { FilterFields, FilterName, HandleFiltersFn } from './filterTypes'
 import { formatPrice } from '@/shared/utils/formatPrice'
 import styles from './Price.module.scss'
@@ -25,10 +25,6 @@ const Price: React.FC<PriceProps> = ({
     value: string
   } | null>(null)
 
-  const percent = (value: number) =>
-    max_price > min_price
-      ? ((value - min_price) / (max_price - min_price)) * 100
-      : 0
   const commit = (
     name: FilterName.Price | FilterName.MinPrice,
     raw: string
@@ -90,41 +86,43 @@ const Price: React.FC<PriceProps> = ({
           </div>
         ))}
       </div>
-      <div
+      <Slider.Root
         className={styles.slider}
-        style={
-          {
-            '--range-start': `${percent(lower)}%`,
-            '--range-end': `${percent(upper)}%`,
-          } as CSSProperties
-        }
+        min={min_price}
+        max={max_price}
+        step={1}
+        preserveThumbOrder
+        value={[lower, upper]}
+        disabled={max_price <= min_price}
+        onValueChange={([minimum, maximum]) => {
+          if (minimum !== lower) handleFilters(FilterName.MinPrice, minimum)
+          if (maximum !== upper) handleFilters(FilterName.Price, maximum)
+          setDraft(null)
+        }}
       >
-        <div className={styles.track} />
+        <Slider.Track className={styles.track}>
+          <Slider.Range className={styles.range} />
+        </Slider.Track>
         {bounds.map(bound => (
-          <input
+          <Slider.Thumb
             key={bound.name}
-            type="range"
-            name={bound.name}
             aria-label={bound.label}
             aria-valuetext={formatPrice(bound.value)}
             aria-valuemin={bound.min}
             aria-valuemax={bound.max}
-            min={min_price}
-            max={max_price}
-            step="1"
-            value={bound.value}
-            disabled={max_price <= min_price}
             className={styles.handle}
-            style={{
-              zIndex:
-                bound.name === FilterName.MinPrice && lower === max_price
-                  ? 3
-                  : undefined,
+            onKeyDown={event => {
+              if (max_price <= min_price) return
+              if (event.key !== 'Home' && event.key !== 'End') return
+              event.preventDefault()
+              commit(
+                bound.name,
+                String(event.key === 'Home' ? bound.min : bound.max)
+              )
             }}
-            onChange={event => commit(bound.name, event.target.value)}
           />
         ))}
-      </div>
+      </Slider.Root>
     </div>
   )
 }

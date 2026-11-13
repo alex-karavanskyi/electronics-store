@@ -344,7 +344,9 @@ it('keeps a personal row and confirmation visible when deletion is rejected', as
   expect(await screen.findByRole('alert')).toHaveTextContent(
     /only change your own products/i
   )
-  expect(screen.getByRole('heading', { name: 'My phone' })).toBeVisible()
+  expect(
+    screen.getByRole('heading', { name: 'My phone', hidden: true })
+  ).toBeVisible()
   expect(screen.getByRole('dialog')).toBeVisible()
   expect(screen.getByLabelText('URL')).toHaveTextContent('/my-products')
 })
@@ -363,14 +365,19 @@ it('returns focus to the list after deleting one of several rows, and to the ope
   opener.focus()
   fireEvent.click(opener)
   fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
-  expect(opener).toHaveFocus()
+  await waitFor(() => expect(opener).toHaveFocus())
   fireEvent.click(opener)
   fireEvent.click(screen.getByRole('button', { name: 'Delete permanently' }))
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  )
   await waitFor(() =>
     expect(
       screen.queryByRole('heading', { name: 'My phone' })
     ).not.toBeInTheDocument()
   )
   expect(screen.getByRole('heading', { name: 'Second phone' })).toBeVisible()
-  expect(screen.getByLabelText('Your products')).toHaveFocus()
+  await waitFor(() =>
+    expect(screen.getByLabelText('Your products')).toHaveFocus()
+  )
 })

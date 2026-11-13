@@ -267,7 +267,7 @@ it('edits a foreign publication and deletes it with confirmation, updates public
   opener.focus()
   fireEvent.click(opener)
   fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
-  expect(opener).toHaveFocus()
+  await waitFor(() => expect(opener).toHaveFocus())
   expect(mockFetch.mock.calls.some(([, req]) => req?.method === 'DELETE')).toBe(
     false
   )
@@ -290,7 +290,9 @@ it('keeps rows and the confirmation after a rejected delete', async () => {
   expect(await screen.findByRole('alert')).toHaveTextContent(
     /changes have not been saved/i
   )
-  expect(screen.getByRole('heading', { name: 'Other phone' })).toBeVisible()
+  expect(
+    screen.getByRole('heading', { name: 'Other phone', hidden: true })
+  ).toBeVisible()
   expect(screen.getByRole('dialog')).toBeVisible()
 })
 it('offers retry after list failure without showing an empty success', async () => {

@@ -42,6 +42,7 @@ export default function DeleteProductDialog({
 
   return (
     <Modal
+      title="Delete Product"
       className={styles.backdrop}
       labelledBy={`${id}-title`}
       describedBy={`${id}-description`}
