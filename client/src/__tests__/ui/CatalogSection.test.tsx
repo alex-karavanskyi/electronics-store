@@ -1,6 +1,6 @@
+import { CatalogRouter } from '../support/CatalogRouter'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { MemoryRouter } from 'react-router-dom'
 
 import CatalogSection from '@/components/home/CatalogSection'
 import { setGridView, setListView } from '@/redux/features/catalogViewSlice'
@@ -62,9 +62,9 @@ function setup() {
   return render(
     <Provider store={store}>
       <QueryProvider>
-        <MemoryRouter>
+        <CatalogRouter>
           <CatalogSection />
-        </MemoryRouter>
+        </CatalogRouter>
       </QueryProvider>
     </Provider>
   )
@@ -115,9 +115,9 @@ it.each([false, true])(
     const rerender = () =>
       view.rerender(
         <Provider store={store}>
-          <MemoryRouter>
+          <CatalogRouter>
             <CatalogSection />
-          </MemoryRouter>
+          </CatalogRouter>
         </Provider>
       )
     expect(

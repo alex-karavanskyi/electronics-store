@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigationType } from 'react-router-dom'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -10,8 +10,7 @@ import { useProductFilters } from './useProductFilters'
 export const useProductSearch = (handleFilters: HandleFiltersFn) => {
   const { key, state } = useLocation()
   const navigationType = useNavigationType()
-  const isPageCorrection =
-    navigationType === 'REPLACE' && state?.catalogPageCorrection === true
+  const previousKey = useRef(key)
   const { filters } = useProductFilters()
   const [text, setText] = useState(filters.text)
   const applySearchDebounced = useDebouncedCallback(
@@ -20,10 +19,16 @@ export const useProductSearch = (handleFilters: HandleFiltersFn) => {
   )
 
   useEffect(() => {
+    // nuqs retains history state, so exempt only the correction transition.
+    const isPageCorrection =
+      navigationType === 'REPLACE' &&
+      key !== previousKey.current &&
+      state?.catalogPageCorrection === previousKey.current
+    previousKey.current = key
     if (isPageCorrection) return
     setText(filters.text)
     applySearchDebounced.cancel()
-  }, [key, filters.text, applySearchDebounced, isPageCorrection])
+  }, [key, filters.text, applySearchDebounced, navigationType, state])
 
   useEffect(() => () => applySearchDebounced.cancel(), [applySearchDebounced])
 

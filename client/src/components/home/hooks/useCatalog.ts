@@ -56,7 +56,7 @@ export const useCatalog = () => {
       {
         replace: true,
         preventScrollReset: true,
-        state: { catalogPageCorrection: true },
+        state: { catalogPageCorrection: location.key },
       }
     )
   }, [
@@ -66,6 +66,7 @@ export const useCatalog = () => {
     isFetching,
     isPlaceholderData,
     location.hash,
+    location.key,
     location.pathname,
     location.search,
     navigate,

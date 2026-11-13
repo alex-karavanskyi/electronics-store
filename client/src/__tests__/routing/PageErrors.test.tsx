@@ -1,5 +1,6 @@
+import { CatalogRouter } from '../support/CatalogRouter'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { Link, MemoryRouter, Route, Routes } from 'react-router-dom'
+import { Link, Route, Routes } from 'react-router-dom'
 import AppLayout from '@/app/AppLayout'
 
 jest.mock('@/layout', () => ({
@@ -24,14 +25,14 @@ it('contains a page render failure, retains the shell and recovers on navigation
   const errors = jest.spyOn(console, 'error').mockImplementation(() => {})
   try {
     render(
-      <MemoryRouter initialEntries={['/broken']}>
+      <CatalogRouter initialEntries={['/broken']}>
         <Routes>
           <Route element={<AppLayout />}>
             <Route path="/broken" element={<BrokenPage />} />
             <Route path="/healthy" element={<h1>Healthy page</h1>} />
           </Route>
         </Routes>
-      </MemoryRouter>
+      </CatalogRouter>
     )
     expect(screen.getByRole('alert')).toHaveTextContent(
       'This page could not be displayed'

@@ -1,3 +1,4 @@
+import { CatalogRouter } from '../support/CatalogRouter'
 import {
   cleanup,
   fireEvent,
@@ -5,7 +6,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+
 import App from '@/App'
 import {
   AccessContext,
@@ -69,11 +70,11 @@ afterEach(() => {
 })
 function setup(access: Access = unavailableAccess, url = '/') {
   return render(
-    <MemoryRouter initialEntries={[url]}>
+    <CatalogRouter initialEntries={[url]}>
       <AccessContext.Provider value={access}>
         <App />
       </AccessContext.Provider>
-    </MemoryRouter>
+    </CatalogRouter>
   )
 }
 it('merges a guest favorite, applies Admin edits to the cart, and isolates the next account', async () => {
@@ -121,7 +122,7 @@ it('merges a guest favorite, applies Admin edits to the cart, and isolates the n
   const view = setup()
   const switchAccount = (userId: string, isAdmin = false) =>
     view.rerender(
-      <MemoryRouter>
+      <CatalogRouter>
         <AccessContext.Provider
           value={{
             status: 'authenticated',
@@ -132,7 +133,7 @@ it('merges a guest favorite, applies Admin edits to the cart, and isolates the n
         >
           <App />
         </AccessContext.Provider>
-      </MemoryRouter>
+      </CatalogRouter>
     )
   fireEvent.click(
     await screen.findByRole('button', { name: 'Favorite Real Phone' })

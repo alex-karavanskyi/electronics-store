@@ -1,6 +1,7 @@
+import { CatalogRouter } from '../support/CatalogRouter'
 import { useState } from 'react'
-import { act, fireEvent, render, screen } from '@testing-library/react'
-import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import Search from '@/components/home/filters/Search'
 import { useFilters } from '@/components/home/hooks/useFilters'
@@ -25,9 +26,19 @@ function SearchPage() {
       </button>
       <button
         onClick={() =>
+          navigate('/?text=Phone&price=200&campaign=sale', {
+            replace: true,
+            state: location.state,
+          })
+        }
+      >
+        Update after correction
+      </button>
+      <button
+        onClick={() =>
           navigate('/?text=Phone&campaign=sale', {
             replace: true,
-            state: { catalogPageCorrection: true },
+            state: { catalogPageCorrection: location.key },
           })
         }
       >
@@ -41,15 +52,17 @@ function SearchPage() {
 
 function setup() {
   render(
-    <MemoryRouter initialEntries={[initialUrl]}>
+    <CatalogRouter initialEntries={[initialUrl]}>
       <SearchPage />
-    </MemoryRouter>
+    </CatalogRouter>
   )
   return screen.getByRole('searchbox', { name: 'Search products' })
 }
 
-const advance = (milliseconds: number) => {
-  act(() => jest.advanceTimersByTime(milliseconds))
+const advance = async (milliseconds: number) => {
+  await act(async () => {
+    await jest.advanceTimersByTimeAsync(milliseconds)
+  })
 }
 const params = () =>
   new URLSearchParams(screen.getByTestId('url').textContent ?? '')
@@ -60,31 +73,31 @@ afterEach(() => {
   jest.useRealTimers()
 })
 
-it('updates the input immediately and applies only the latest text after 500 ms', () => {
+it('updates the input immediately and applies only the latest text after 500 ms', async () => {
   const input = setup()
   expect(input).toHaveValue('Phone')
   fireEvent.change(input, { target: { value: 'Lap' } })
   expect(input).toHaveValue('Lap')
-  advance(400)
+  await advance(400)
   expect(params().get('text')).toBe('Phone')
 
   fireEvent.change(input, { target: { value: 'Laptop' } })
-  advance(499)
+  await advance(499)
   expect(params().get('text')).toBe('Phone')
-  advance(1)
-  expect(params().get('text')).toBe('Laptop')
+  await advance(1)
+  await waitFor(() => expect(params().get('text')).toBe('Laptop'))
   expect(params().has('page')).toBe(false)
   expect(params().get('campaign')).toBe('sale')
 })
 
-it('clears immediately and cancels a pending search', () => {
+it('clears immediately and cancels a pending search', async () => {
   const input = setup()
   fireEvent.change(input, { target: { value: 'Laptop' } })
-  advance(200)
+  await advance(200)
   fireEvent.click(screen.getByRole('button', { name: 'Clear search' }))
   expect(input).toHaveValue('')
-  expect(params().has('text')).toBe(false)
-  advance(500)
+  await waitFor(() => expect(params().has('text')).toBe(false))
+  await advance(500)
   expect(params().has('text')).toBe(false)
   expect(params().get('campaign')).toBe('sale')
 })
@@ -94,50 +107,64 @@ it.each([
   ['Saved search', 'Tablet'],
 ])(
   'cancels pending input and restores URL text after %s',
-  (button, expectedText) => {
+  async (button, expectedText) => {
     const input = setup()
     fireEvent.change(input, { target: { value: 'Laptop' } })
-    advance(200)
+    await advance(200)
     fireEvent.click(screen.getByRole('button', { name: button }))
     expect(input).toHaveValue(expectedText)
     const navigatedUrl = screen.getByTestId('url').textContent
-    advance(500)
+    await advance(500)
     expect(screen.getByTestId('url').textContent).toBe(navigatedUrl)
   }
 )
 
-it('restores the previous search and cancels pending input on history navigation', () => {
+it('restores the previous search and cancels pending input on history navigation', async () => {
   const input = setup()
   fireEvent.click(screen.getByRole('button', { name: 'Saved search' }))
   expect(input).toHaveValue('Tablet')
   fireEvent.change(input, { target: { value: 'Laptop' } })
   fireEvent.click(screen.getByRole('button', { name: 'Back' }))
   expect(input).toHaveValue('Phone')
-  advance(500)
+  await advance(500)
   expect(screen.getByTestId('url')).toHaveTextContent(initialUrl.slice(1))
 })
 
-it('does not apply pending text after Search unmounts', () => {
+it('does not apply pending text after Search unmounts', async () => {
   const input = setup()
   fireEvent.change(input, { target: { value: 'Laptop' } })
   fireEvent.click(screen.getByRole('button', { name: 'Hide search' }))
   expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
-  advance(500)
+  await advance(500)
   expect(screen.getByTestId('url')).toHaveTextContent(initialUrl.slice(1))
 })
 
-it('preserves a pending draft across automatic page correction but resets it on history navigation', () => {
+it('preserves a pending draft across automatic page correction but resets it on history navigation', async () => {
   const input = setup()
   fireEvent.change(input, { target: { value: 'Laptop' } })
-  advance(200)
+  await advance(200)
   fireEvent.click(screen.getByRole('button', { name: 'Correct page' }))
   expect(input).toHaveValue('Laptop')
-  advance(300)
-  expect(params().get('text')).toBe('Laptop')
+  await advance(300)
+  await waitFor(() => expect(params().get('text')).toBe('Laptop'))
   expect(params().get('campaign')).toBe('sale')
   fireEvent.change(input, { target: { value: 'pending' } })
   fireEvent.click(screen.getByRole('button', { name: 'Back' }))
   expect(input).toHaveValue('Phone')
-  advance(500)
+  await advance(500)
   expect(params().get('text')).toBe('Phone')
+})
+
+it('cancels pending input when a later URL update inherits page-correction state', async () => {
+  const input = setup()
+  fireEvent.click(screen.getByRole('button', { name: 'Correct page' }))
+  fireEvent.change(input, { target: { value: 'Laptop' } })
+  await advance(200)
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Update after correction' })
+  )
+  expect(input).toHaveValue('Phone')
+  await advance(500)
+  expect(params().get('text')).toBe('Phone')
+  expect(params().get('price')).toBe('200')
 })

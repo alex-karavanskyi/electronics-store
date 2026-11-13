@@ -4,7 +4,7 @@ module.exports = {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.cjs'],
   transformIgnorePatterns: [
-    '/node_modules/(?!(?:ai|@ai-sdk/[^/]+|@standard-schema/spec|@workflow/serde)/)',
+    '/node_modules/(?!(?:nuqs|ai|@ai-sdk/[^/]+|@standard-schema/spec|@workflow/serde)/)',
   ],
   transform: {
     '^.+\\.[tj]sx?$': [

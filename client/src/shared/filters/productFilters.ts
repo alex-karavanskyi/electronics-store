@@ -1,36 +1,62 @@
-import { z } from 'zod'
+﻿import { z } from 'zod'
+import {
+  createLoader,
+  createMultiParser,
+  createParser,
+  createSerializer,
+  parseAsString,
+  parseAsStringLiteral,
+} from 'nuqs/server'
 
 const priceSchema = z.number().nonnegative()
 const pageSchema = z.number().int().positive()
-export const sortSchema = z
-  .enum(['price-lowest', 'price-highest', 'name-a', 'name-z'])
-  .catch('price-lowest')
+const sortingValues = [
+  'price-lowest',
+  'price-highest',
+  'name-a',
+  'name-z',
+] as const
+export const sortSchema = z.enum(sortingValues).catch('price-lowest')
 
-function normalizeCategories(categories: string[]): string[] {
+function normalizeCategories(categories: readonly string[]): string[] {
   return [...new Set(categories.filter(Boolean))].sort()
 }
 
-export function parseFilters(params: URLSearchParams) {
-  const minValue = params.get('minPrice')
-  const minResult = minValue?.trim()
-    ? priceSchema.safeParse(Number(minValue))
-    : null
-  const priceValue = params.get('price')
-  const priceResult = priceValue?.trim()
-    ? priceSchema.safeParse(Number(priceValue))
-    : null
-  const pageResult = pageSchema.safeParse(Number(params.get('page')))
+const priceParser = createParser({
+  parse: raw => {
+    if (!raw.trim()) return null
+    const result = priceSchema.safeParse(Number(raw))
+    return result.success ? result.data : null
+  },
+  serialize: String,
+})
 
-  return {
-    filters: {
-      text: params.get('text') ?? '',
-      category: normalizeCategories(params.getAll('category')),
-      price: priceResult?.success ? priceResult.data : null,
-      minPrice: minResult?.success ? minResult.data : null,
+export const catalogParsers = {
+  text: parseAsString.withDefault(''),
+  category: createMultiParser({
+    parse: normalizeCategories,
+    serialize: normalizeCategories,
+    eq: (a, b) =>
+      a.length === b.length && a.every((value, index) => value === b[index]),
+  }).withDefault([]),
+  price: priceParser,
+  minPrice: priceParser,
+  sort: parseAsStringLiteral(sortingValues).withDefault('price-lowest'),
+  page: createParser({
+    parse: raw => {
+      const result = pageSchema.safeParse(Number(raw))
+      return result.success ? result.data : null
     },
-    sort: sortSchema.parse(params.get('sort')),
-    page: pageResult.success ? pageResult.data : 1,
-  }
+    serialize: String,
+  }).withDefault(1),
+}
+
+const loadFilters = createLoader(catalogParsers)
+const writeFilters = createSerializer(catalogParsers)
+
+export function parseFilters(params: URLSearchParams) {
+  const { sort, page, ...filters } = loadFilters(params)
+  return { filters, sort, page }
 }
 
 export type CatalogState = ReturnType<typeof parseFilters>
@@ -41,37 +67,13 @@ export function serializeFilters(
   state: CatalogState,
   current = new URLSearchParams()
 ) {
-  const params = new URLSearchParams(current)
-
-  for (const key of ['text', 'category', 'price', 'minPrice', 'sort', 'page']) {
-    params.delete(key)
-  }
-
-  if (state.filters.text) {
-    params.set('text', state.filters.text)
-  }
-
-  for (const category of normalizeCategories(state.filters.category)) {
-    params.append('category', category)
-  }
-
-  if (state.filters.price !== null) {
-    params.set('price', String(state.filters.price))
-  }
-
-  if (state.filters.minPrice != null) {
-    params.set('minPrice', String(state.filters.minPrice))
-  }
-
-  if (state.sort !== 'price-lowest') {
-    params.set('sort', state.sort)
-  }
-
-  if (state.page !== 1) {
-    params.set('page', String(state.page))
-  }
-
-  return params
+  return new URLSearchParams(
+    writeFilters(current, {
+      ...state.filters,
+      sort: state.sort,
+      page: state.page,
+    })
+  )
 }
 
 // The page size must be positive; an empty catalog still uses page 1.

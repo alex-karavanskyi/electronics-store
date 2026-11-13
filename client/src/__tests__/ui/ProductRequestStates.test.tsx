@@ -1,6 +1,7 @@
+import { CatalogRouter } from '../support/CatalogRouter'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { mockFetch, jsonResponse } from '../support/fetch'
 import { store } from '@/redux/store'
@@ -58,13 +59,13 @@ function setup(ui: React.ReactNode, detail = false) {
   return render(
     <Provider store={store}>
       <QueryClientProvider client={client}>
-        <MemoryRouter initialEntries={[detail ? '/product/phone' : '/']}>
+        <CatalogRouter initialEntries={[detail ? '/product/phone' : '/']}>
           <Location />
           <Routes>
             <Route path={detail ? '/product/:id' : '/'} element={ui} />
             <Route path="*" element={<p>Left product page</p>} />
           </Routes>
-        </MemoryRouter>
+        </CatalogRouter>
       </QueryClientProvider>
     </Provider>
   )

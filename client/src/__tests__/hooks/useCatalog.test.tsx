@@ -1,9 +1,5 @@
-import {
-  MemoryRouter,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from 'react-router-dom'
+import { CatalogRouter } from '../support/CatalogRouter'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 import { QueryClientProvider } from '@tanstack/react-query'
@@ -38,11 +34,11 @@ function setup(url = '/?text=Phone&price=100') {
   client.setDefaultOptions({ queries: { retry: false, staleTime: 60000 } })
   const store = configureStore({ reducer: { catalogView } })
   const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <MemoryRouter initialEntries={[url]}>
+    <CatalogRouter initialEntries={[url]}>
       <Provider store={store}>
         <QueryClientProvider client={client}>{children}</QueryClientProvider>
       </Provider>
-    </MemoryRouter>
+    </CatalogRouter>
   )
   return {
     client,
@@ -133,6 +129,13 @@ it('replaces an out-of-range list page with the returned page without losing URL
   client.clear()
 })
 it('shares the exact parameterized request and cache key across catalog consumers', async () => {
+  // Keep the requested page valid: page correction has its own test above.
+  mockFetch.mockImplementation(async input => {
+    const page = Number(
+      new URL(String(input), 'http://localhost').searchParams.get('page') ?? 1
+    )
+    return jsonResponse({ ...response, page, total: page === 2 ? 12 : 1 })
+  })
   const { client, result, unmount } = setup()
   await waitFor(() => expect(result.current.first.products).toHaveLength(1))
   expect(mockFetch).toHaveBeenCalledTimes(1)
@@ -154,7 +157,10 @@ it('shares the exact parameterized request and cache key across catalog consumer
     '/api/products/catalog?text=Laptop&page=2&pageSize=6'
   )
   act(() => result.current.set({ text: 'Phone', price: '100' }))
-  expect(mockFetch).toHaveBeenCalledTimes(2)
+  expect(mockFetch.mock.calls.map(([url]) => url)).toEqual([
+    '/api/products/catalog?text=Phone&price=100&pageSize=6',
+    '/api/products/catalog?text=Laptop&page=2&pageSize=6',
+  ])
   unmount()
   client.clear()
 })

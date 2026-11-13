@@ -1,3 +1,4 @@
+import { CatalogRouter } from '../support/CatalogRouter'
 import {
   act,
   fireEvent,
@@ -6,7 +7,7 @@ import {
   waitFor,
   within,
 } from '@testing-library/react'
-import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { mockFetch, jsonResponse } from '../support/fetch'
 import App from '@/App'
 import { store } from '@/redux/store'
@@ -58,10 +59,10 @@ function HistoryControls() {
 }
 function setup(url = '/') {
   return render(
-    <MemoryRouter initialEntries={[url]}>
+    <CatalogRouter initialEntries={[url]}>
       <HistoryControls />
       <App />
-    </MemoryRouter>
+    </CatalogRouter>
   )
 }
 beforeEach(() => {
@@ -282,10 +283,14 @@ it('keeps search draft local, preserves focus on commit and resets only owned UR
   fireEvent.change(screen.getByRole('combobox', { name: 'Sort by:' }), {
     target: { value: 'name-z' },
   })
-  expect(screen.getByTestId('location')).toHaveTextContent('sort=name-z')
+  await waitFor(() =>
+    expect(screen.getByTestId('location')).toHaveTextContent('sort=name-z')
+  )
   fireEvent.click(screen.getByRole('button', { name: /clear filters/i }))
-  expect(screen.getByTestId('location')).toHaveTextContent(
-    /^\/\?campaign=sale$/
+  await waitFor(() =>
+    expect(screen.getByTestId('location')).toHaveTextContent(
+      /^\/\?campaign=sale$/
+    )
   )
   expect(input).toHaveValue('')
   expect(screen.getByRole('combobox', { name: 'Sort by:' })).toHaveValue(

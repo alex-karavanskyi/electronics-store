@@ -16,7 +16,7 @@ it('validates prices and sorting while retaining legitimate zero price', () => {
   expect(
     parseCatalogUrl(new URLSearchParams('price=0&sort=name-z'))
   ).toMatchObject({ filters: { price: 0 }, sort: 'name-z' })
-  for (const price of ['', '-1', 'Infinity', 'invalid'])
+  for (const price of ['', ' ', '-1', 'Infinity', 'NaN', '10oops', 'invalid'])
     expect(
       parseCatalogUrl(new URLSearchParams({ price })).filters.price
     ).toBeNull()

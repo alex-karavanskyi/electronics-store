@@ -1,5 +1,6 @@
+import { CatalogRouter } from '../support/CatalogRouter'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { store } from '@/redux/store'
 import Pagination from '@/components/home/list/Pagination'
@@ -18,10 +19,10 @@ it('uses URL pagination over saved data, preserves parameters and supports histo
   localStorage.setItem('pagination', '99')
   render(
     <Provider store={store}>
-      <MemoryRouter initialEntries={['/?page=2&text=Phone&campaign=sale']}>
+      <CatalogRouter initialEntries={['/?page=2&text=Phone&campaign=sale']}>
         <Location />
         <Pagination pageSize={6} totalItems={18} />
-      </MemoryRouter>
+      </CatalogRouter>
     </Provider>
   )
   expect(screen.getByRole('link', { name: '2' })).toHaveAttribute(
@@ -29,9 +30,15 @@ it('uses URL pagination over saved data, preserves parameters and supports histo
     'page'
   )
   fireEvent.click(screen.getByRole('link', { name: '3' }))
-  expect(screen.getByTestId('url')).toHaveTextContent(
-    'campaign=sale&text=Phone&page=3'
-  )
+  expect(
+    Object.fromEntries(
+      new URLSearchParams(screen.getByTestId('url').textContent!)
+    )
+  ).toEqual({
+    campaign: 'sale',
+    text: 'Phone',
+    page: '3',
+  })
   fireEvent.click(screen.getByText('Back'))
   expect(screen.getByRole('link', { name: '2' })).toHaveAttribute(
     'aria-current',

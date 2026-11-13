@@ -1,6 +1,7 @@
+import { CatalogRouter } from '../support/CatalogRouter'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouter, useLocation } from 'react-router-dom'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { useLocation } from 'react-router-dom'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { mockFetch, jsonResponse } from '../support/fetch'
 import Category from '@/components/home/filters/Category'
 import { useProductFilters } from '@/components/home/hooks/useProductFilters'
@@ -31,9 +32,11 @@ it('shows unique categories in their original order and applies a category to th
   })
   const view = render(
     <QueryClientProvider client={client}>
-      <MemoryRouter initialEntries={['/?category=phones&page=3&campaign=sale']}>
+      <CatalogRouter
+        initialEntries={['/?category=phones&page=3&campaign=sale']}
+      >
         <CategoryControls />
-      </MemoryRouter>
+      </CatalogRouter>
     </QueryClientProvider>
   )
   try {
@@ -44,6 +47,11 @@ it('shows unique categories in their original order and applies a category to th
     expect(categories[1]).toBeChecked()
     fireEvent.click(categories[0])
     expect(categories[0]).toBeChecked()
+    await waitFor(() =>
+      expect(
+        screen.getByRole('status', { name: 'Catalog URL' })
+      ).toHaveTextContent('category=laptops')
+    )
     const params = new URLSearchParams(
       screen.getByRole('status', { name: 'Catalog URL' }).textContent ?? ''
     )

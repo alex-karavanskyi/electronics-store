@@ -1,6 +1,7 @@
+import { CatalogRouter } from '../support/CatalogRouter'
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+
 import Pagination from '@/components/home/list/Pagination'
 
 function clickModifiedLink(link: HTMLElement, modifiers: MouseEventInit) {
@@ -21,11 +22,11 @@ function clickModifiedLink(link: HTMLElement, modifiers: MouseEventInit) {
 }
 function setup(initialEntry = '/#collection', totalItems = 18) {
   render(
-    <MemoryRouter initialEntries={[initialEntry]}>
+    <CatalogRouter initialEntries={[initialEntry]}>
       <section id="collection" aria-label="Product catalog" tabIndex={-1}>
         <Pagination pageSize={6} totalItems={totalItems} />
       </section>
-    </MemoryRouter>
+    </CatalogRouter>
   )
   const catalog = screen.getByRole('region', { name: 'Product catalog' })
   catalog.scrollIntoView = jest.fn()

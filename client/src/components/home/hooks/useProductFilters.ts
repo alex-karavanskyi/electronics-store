@@ -1,58 +1,37 @@
-import { useMemo, useRef } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+﻿import { useQueryStates } from 'nuqs'
 import {
-  parseFilters,
-  serializeFilters,
+  catalogParsers,
   type CatalogState,
   type Sorting,
 } from '@/shared/filters/productFilters'
 
 export function useProductFilters() {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const pending = useRef({
-    key: location.key,
-    params: new URLSearchParams(location.search),
-  })
-  if (pending.current.key !== location.key)
-    pending.current = {
-      key: location.key,
-      params: new URLSearchParams(location.search),
+  const [{ sort, page, ...filters }, setFilters] = useQueryStates(
+    catalogParsers,
+    {
+      history: 'push',
+      shallow: false,
+      scroll: false,
     }
-  const state = useMemo(
-    () => parseFilters(new URLSearchParams(location.search)),
-    [location.search]
   )
-  const commit = (change: (current: CatalogState) => CatalogState) => {
-    const params = serializeFilters(
-      change(parseFilters(pending.current.params)),
-      pending.current.params
-    )
-    pending.current.params = params
-    navigate(
-      {
-        pathname: location.pathname,
-        search: params.toString(),
-        hash: location.hash,
-      },
-      { preventScrollReset: true }
-    )
-  }
+
   return {
-    ...state,
-    sorting: state.sort,
+    filters,
+    sort,
+    page,
+    sorting: sort,
     updateFilter: <K extends keyof CatalogState['filters']>(
       name: K,
       value: CatalogState['filters'][K]
     ) =>
-      commit(current => ({
-        ...current,
-        filters: { ...current.filters, [name]: value },
+      setFilters({
+        [name]: Array.isArray(value)
+          ? catalogParsers.category.parse(value)
+          : value,
         page: 1,
-      })),
-    updateSort: (sort: Sorting) =>
-      commit(current => ({ ...current, sort, page: 1 })),
-    updatePage: (page: number) => commit(current => ({ ...current, page })),
-    resetFilters: () => commit(() => parseFilters(new URLSearchParams())),
+      }),
+    updateSort: (sort: Sorting) => setFilters({ sort, page: 1 }),
+    updatePage: (page: number) => setFilters({ page }),
+    resetFilters: () => setFilters(null),
   }
 }

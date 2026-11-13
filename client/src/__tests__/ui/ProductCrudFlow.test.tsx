@@ -1,3 +1,4 @@
+import { CatalogRouter } from '../support/CatalogRouter'
 import {
   cleanup,
   fireEvent,
@@ -9,7 +10,7 @@ import {
 import { QueryClientProvider } from '@tanstack/react-query'
 import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import CatalogSection from '@/components/home/CatalogSection'
 import SingleProduct from '@/components/product/SingleProduct'
 import { AccessContext, type Access } from '@/shared/auth/useAccess'
@@ -57,7 +58,7 @@ function setup(url: string) {
     )
   }
   return render(
-    <MemoryRouter initialEntries={[url]}>
+    <CatalogRouter initialEntries={[url]}>
       <AccessContext.Provider value={admin}>
         <Provider store={store}>
           <QueryClientProvider client={client}>
@@ -69,7 +70,7 @@ function setup(url: string) {
           </QueryClientProvider>
         </Provider>
       </AccessContext.Provider>
-    </MemoryRouter>
+    </CatalogRouter>
   )
 }
 function respond(raw: RequestInfo | URL) {
@@ -119,12 +120,21 @@ it.each([false, true])(
 it('normalizes the URL to the server-clamped page and keeps filters and unrelated parameters', async () => {
   mockFetch.mockImplementation(async raw => respond(raw))
   setup('/?category=phones&sort=name-z&page=3&campaign=sale')
-  await waitFor(() =>
-    expect(screen.getByLabelText('URL')).toHaveTextContent(
-      '/?campaign=sale&category=phones&sort=name-z'
+  await waitFor(() => {
+    const url = new URL(
+      screen.getByLabelText('URL').textContent!,
+      'http://localhost'
     )
+    expect(url.pathname).toBe('/')
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      campaign: 'sale',
+      category: 'phones',
+      sort: 'name-z',
+    })
+  })
+  await waitFor(() =>
+    expect(screen.getByRole('link', { name: 'View Phone' })).toBeVisible()
   )
-  expect(await screen.findByRole('link', { name: 'View Phone' })).toBeVisible()
 })
 it('edits the real detail view and deletes it back to the catalog', async () => {
   let current = phone

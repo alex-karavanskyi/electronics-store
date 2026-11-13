@@ -69,6 +69,50 @@ describe('Standalone Vite storefront', () => {
     cy.viewport(1280, 900)
     installApi()
   })
+  it('cancels a search draft when clearing an already empty corrected URL', () => {
+    cy.intercept('GET', '**/api/products/catalog*', {
+      items: products.slice(0, 3),
+      total: 3,
+      page: 1,
+      pageSize: 6,
+      min_price: 0,
+      max_price: 130,
+    }).as('smallCatalog')
+    cy.visit('/?page=99')
+    cy.wait('@smallCatalog')
+    cy.location('search').should('eq', '')
+    cy.clock()
+    cy.get('input[type="search"]').type('Laptop', { delay: 0 })
+    cy.contains('button', /clear filters/i).click()
+    cy.tick(100)
+    cy.get('input[type="search"]').should('have.value', '')
+    cy.tick(600)
+    cy.location('search').should('eq', '')
+  })
+  it('keeps filter history after page correction and cancels superseded search drafts', () => {
+    cy.visit('/?page=99&text=Phone&campaign=sale#collection')
+    cy.wait('@catalog')
+    cy.location('search').should('include', 'page=2')
+    cy.clock()
+    cy.get('input[type="search"]').clear().type('Laptop', { delay: 0 })
+    cy.get('select[name="sort"]').select('name-z')
+    cy.tick(100)
+    cy.get('input[type="search"]').should('have.value', 'Phone')
+    cy.location('search')
+      .should('include', 'sort=name-z')
+      .and('not.include', 'page=')
+    cy.location('hash').should('eq', '#collection')
+    cy.go('back')
+    cy.location('search')
+      .should('include', 'page=2')
+      .and('not.include', 'sort=')
+    cy.get('input[type="search"]').should('have.value', 'Phone')
+    cy.go('forward')
+    cy.location('search')
+      .should('include', 'sort=name-z')
+      .and('include', 'campaign=sale')
+    cy.get('input[type="search"]').should('have.value', 'Phone')
+  })
   it('keeps one page title across client navigation and browser history', () => {
     cy.visit('/')
     cy.wait('@home')
