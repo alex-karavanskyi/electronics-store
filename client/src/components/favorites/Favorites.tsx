@@ -1,8 +1,6 @@
-import { AnimatePresence, Reorder } from 'framer-motion'
-import { useState } from 'react'
 import Breadcrumbs from '@/shared/ui/Breadcrumbs'
 import { useFavorites } from './useFavorites'
-import FavoriteRow from './FavoriteRow'
+import FavoritesList from './FavoritesList'
 import styles from './Favorites.module.scss'
 import RequestError from '@/shared/ui/RequestError'
 
@@ -20,27 +18,6 @@ const Favorites = () => {
     hasPendingImport,
     discardImport,
   } = useFavorites()
-  const [drag, setDrag] = useState<{ base: string[]; order: string[] } | null>(
-    null
-  )
-  const order = drag?.base === favoriteIds ? drag.order : favoriteIds
-  const handlePrepareDrag = () => {
-    if (!canWrite) return
-    // Refresh Reorder's cached row positions before starting another gesture.
-    setDrag({ base: favoriteIds, order: [...favoriteIds] })
-  }
-  const handleFinishDrag = () => {
-    if (drag?.base === favoriteIds) setFavoriteOrder(drag.order)
-    setDrag(null)
-  }
-  const move = (from: number, to: number) => {
-    if (!canWrite || to < 0 || to >= order.length) return
-    const next = [...order]
-    const [id] = next.splice(from, 1)
-    next.splice(to, 0, id)
-    setFavoriteOrder(next)
-    setDrag(null)
-  }
 
   return (
     <div className={styles.container}>
@@ -49,7 +26,6 @@ const Favorites = () => {
       </div>
       <h2 className={styles.favorites__title}>Wishlist</h2>
       {isLoading && <p role="status">Loading your wishlist...</p>}
-      {isSaving && <p role="status">Saving your wishlist...</p>}
       {error && (
         <RequestError
           message={
@@ -94,29 +70,13 @@ const Favorites = () => {
           <p className={styles.favorites__empty}>Your wishlist is empty</p>
         )
       ) : (
-        <Reorder.Group
-          axis="y"
-          values={order}
-          onReorder={ids => setDrag({ base: favoriteIds, order: ids })}
-          className={styles.favorites__list}
-        >
-          <AnimatePresence>
-            {order.map((id, index) => (
-              <FavoriteRow
-                key={id}
-                id={id}
-                disabled={!canWrite}
-                canMoveUp={canWrite && index > 0}
-                canMoveDown={canWrite && index < order.length - 1}
-                onMoveUp={() => move(index, index - 1)}
-                onMoveDown={() => move(index, index + 1)}
-                onRemove={() => removeFavorite(id)}
-                onPrepareDrag={handlePrepareDrag}
-                onFinishDrag={handleFinishDrag}
-              />
-            ))}
-          </AnimatePresence>
-        </Reorder.Group>
+        <FavoritesList
+          favoriteIds={favoriteIds}
+          canWrite={canWrite}
+          error={error}
+          removeFavorite={removeFavorite}
+          setFavoriteOrder={setFavoriteOrder}
+        />
       )}
     </div>
   )
