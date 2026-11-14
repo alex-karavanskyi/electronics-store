@@ -24,6 +24,8 @@ test('connected delete failures are logged once and successful deletes stay quie
     await assert.rejects(products.remove('private-id', actor), { status: 503 })
     assert.equal(log.mock.callCount(), 1)
     assert.equal(log.mock.calls[0].arguments[1].category, 'network')
+    assert.equal(log.mock.calls[0].arguments[1].phase, 'operation')
+    assert.equal(exec.mock.callCount(), 1)
     assert.equal(log.mock.calls[0].arguments[1].connection, 'connected')
     assert.ok(!JSON.stringify(log.mock.calls[0].arguments).includes('private-'))
     exec.mock.mockImplementation(async () => ({
@@ -45,7 +47,26 @@ test('cancelled product reads do not emit database failure diagnostics', async t
   assert.equal(log.mock.callCount(), 0)
 })
 
+test('a product read cancelled while waiting never reaches MongoDB', async t => {
+  const log = t.mock.method(console, 'error', () => {})
+  const model = getProductModel(diagnostics.database)
+  const find = t.mock.method(model, 'find', () => {
+    throw new Error('cancelled read must not run')
+  })
+  const controller = new AbortController()
+  const reason = new Error('cancelled by caller')
+  const failed = assert.rejects(
+    createMongoProductsService().list(controller.signal),
+    error => error === reason
+  )
+  controller.abort(reason)
+  await failed
+  assert.equal(find.mock.callCount(), 0)
+  assert.equal(log.mock.callCount(), 0)
+})
+
 test('disconnected product writes log operation and state without product or user data', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] })
   const log = t.mock.method(console, 'error', () => {})
   const products = createMongoProductsService()
   const actor = { userId: 'private-user', role: 'user' as const }
@@ -70,7 +91,9 @@ test('disconnected product writes log operation and state without product or use
     ],
     ['product.delete', () => products.remove('private-id', actor)],
   ] as const) {
-    await assert.rejects(run(), { status: 503 })
+    const failure = assert.rejects(run(), { status: 503 })
+    t.mock.timers.tick(5000)
+    await failure
     const call = log.mock.calls.at(-1)
     assert.ok(call, 'failure must emit a diagnostic')
     assert.equal(call.arguments[0], 'MongoDB operation failed')
@@ -78,6 +101,7 @@ test('disconnected product writes log operation and state without product or use
     assert.equal(metadata.operation, operation)
     assert.equal(metadata.connection, 'disconnected')
     assert.equal(metadata.category, 'connection-not-ready')
+    assert.equal(metadata.phase, 'readiness')
     assert.ok(Number.isFinite(metadata.durationMs) && metadata.durationMs >= 0)
     assert.ok(!JSON.stringify(call.arguments).includes('private-'))
   }

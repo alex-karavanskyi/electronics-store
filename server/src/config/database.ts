@@ -64,10 +64,12 @@ export function logDatabaseFailure(
   error: unknown,
   operation: DatabaseOperation,
   startedAt: number,
-  state: number = database.readyState
+  state: number = database.readyState,
+  phase?: 'readiness' | 'operation'
 ) {
   console.error('MongoDB operation failed', {
     operation,
+    ...(phase ? { phase } : {}),
     connection:
       ['disconnected', 'connected', 'connecting', 'disconnecting'][state] ??
       'unknown',

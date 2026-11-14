@@ -7,6 +7,7 @@ import {
   type DatabaseOperation,
 } from '../config/database.js'
 import { getProductModel } from '../models/product.js'
+import { waitForDatabase } from '../config/database-ready.js'
 import { HttpError } from '../middleware/errors.js'
 import { readMongoCatalog } from './mongodb-catalog.js'
 import { readMongoHome } from './mongodb-home.js'
@@ -42,17 +43,19 @@ export function createMongoProductsService({
     signal?: AbortSignal
   ): Promise<T> {
     const startedAt = performance.now()
+    let phase: 'readiness' | 'operation' = 'readiness'
     try {
+      await waitForDatabase(signal)
       signal?.throwIfAborted()
-      if (database.readyState !== 1)
-        throw new HttpError(503, 'Product service temporarily unavailable')
+      phase = 'operation'
       return await operation()
     } catch (error) {
+      if (signal?.aborted) throw signal.reason
       if (
         !signal?.aborted &&
         !(error instanceof HttpError && error.status < 500)
       )
-        logDatabaseFailure(error, name, startedAt)
+        logDatabaseFailure(error, name, startedAt, database.readyState, phase)
       throw databaseError(error)
     }
   }
