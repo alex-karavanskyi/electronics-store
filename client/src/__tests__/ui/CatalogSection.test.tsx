@@ -94,6 +94,13 @@ it.each([false, true])(
       store.dispatch(setListView())
     })
     expect(screen.getByRole('link', { name: 'Details' })).toBeVisible()
+    expect(
+      screen.queryByRole('navigation', { name: 'Product pagination' })
+    ).not.toBeInTheDocument()
+
+    act(() => {
+      store.dispatch(setGridView())
+    })
     expect(screen.getByRole('link', { name: '2' })).toHaveAttribute(
       'href',
       '/?page=2'

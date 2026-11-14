@@ -35,7 +35,7 @@ const ProductResults = ({
       ) : (
         <ListView products={products} isLoading={isLoading} />
       )}
-      <Pagination pageSize={pageSize} totalItems={total} />
+      {isGridView && <Pagination pageSize={pageSize} totalItems={total} />}
     </>
   )
 }

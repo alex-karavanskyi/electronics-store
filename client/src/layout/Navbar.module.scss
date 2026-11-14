@@ -50,8 +50,8 @@
   z-index: 3000;
   height: var(--navbar-height);
   padding: 0 1rem;
-  background: var(--navy);
-  border-bottom: 1px solid rgb(255, 255, 255, 0.1);
+  background: var(--navbar-background);
+  border-bottom: 1px solid var(--navbar-border);
   box-shadow: none;
   backdrop-filter: blur(16px);
   transition:
@@ -73,7 +73,7 @@
     flex-direction: column;
     align-items: flex-start;
     min-width: 0;
-    color: white;
+    color: var(--navbar-text);
   }
 
   &__products {
@@ -94,7 +94,7 @@
     display: flex;
     align-items: baseline;
     gap: 0.75rem;
-    color: white;
+    color: var(--navbar-text);
 
     span {
       font-family: var(--font-display);
@@ -106,8 +106,8 @@
     small {
       display: none;
       padding-left: 0.75rem;
-      border-left: 1px solid rgb(255, 255, 255, 0.25);
-      color: rgb(255, 255, 255, 0.55);
+      border-left: 1px solid var(--navbar-border);
+      color: var(--navbar-muted);
       font-family: var(--font-utility);
       font-size: 0.62rem;
       letter-spacing: 0.08em;
@@ -116,14 +116,14 @@
   }
 
   &__icons {
-    --theme-switcher-hover: rgb(255, 255, 255, 0.1);
+    --theme-switcher-hover: var(--navbar-hover);
 
     display: flex;
     align-items: center;
     flex-shrink: 0;
     gap: 0.2rem;
     margin-left: auto;
-    color: white;
+    color: var(--navbar-text);
 
     > button,
     > a {
