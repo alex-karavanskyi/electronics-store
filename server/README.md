@@ -249,3 +249,33 @@ isolated MongoDB/HTTP authorization checks and remaining production setup.
 For an application regression, restore a verified MongoDB deployment on Vercel, then check `/api/products`, `/api/products/catalog`, product details, images and chat. Confirm that the restored deployment has the intended environment and access settings.
 
 For damaged data, preserve the current database and logs before restoring from a suitable backup.
+
+## Database failure diagnostics
+
+In Vercel Runtime Logs, search for `MongoDB operation failed` and open the
+associated request. Vercel supplies its timestamp and request context.
+
+Each event contains only:
+
+- `operation`: a fixed label such as `database.connect`, `product.create`,
+  `product.update`, or `product.delete` (product reads are also covered).
+- `connection`: `disconnected`, `connected`, `connecting`, `disconnecting`, or
+  `unknown`, sampled when the operation fails.
+- `category`: a controlled classification such as `network`, `timeout`,
+  `server-selection`, `authentication`, `authorization`, `conflict`, `validation`,
+  `dns`, `configuration`, `connection-not-ready`, or `unknown`.
+- `durationMs`: elapsed time for the attempted database operation, not the entire
+  HTTP request.
+
+The event does not include raw errors, stacks, connection strings, hostnames,
+tokens, user IDs, product IDs, query filters, or product data. Unknown errors are
+classified as `unknown` rather than serialized. Expected application errors below
+500 and cancelled product reads do not produce database failure events.
+
+Connection state alone does not prove reachability: an operation can fail while
+the driver still reports `connected`. Categories describe the observed failure,
+not a confirmed infrastructure root cause. No retries, API response changes, or
+connection recovery changes are introduced by this instrumentation.
+
+These events become available on the hosted site only after deployment of this
+change. Existing log retention limits still apply.

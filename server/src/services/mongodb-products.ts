@@ -1,6 +1,11 @@
 import { toProduct } from '../mappers/mongodb-product.js'
 import { randomUUID } from 'node:crypto'
-import { database, databaseError } from '../config/database.js'
+import {
+  database,
+  databaseError,
+  logDatabaseFailure,
+  type DatabaseOperation,
+} from '../config/database.js'
 import { getProductModel } from '../models/product.js'
 import { HttpError } from '../middleware/errors.js'
 import { readMongoCatalog } from './mongodb-catalog.js'
@@ -32,22 +37,29 @@ export function createMongoProductsService({
   const ProductModel = getProductModel(database)
   const options = { timeoutMS: 15000, maxTimeMS: 15000 }
   async function request<T>(
+    name: DatabaseOperation,
     operation: () => Promise<T>,
     signal?: AbortSignal
   ): Promise<T> {
+    const startedAt = performance.now()
     try {
       signal?.throwIfAborted()
       if (database.readyState !== 1)
         throw new HttpError(503, 'Product service temporarily unavailable')
       return await operation()
     } catch (error) {
+      if (
+        !signal?.aborted &&
+        !(error instanceof HttpError && error.status < 500)
+      )
+        logDatabaseFailure(error, name, startedAt)
       throw databaseError(error)
     }
   }
   const writeFilter = (id: string, actor: ProductActor) =>
     actor.role === 'admin' ? { _id: id } : { _id: id, ownerId: actor.userId }
   async function deniedOrMissing(id: string): Promise<never> {
-    const exists = await request(() =>
+    const exists = await request('product.exists', () =>
       ProductModel.exists({ _id: id }).setOptions(options).exec()
     )
     if (exists)
@@ -56,16 +68,22 @@ export function createMongoProductsService({
   }
   return {
     home(signal) {
-      return request(() => readMongoHome(ProductModel, signal), signal)
+      return request(
+        'product.home',
+        () => readMongoHome(ProductModel, signal),
+        signal
+      )
     },
     catalog(params, signal) {
       return request(
+        'product.catalog',
         () => readMongoCatalog(ProductModel, params, signal),
         signal
       )
     },
     async listForAdmin(signal) {
       const records = await request(
+        'product.listForAdmin',
         () =>
           ProductModel.find({})
             .sort({ createdAt: -1, _id: 1 })
@@ -100,7 +118,7 @@ export function createMongoProductsService({
         createProductSchema,
         input
       )
-      const record = await request(async () => {
+      const record = await request('product.create', async () => {
         const last = await ProductModel.findOne({ catalogOrder: { $gte: 0 } })
           .sort({ catalogOrder: -1 })
           .select('catalogOrder')
@@ -144,7 +162,7 @@ export function createMongoProductsService({
         updateProductSchema,
         input
       )
-      const record = await request(() =>
+      const record = await request('product.update', () =>
         ProductModel.findOneAndUpdate(
           writeFilter(id, actor),
           {
@@ -168,7 +186,7 @@ export function createMongoProductsService({
     },
     async remove(id, actor) {
       parseProductInput(productWriteIdSchema, id)
-      const result = await request(() =>
+      const result = await request('product.delete', () =>
         ProductModel.deleteOne(writeFilter(id, actor))
           .setOptions(options)
           .exec()
@@ -177,6 +195,7 @@ export function createMongoProductsService({
     },
     async listOwned(userId, signal) {
       const records = await request(
+        'product.listOwned',
         () =>
           ProductModel.find({ ownerId: userId })
             .sort({ catalogOrder: 1, _id: 1 })
@@ -189,6 +208,7 @@ export function createMongoProductsService({
     },
     async list(signal) {
       const records = await request(
+        'product.list',
         () =>
           ProductModel.find({ catalogOrder: { $gte: 0 } })
             .sort({ catalogOrder: 1, _id: 1 })
@@ -203,6 +223,7 @@ export function createMongoProductsService({
       if (!id.trim() || id.length > 200)
         throw new HttpError(400, 'Invalid product ID')
       const record = await request(
+        'product.get',
         () =>
           ProductModel.findById(id)
             .setOptions({ signal, timeoutMS: 15000, maxTimeMS: 15000 })

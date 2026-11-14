@@ -65,9 +65,24 @@ test('database startup logs classify authentication errors and never log raw err
     assert.deepEqual(
       log.mock.calls.map(call => call.arguments),
       [
-        ['MongoDB connection failed', { category: 'authentication' }],
+        [
+          'MongoDB operation failed',
+          {
+            operation: 'database.connect',
+            category: 'authentication',
+            connection: 'disconnected',
+            durationMs: log.mock.calls[0].arguments[1].durationMs,
+          },
+        ],
         ['API initialization failed', { stage: 'runtime' }],
       ]
+    )
+    const durationMs = log.mock.calls[0].arguments[1].durationMs
+    assert.ok(Number.isFinite(durationMs) && durationMs >= 0)
+    assert.ok(
+      !JSON.stringify(log.mock.calls.map(call => call.arguments)).includes(
+        'private-'
+      )
     )
   } finally {
     server.closeAllConnections()
