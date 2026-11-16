@@ -2,6 +2,7 @@
 
 .styledButton {
   @include shared.icon-button(2.45rem);
+  flex-shrink: 0;
   padding: 0;
   border: 1px solid var(--line);
   background: var(--porcelain);
@@ -32,5 +33,12 @@
 
   &:active {
     transform: scale(0.94);
+  }
+}
+
+@media (pointer: coarse) {
+  .styledButton {
+    min-inline-size: 44px;
+    min-block-size: 44px;
   }
 }

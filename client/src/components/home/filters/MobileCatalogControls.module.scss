@@ -2,6 +2,7 @@
 
 .conteiner {
   display: flex;
+  align-items: center;
   justify-content: space-evenly;
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -10,12 +11,14 @@
 .horizontalLine {
   width: 50%;
   height: 1px;
-  background-color: black;
+  background-color: var(--control-border);
   border: none;
-  margin: 0.75rem 0;
+  margin: 0;
 }
 
 .mobileFiltersToggle {
+  min-block-size: 44px;
+  min-inline-size: 44px;
   background-color: #111;
   color: #fff;
   padding: 0.5rem 1rem;

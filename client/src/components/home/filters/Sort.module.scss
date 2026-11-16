@@ -2,6 +2,7 @@
 
 .container {
   @include shared.container;
+  container: catalog-sort / inline-size;
   padding-left: 1rem;
   padding-right: 1rem;
 }
@@ -9,6 +10,7 @@
 .container .sort {
   &__btn {
     display: none;
+    inline-size: fit-content;
   }
 
   &__container {
@@ -33,11 +35,17 @@
   }
 
   &__select-wrapper {
-    width: max-content;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    min-inline-size: 0;
     position: relative;
   }
 
   &__select {
+    max-inline-size: 100%;
+    min-inline-size: 0;
     appearance: none;
     background: var(--surface);
     border: 1px solid var(--line);
@@ -119,13 +127,23 @@
         transform: translateY(-1px);
       }
     }
+  }
+}
 
-    &__container {
-      display: grid;
-      grid-template-columns: auto auto 1fr auto;
-      align-items: center;
-      column-gap: 2rem;
-    }
+@container catalog-sort (min-width: 42rem) {
+  .container .sort__container {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 1rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .container .sort__btn button,
+  .container .sort__select {
+    min-inline-size: 44px;
+    min-block-size: 44px;
   }
 }
 

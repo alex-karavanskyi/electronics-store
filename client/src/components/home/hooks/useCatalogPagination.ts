@@ -18,9 +18,16 @@ export const useCatalogPagination = ({
   const { pathname, search, hash } = useLocation()
   const currentPage = clampPage(criteria.page, totalItems, pageSize)
   const totalPages = Math.ceil(totalItems / pageSize)
-  const pageNumbers = Array.from(
-    { length: totalPages },
-    (_, index) => index + 1
+  const pageNumbers = [
+    ...new Set([1, currentPage - 1, currentPage, currentPage + 1, totalPages]),
+  ]
+    .filter(page => page >= 1 && page <= totalPages)
+    .sort((a, b) => a - b)
+  const pageItems = pageNumbers.flatMap(
+    (page, index): Array<number | string> =>
+      index > 0 && page - pageNumbers[index - 1] > 1
+        ? [`gap-${page}`, page]
+        : [page]
   )
   const previousPage = Math.max(1, currentPage - 1)
   const nextPage = Math.max(1, Math.min(totalPages, currentPage + 1))
@@ -62,7 +69,7 @@ export const useCatalogPagination = ({
 
   return {
     currentPage,
-    pageNumbers,
+    pageItems,
     previousPage,
     nextPage,
     isPreviousDisabled,

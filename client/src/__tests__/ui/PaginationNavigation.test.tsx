@@ -4,6 +4,30 @@ import userEvent from '@testing-library/user-event'
 
 import Pagination from '@/components/home/list/Pagination'
 
+it.each([1, 2, 50, 99, 100])(
+  'keeps a large catalog navigable with a bounded number of links on page %s',
+  page => {
+    setup(`/?page=${page}#collection`, 600)
+    expect(screen.getAllByRole('link').length).toBeLessThanOrEqual(7)
+    for (const number of new Set([
+      1,
+      100,
+      page,
+      Math.max(1, page - 1),
+      Math.min(100, page + 1),
+    ])) {
+      expect(
+        screen.getByRole('link', { name: String(number) })
+      ).toBeInTheDocument()
+    }
+    expect(screen.getByRole('link', { name: String(page) })).toHaveAttribute(
+      'aria-current',
+      'page'
+    )
+    expect(screen.getAllByText('…').length).toBeGreaterThan(0)
+  }
+)
+
 function clickModifiedLink(link: HTMLElement, modifiers: MouseEventInit) {
   let wasPrevented: boolean | undefined
   // React handles the click at the root before it bubbles to document.

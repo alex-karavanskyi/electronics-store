@@ -13,6 +13,7 @@
   }
 
   &-product {
+    container: catalog-card / inline-size;
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -107,10 +108,16 @@
 
   &-footer {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch;
     gap: 1rem;
     padding: 1.1rem 1.15rem 1.25rem;
+
+    > * {
+      min-inline-size: 0;
+      overflow-wrap: anywhere;
+    }
   }
 
   &-favorite {
@@ -125,6 +132,21 @@
 
   &-price-cart {
     @include shared.cart-row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+}
+
+@container catalog-card (min-width: 24rem) {
+  .container .grid__view-footer {
+    flex-flow: row wrap;
+    align-items: center;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .container .grid__view-products-link {
+    opacity: 1;
   }
 }
 

@@ -13,7 +13,7 @@ type PaginationProps = {
 const Pagination = ({ pageSize, totalItems }: PaginationProps) => {
   const {
     currentPage,
-    pageNumbers,
+    pageItems,
     previousPage,
     nextPage,
     isPreviousDisabled,
@@ -33,25 +33,35 @@ const Pagination = ({ pageSize, totalItems }: PaginationProps) => {
           isDisabled={isPreviousDisabled}
           onClick={handlePreviousClick}
         />
-        {pageNumbers.map(number => (
-          <li
-            key={number}
-            className={
-              number === currentPage
-                ? [styles.pagination, styles['pagination--active']].join(' ')
-                : styles.pagination
-            }
-          >
-            <Link
-              onClick={handlePageClick}
-              aria-current={number === currentPage ? 'page' : undefined}
-              to={getPageLink(number)}
-              className={styles.pagination__link}
+        {pageItems.map(number =>
+          typeof number === 'string' ? (
+            <li
+              key={number}
+              className={styles.pagination__ellipsis}
+              aria-hidden="true"
             >
-              {number}
-            </Link>
-          </li>
-        ))}
+              …
+            </li>
+          ) : (
+            <li
+              key={number}
+              className={
+                number === currentPage
+                  ? [styles.pagination, styles['pagination--active']].join(' ')
+                  : styles.pagination
+              }
+            >
+              <Link
+                onClick={handlePageClick}
+                aria-current={number === currentPage ? 'page' : undefined}
+                to={getPageLink(number)}
+                className={styles.pagination__link}
+              >
+                {number}
+              </Link>
+            </li>
+          )
+        )}
         <PaginationArrow
           direction="next"
           to={getPageLink(nextPage)}
